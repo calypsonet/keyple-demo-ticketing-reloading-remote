@@ -20,15 +20,15 @@ using the Keyple SDK.
 ## Keyple Demos
 
 This demo is part of a set of three demos:
-* [Keyple Reload Demo](https://github.com/calypsonet/keyple-java-demo-remote)
-* [Keyple Validation Demo](https://github.com/calypsonet/keyple-android-demo-validation)
-* [Keyple Control Demo](https://github.com/calypsonet/keyple-android-demo-control)
+* [Keyple Reload Demo](https://github.com/calypsonet/keyple-demo-ticketing-reloading-remote)
+* [Keyple Validation Demo](https://github.com/calypsonet/keyple-demo-ticketing-validation-app)
+* [Keyple Control Demo](https://github.com/calypsonet/keyple-demo-ticketing-control-app)
 
 These demos are all based on a common library that defines elements such as constants and data structures implemented
 for the logic of the ticketing application: 
-[Keyple Demo Common Library](https://github.com/calypsonet/keyple-demo-common-lib).
+[Keyple Demo Common Library](https://github.com/calypsonet/keyple-demo-ticketing-common-lib).
 
-Please refer to the [README](https://github.com/calypsonet/keyple-demo-common-lib/blob/main/README.md)
+Please refer to the [README](https://github.com/calypsonet/keyple-demo-ticketing-common-lib/blob/main/README.md)
 file of this library to discover these data structures.
 
 ## Code organization

@@ -4,7 +4,7 @@ This is the repository for the Java Server of the Keyple Reload Demo application
 
 The server is accessible from the client application and can be monitored via a GUI.
 
-Read the main [README](https://github.com/calypsonet/keyple-java-demo-remote#readme) to understand the purpose of this
+Read the main [README](https://github.com/calypsonet/keyple-demo-ticketing-reloading-remote#readme) to understand the purpose of this
 demo.
 
 ## Running the server from the executable JAR file

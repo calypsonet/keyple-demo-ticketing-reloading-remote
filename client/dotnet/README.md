@@ -13,13 +13,13 @@ any application using the **Keyple Distributed JSON API**, whatever the operatin
 - C# (.NET 7.0) for Windows.
 - Command line interface.
 - PC/SC card reader interface.
-- Connected to the [Java Server Application](https://github.com/calypsonet/keyple-java-demo-remote/tree/main/server).
+- Connected to the [Java Server Application](https://github.com/calypsonet/keyple-demo-ticketing-reloading-remote/tree/main/server).
 
 ## Operations
 ### Prerequisites
 1. Build the C# client application using **Microsoft Visual Studio 2022**.
 2. Make sure a PC/SC reader is connected.
-3. Have a pre-personalized card (use the [Android Client Application](https://github.com/calypsonet/keyple-java-demo-remote/tree/main/client/android)) with at least one of these AIDs:
+3. Have a pre-personalized card (use the [Android Client Application](https://github.com/calypsonet/keyple-demo-ticketing-reloading-remote/tree/main/client/android)) with at least one of these AIDs:
    - `A000000291FF9101`: Keyple Generic
    - `315449432E49434131`: CD Light GTML
    - `315449432E49434133`: Calypso Light

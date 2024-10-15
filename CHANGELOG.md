@@ -29,7 +29,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [2024.04.23]
 ### Upgraded
-- keyple-demo-common-lib `2.0.0-SNAPSHOT` -> `2.0.1-SNAPSHOT`
+- keyple-demo-ticketing-common-lib `2.0.0-SNAPSHOT` -> `2.0.1-SNAPSHOT`
 - All Keyple components (compiled to java 8)
     - keypop-reader-java-api `2.0.0` -> `2.0.1`
     - keypop-calypso-card-java-api `2.0.0` -> `2.1.0`
@@ -68,7 +68,7 @@ New dependencies
 ### Added
 - Added a new C# application to demonstrate the use of the **Keyple Distributed JSON API** inside the `client/dotnet` folder.
 ### Upgraded
-- `keyple-demo-common-lib:2.0.0-SNAPSHOT`
+- `keyple-demo-ticketing-common-lib:2.0.0-SNAPSHOT`
 - `calypsonet-terminal-reader-java-api:1.3.0`
 - `calypsonet-terminal-calypso-java-api:1.8.0`
 - `keyple-service-java-lib:2.3.1`
@@ -101,7 +101,7 @@ New dependencies
 ### Changed
 - Major refactoring of the source code.
 ### Upgraded
-- `keyple-demo-common-lib:1.0.0-SNAPSHOT`
+- `keyple-demo-ticketing-common-lib:1.0.0-SNAPSHOT`
 - `calypsonet-terminal-reader-java-api:1.1.0`
 - `calypsonet-terminal-calypso-java-api:1.4.1`
 - `keyple-service-java-lib:2.1.1`
@@ -111,12 +111,12 @@ New dependencies
 - `keyple-plugin-android-omapi-java-lib:2.0.1`
 - `keyple-util-java-lib:2.3.0`
 
-[Unreleased]: https://github.com/calypsonet/keyple-java-demo-remote/compare/2024.10.01...HEAD
-[2024.10.01]: https://github.com/calypsonet/keyple-java-demo-remote/compare/2024.09.20...2024.10.01
-[2024.09.20]: https://github.com/calypsonet/keyple-java-demo-remote/compare/2024.04.23...2024.09.20
-[2024.04.23]: https://github.com/calypsonet/keyple-java-demo-remote/compare/2023.12.06...2024.04.23
-[2023.12.06]: https://github.com/calypsonet/keyple-java-demo-remote/compare/2023.05.31...2023.12.06
-[2023.05.31]: https://github.com/calypsonet/keyple-java-demo-remote/compare/2023.03.03...2023.05.31
-[2023.03.03]: https://github.com/calypsonet/keyple-java-demo-remote/compare/2023.02.24...2023.03.03
-[2023.02.24]: https://github.com/calypsonet/keyple-java-demo-remote/compare/2022.11.18...2023.02.24
-[2022.11.18]: https://github.com/calypsonet/keyple-java-demo-remote/compare/v2021.11...2022.11.18
+[Unreleased]: https://github.com/calypsonet/keyple-demo-ticketing-reloading-remote/compare/2024.10.01...HEAD
+[2024.10.01]: https://github.com/calypsonet/keyple-demo-ticketing-reloading-remote/compare/2024.09.20...2024.10.01
+[2024.09.20]: https://github.com/calypsonet/keyple-demo-ticketing-reloading-remote/compare/2024.04.23...2024.09.20
+[2024.04.23]: https://github.com/calypsonet/keyple-demo-ticketing-reloading-remote/compare/2023.12.06...2024.04.23
+[2023.12.06]: https://github.com/calypsonet/keyple-demo-ticketing-reloading-remote/compare/2023.05.31...2023.12.06
+[2023.05.31]: https://github.com/calypsonet/keyple-demo-ticketing-reloading-remote/compare/2023.03.03...2023.05.31
+[2023.03.03]: https://github.com/calypsonet/keyple-demo-ticketing-reloading-remote/compare/2023.02.24...2023.03.03
+[2023.02.24]: https://github.com/calypsonet/keyple-demo-ticketing-reloading-remote/compare/2022.11.18...2023.02.24
+[2022.11.18]: https://github.com/calypsonet/keyple-demo-ticketing-reloading-remote/compare/v2021.11...2022.11.18
