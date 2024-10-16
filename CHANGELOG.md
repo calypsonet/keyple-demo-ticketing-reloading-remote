@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 ### Changed
 - Rename repository from `keyple-demo-remote-server` to `keyple-demo-ticketing-reloading-remote`
-- Rename Android artifact from `keyple-demo-remote-server` to `keyple-demo-ticketing-reloading-remote`
+- Rename Android artifact from `keyple-demo-remote-client-android` to `keyple-demo-ticketing-reloading-remote-client-app`
 - Change `minSdk` from `24` -> `26`
 ### Upgraded
 - keyple-demo-common-lib `2.0.1-SNAPSHOT` -> keyple-demo-ticketing-common-lib `2.0.2-SNAPSHOT`
@@ -77,7 +77,7 @@ New dependencies
 ### Added
 - Added a new C# application to demonstrate the use of the **Keyple Distributed JSON API** inside the `client/dotnet` folder.
 ### Upgraded
-- `keyple-demo-ticketing-common-lib:2.0.0-SNAPSHOT`
+- `keyple-demo-common-lib:2.0.0-SNAPSHOT`
 - `calypsonet-terminal-reader-java-api:1.3.0`
 - `calypsonet-terminal-calypso-java-api:1.8.0`
 - `keyple-service-java-lib:2.3.1`
