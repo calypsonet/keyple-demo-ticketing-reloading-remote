@@ -5,8 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 ### Changed
-- Rename repository from `keyple-demo-remote-server` to `keyple-demo-ticketing-reloading-remote`
-- Rename Android artifact from `keyple-demo-remote-client-android` to `keyple-demo-ticketing-reloading-remote-client-app`
+- Rename repository from `keyple-java-demo-remote` to `keyple-demo-ticketing-reloading-remote`
+- Rename Android artifact from `keyple-demo-remote-client-android` to `keyple-demo-ticketing-reloading-client-android-app`
 - Change `minSdk` from `24` -> `26`
 ### Upgraded
 - keyple-demo-common-lib `2.0.1-SNAPSHOT` -> keyple-demo-ticketing-common-lib `2.0.2-SNAPSHOT`
