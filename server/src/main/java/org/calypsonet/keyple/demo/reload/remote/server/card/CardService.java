@@ -439,9 +439,9 @@ public class CardService {
                     case SEASON_PASS:
                       title = "Season pass";
                       description =
-                          "From "
+                          "From\n"
                               + contract.getContractSaleDate().getDate().format(dateTimeFormatter)
-                              + " to "
+                              + "\nto\n"
                               + contract
                                   .getContractValidityEndDate()
                                   .getDate()
@@ -456,9 +456,9 @@ public class CardService {
                     case EXPIRED:
                       title = "Season pass - Expired";
                       description =
-                          "From "
+                          "From\n"
                               + contract.getContractSaleDate().getDate().format(dateTimeFormatter)
-                              + " to "
+                              + "\nto\n"
                               + contract
                                   .getContractValidityEndDate()
                                   .getDate()
@@ -544,18 +544,14 @@ public class CardService {
       return new SelectAppAndLoadContractOutputDto(2, "Not the same card");
     }
 
-    // Analyze contracts
-    AnalyzeContractsInputDto inputData2 = new AnalyzeContractsInputDto(pluginType);
-    analyzeContracts(cardReader, calypsoCard, inputData2);
-
     // Write contract
-    WriteContractInputDto inputData3 =
+    WriteContractInputDto inputData2 =
         new WriteContractInputDto(
             inputData.getContractTariff(), inputData.getTicketToLoad(), pluginType);
-    WriteContractOutputDto outputData3 = writeContract(cardReader, calypsoCard, inputData3);
+    WriteContractOutputDto outputData2 = writeContract(cardReader, calypsoCard, inputData2);
 
     // Build result
-    int statusCode = outputData3.getStatusCode();
+    int statusCode = outputData2.getStatusCode();
 
     String message;
     switch (statusCode) {

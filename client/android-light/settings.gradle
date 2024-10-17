@@ -1,0 +1,3 @@
+rootProject.name = "keyple-demo-ticketing-reloading-client-android-light-app"
+
+include ':app'
