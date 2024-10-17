@@ -87,14 +87,16 @@ public class CardRepository {
   }
 
   CalypsoCard selectCard(CardReader cardReader) {
+
     CardSelectionManager cardSelectionManager = createCardSelectionManager();
+
     // Actual card communication: run the selection scenario.
     CardSelectionResult selectionResult =
         cardSelectionManager.processCardSelectionScenario(cardReader);
 
     // Check the selection result.
     if (selectionResult.getActiveSmartCard() == null) {
-      throw new IllegalStateException("The selection of the application failed.");
+      throw new IllegalStateException("Selection error: AID not found");
     }
 
     // Get the SmartCard resulting of the selection.

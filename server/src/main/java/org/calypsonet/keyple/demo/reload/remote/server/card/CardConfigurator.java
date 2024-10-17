@@ -15,10 +15,7 @@ import java.util.regex.Pattern;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import org.calypsonet.keyple.demo.common.constant.RemoteServiceId;
-import org.calypsonet.keyple.demo.common.dto.AnalyzeContractsInputDto;
-import org.calypsonet.keyple.demo.common.dto.CardIssuanceInputDto;
-import org.calypsonet.keyple.demo.common.dto.SelectAppAndIncreaseContractCounterInputDto;
-import org.calypsonet.keyple.demo.common.dto.WriteContractInputDto;
+import org.calypsonet.keyple.demo.common.dto.*;
 import org.eclipse.keyple.card.calypso.crypto.legacysam.LegacySamExtensionService;
 import org.eclipse.keyple.card.calypso.crypto.legacysam.LegacySamUtil;
 import org.eclipse.keyple.core.service.*;
@@ -248,6 +245,33 @@ public class CardConfigurator {
         outputData =
             cardService.initCard(
                 reader, (CalypsoCard) readerExtension.getInitialCardContent(), inputData);
+
+      } else if (RemoteServiceId.SELECT_APP_AND_ANALYZE_CONTRACTS.name().equals(serviceId)) {
+
+        // Get input data
+        SelectAppAndAnalyzeContractsInputDto inputData =
+            readerExtension.getInputData(SelectAppAndAnalyzeContractsInputDto.class);
+
+        // Execute service
+        outputData = cardService.selectAppAndAnalyzeContracts(reader, inputData);
+
+      } else if (RemoteServiceId.SELECT_APP_AND_LOAD_CONTRACT.name().equals(serviceId)) {
+
+        // Get input data
+        SelectAppAndLoadContractInputDto inputData =
+            readerExtension.getInputData(SelectAppAndLoadContractInputDto.class);
+
+        // Execute service
+        outputData = cardService.selectAppAndLoadContract(reader, inputData);
+
+      } else if (RemoteServiceId.SELECT_APP_AND_PERSONALIZE_CARD.name().equals(serviceId)) {
+
+        // Get input data
+        SelectAppAndPersonalizeCardInputDto inputData =
+            readerExtension.getInputData(SelectAppAndPersonalizeCardInputDto.class);
+
+        // Execute service
+        outputData = cardService.selectAppAndPersonalizeCard(reader, inputData);
 
       } else {
         throw new IllegalArgumentException("Service ID not recognized");

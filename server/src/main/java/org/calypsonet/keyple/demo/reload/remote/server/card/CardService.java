@@ -12,8 +12,10 @@
 package org.calypsonet.keyple.demo.reload.remote.server.card;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.Collections;
+import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import org.calypsonet.keyple.demo.common.constant.CardConstant;
@@ -70,6 +72,9 @@ public class CardService {
   private static final String CARD_NOT_PERSONALIZED = "Card not personalized.";
   private static final String ENVIRONMENT_EXPIRED = "Environment expired.";
   private static final String RUNTIME_EXCEPTION = "Runtime exception: ";
+
+  private final DateTimeFormatter dateTimeFormatter =
+      DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.ENGLISH);
 
   @Inject CardRepository cardRepository;
   @Inject ActivityService activityService;
@@ -159,15 +164,15 @@ public class CardService {
       }
     } catch (CardNotPersonalizedException e) {
       statusCode = 3;
-      logger.error(AN_ERROR_OCCURRED_WHILE_INCREASING_THE_CONTRACT_COUNTER, e.getMessage());
+      logger.error(AN_ERROR_OCCURRED_WHILE_ANALYZING_THE_CONTRACTS, e.getMessage());
       message = CARD_NOT_PERSONALIZED;
     } catch (ExpiredEnvironmentException e) {
       statusCode = 4;
-      logger.error(AN_ERROR_OCCURRED_WHILE_INCREASING_THE_CONTRACT_COUNTER, e.getMessage());
+      logger.error(AN_ERROR_OCCURRED_WHILE_ANALYZING_THE_CONTRACTS, e.getMessage());
       message = ENVIRONMENT_EXPIRED;
     } catch (RuntimeException e) {
       statusCode = 1;
-      logger.error(AN_ERROR_OCCURRED_WHILE_INCREASING_THE_CONTRACT_COUNTER, e.getMessage(), e);
+      logger.error(AN_ERROR_OCCURRED_WHILE_ANALYZING_THE_CONTRACTS, e.getMessage(), e);
       message = RUNTIME_EXCEPTION + e.getMessage();
     } finally {
       activityService.push(
@@ -384,6 +389,239 @@ public class CardService {
     } finally {
       CardResourceServiceProvider.getService().releaseCardResource(samResource);
     }
+  }
+
+  SelectAppAndAnalyzeContractsOutputDto selectAppAndAnalyzeContracts(
+      CardReader cardReader, SelectAppAndAnalyzeContractsInputDto inputData) {
+
+    String pluginType = inputData.getPluginType();
+
+    // Select application
+    CalypsoCard calypsoCard;
+    try {
+      calypsoCard = cardRepository.selectCard(cardReader);
+    } catch (RuntimeException e) {
+      logger.error(AN_ERROR_OCCURRED_WHILE_ANALYZING_THE_CONTRACTS, e.getMessage(), e);
+      activityService.push(
+          new Activity()
+              .setPlugin(pluginType)
+              .setStatus(FAIL)
+              .setType(SECURED_READ)
+              .setCardSerialNumber(""));
+      return new SelectAppAndAnalyzeContractsOutputDto(
+          "", Collections.emptyList(), 1, e.getMessage());
+    }
+
+    // Analyze contracts
+    AnalyzeContractsInputDto inputData2 = new AnalyzeContractsInputDto(pluginType);
+    AnalyzeContractsOutputDto outputData2 = analyzeContracts(cardReader, calypsoCard, inputData2);
+
+    // Build result
+    String appSerialNumber = HexUtil.toHex(calypsoCard.getApplicationSerialNumber());
+
+    List<SelectAppAndAnalyzeContractsOutputDto.ContractInfo> validContracts =
+        outputData2.getValidContracts().stream()
+            .map(
+                contract -> {
+                  String title;
+                  String description;
+                  boolean isValid;
+                  switch (contract.getContractTariff()) {
+                    case MULTI_TRIP:
+                      title = "Multi trip";
+                      description =
+                          contract.getCounterValue() != null
+                              ? contract.getCounterValue() + " trip(s) left"
+                              : "No counter";
+                      isValid =
+                          contract.getCounterValue() != null && contract.getCounterValue() >= 1;
+                      break;
+                    case SEASON_PASS:
+                      title = "Season pass";
+                      description =
+                          "From "
+                              + contract.getContractSaleDate().getDate().format(dateTimeFormatter)
+                              + " to "
+                              + contract
+                                  .getContractValidityEndDate()
+                                  .getDate()
+                                  .format(dateTimeFormatter);
+                      LocalDate now = LocalDate.now();
+                      isValid =
+                          (contract.getContractSaleDate().getDate().isBefore(now)
+                                  || contract.getContractSaleDate().getDate().isEqual(now))
+                              && (contract.getContractValidityEndDate().getDate().isAfter(now)
+                                  || contract.getContractValidityEndDate().getDate().isEqual(now));
+                      break;
+                    case EXPIRED:
+                      title = "Season pass - Expired";
+                      description =
+                          "From "
+                              + contract.getContractSaleDate().getDate().format(dateTimeFormatter)
+                              + " to "
+                              + contract
+                                  .getContractValidityEndDate()
+                                  .getDate()
+                                  .format(dateTimeFormatter);
+                      isValid = false;
+                      break;
+                    case FORBIDDEN:
+                      title = "FORBIDDEN";
+                      description = "";
+                      isValid = false;
+                      break;
+                    case STORED_VALUE:
+                      title = "STORED_VALUE";
+                      description = "";
+                      isValid = false;
+                      break;
+                    default:
+                      title = "UNKNOWN";
+                      description = "";
+                      isValid = false;
+                      break;
+                  }
+                  return new SelectAppAndAnalyzeContractsOutputDto.ContractInfo(
+                      title, description, isValid);
+                })
+            .collect(Collectors.toList());
+
+    int statusCode = outputData2.getStatusCode();
+
+    String message;
+    switch (statusCode) {
+      case 0:
+        message = "Success";
+        break;
+      case 1:
+        message = "Server error";
+        break;
+      case 2:
+        message =
+            "Invalid card\nFile structure "
+                + HexUtil.toHex(calypsoCard.getApplicationSubtype())
+                + "h not supported";
+        break;
+      case 3:
+        message = "Environment error: wrong version number";
+        break;
+      case 4:
+        message = "Environment error: end date expired";
+        break;
+      default:
+        message = "";
+    }
+    return new SelectAppAndAnalyzeContractsOutputDto(
+        appSerialNumber, validContracts, statusCode, message);
+  }
+
+  SelectAppAndLoadContractOutputDto selectAppAndLoadContract(
+      CardReader cardReader, SelectAppAndLoadContractInputDto inputData) {
+
+    String pluginType = inputData.getPluginType();
+
+    // Select application
+    CalypsoCard calypsoCard;
+    try {
+      calypsoCard = cardRepository.selectCard(cardReader);
+    } catch (RuntimeException e) {
+      logger.error(AN_ERROR_OCCURRED_WHILE_WRITING_THE_CONTRACT, e.getMessage(), e);
+      activityService.push(
+          new Activity()
+              .setPlugin(pluginType)
+              .setStatus(FAIL)
+              .setType(SECURED_READ)
+              .setCardSerialNumber(""));
+      return new SelectAppAndLoadContractOutputDto(1, e.getMessage());
+    }
+
+    String selectedApplicationSerialNumber =
+        HexUtil.toHex(calypsoCard.getApplicationSerialNumber());
+    String expectedApplicationSerialNumber = inputData.getApplicationSerialNumber();
+    if (!selectedApplicationSerialNumber.equals(expectedApplicationSerialNumber)) {
+      // Ticket would have been bought for the Card read at step one.
+      // To avoid swapping we check thant loading is done on the same card
+      return new SelectAppAndLoadContractOutputDto(2, "Not the same card");
+    }
+
+    // Analyze contracts
+    AnalyzeContractsInputDto inputData2 = new AnalyzeContractsInputDto(pluginType);
+    analyzeContracts(cardReader, calypsoCard, inputData2);
+
+    // Write contract
+    WriteContractInputDto inputData3 =
+        new WriteContractInputDto(
+            inputData.getContractTariff(), inputData.getTicketToLoad(), pluginType);
+    WriteContractOutputDto outputData3 = writeContract(cardReader, calypsoCard, inputData3);
+
+    // Build result
+    int statusCode = outputData3.getStatusCode();
+
+    String message;
+    switch (statusCode) {
+      case 0:
+        message = "Success";
+        break;
+      case 1:
+        message = "Server error";
+        break;
+      case 2:
+        message =
+            "Invalid card\nFile structure "
+                + HexUtil.toHex(calypsoCard.getApplicationSubtype())
+                + "h not supported";
+        break;
+      default:
+        message = "";
+    }
+    return new SelectAppAndLoadContractOutputDto(statusCode, message);
+  }
+
+  SelectAppAndPersonalizeCardOutputDto selectAppAndPersonalizeCard(
+      CardReader cardReader, SelectAppAndPersonalizeCardInputDto inputData) {
+
+    String pluginType = inputData.getPluginType();
+
+    // Select application
+    CalypsoCard calypsoCard;
+    try {
+      calypsoCard = cardRepository.selectCard(cardReader);
+    } catch (RuntimeException e) {
+      logger.error(AN_ERROR_OCCURRED_WHILE_INITIALIZING_THE_CARD, e.getMessage(), e);
+      activityService.push(
+          new Activity()
+              .setPlugin(pluginType)
+              .setStatus(FAIL)
+              .setType(SECURED_READ)
+              .setCardSerialNumber(""));
+      return new SelectAppAndPersonalizeCardOutputDto(1, e.getMessage());
+    }
+
+    // Init card
+    CardIssuanceInputDto inputData2 = new CardIssuanceInputDto(pluginType);
+    CardIssuanceOutputDto outputData2 = initCard(cardReader, calypsoCard, inputData2);
+
+    // Build result
+    int statusCode = outputData2.getStatusCode();
+
+    String message;
+    switch (statusCode) {
+      case 0:
+        message = "Success";
+        break;
+      case 1:
+        message = "Server error";
+        break;
+      case 2:
+        message =
+            "Invalid card\nFile structure "
+                + HexUtil.toHex(calypsoCard.getApplicationSubtype())
+                + "h not supported";
+        break;
+      default:
+        message = "";
+    }
+    return new SelectAppAndPersonalizeCardOutputDto(statusCode, message);
   }
 
   private List<ContractStructure> findValidContracts(Card card) {
