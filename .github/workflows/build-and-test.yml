@@ -45,14 +45,14 @@ jobs:
           dotnet test --no-build --verbosity normal
       - name: Build and Test client Android
         working-directory: ./client/android/
-        run: ./gradlew build test --info --stacktrace
+        run: ./gradlew clean build test --info --stacktrace
       - name: Build and Test client Android Light
         working-directory: ./client/android-light/
-        run: ./gradlew build test --info --stacktrace
+        run: ./gradlew clean build test --info --stacktrace
       - name: Build and Test server
         working-directory: ./server/
         run: |
           cd ./dashboard-app
           npm install
           cd ..
-          ./gradlew build test --info --stacktrace
+          ./gradlew clean build test --info --stacktrace
