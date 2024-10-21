@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
+### Added
+- Added a new Android client application to demonstrate the use of the **Keyple Distributed JSON API** and without the
+  need of the `keyple-card-calypso-java-lib` on terminal side. The corresponding code is located in the folder named
+  `android-light`.
+- Added new remote services in the server app to enhance keyple-less clients capabilities.
 ### Changed
 - Rename repository from `keyple-java-demo-remote` to `keyple-demo-ticketing-reloading-remote`
 - Rename Android artifact from `keyple-demo-remote-client-android` to `keyple-demo-ticketing-reloading-client-android-app`
