@@ -15,32 +15,35 @@ Following the contract loading the card can pay presented to a validator running
 [Keyple Demo Validation](https://github.com/calypsonet/keyple-demo-ticketing-validation-app) application and then checked with
 the [Keyple Demo Control](https://github.com/calypsonet/keyple-demo-ticketing-control-app) application.
 
-Read the main [README](https://github.com/calypsonet/keyple-demo-ticketing-reloading-remote#readme) to understand the purpose of this
-application.
+Read the main [README](https://github.com/calypsonet/keyple-demo-ticketing-reloading-remote#readme) to understand the purpose of this application.
 
 ## Screens
 
 - Main screen (`MainActivity`): Setup Screen.
 - Home (`HomeActivity`): Display a menu allowing to choose the Calypso card type to read and load.
-    - 'Contactless support': works with the native Android NFC reader and is available for any android smartphone.
-    - 'SIM Card': works with the native Android OMAPI reader and is available for any android smartphone. (Work in progress)
-    - 'Embedded Secure Element': works with the Wizway plugin to access to eSE. (Work in progress)
+  - 'Contactless support': works with the native Android NFC reader and is available for any android smartphone.
+  - 'SIM Card': works with the native Android OMAPI reader and is available for any android smartphone. (Work in
+    progress)
+  - 'Embedded Secure Element': works with the Wizway plugin to access to eSE. (Work in progress)
 - Settings (`SettingsMenuActivity`):
-    - Server (ServerSettingsActivity): Settings for server connexion.
-    - Configuration (ConfigurationSettingsActivity): Activate/Deactivate each plugin availability in the android smartphone.
-    - Personalization (PersonalizationActivity): Reset a card (clean contracts).
-- Card Reader (`CardReaderActivity`): Launches the flavour associated Keyple plugin. It will try to read Card using selected card reader.
-    - Initialize Keyple plugin regarding selected Calypso card type.
-    - Connect to remote server.
-    - With remote server connected to a Calypso SAM, proceed to a secured reading of card content.
+  - Server (ServerSettingsActivity): Settings for server connexion.
+  - Configuration (ConfigurationSettingsActivity): Activate/Deactivate each plugin availability in the android
+    smartphone.
+  - Personalization (PersonalizationActivity): Reset a card (clean contracts).
+- Card Reader (`CardReaderActivity`): Launches the flavour associated Keyple plugin. It will try to read Card using
+  selected card reader.
+  - Initialize Keyple plugin regarding selected Calypso card type.
+  - Connect to remote server.
+  - With remote server connected to a Calypso SAM, proceed to a secured reading of card content.
 - Card Summary (`CardSummaryActivity`): displays the card content.
-    - Card content can be season pass and/or multi-trip ticket.
-- Select Tickets (`SelectTicketsActivity`): The remote server will returns a list of available products (Season Pass and Multi-trip ticket) to buy for this card. This list presented in this view.
+  - Card content can be season pass and/or multi-trip ticket.
+- Select Tickets (`SelectTicketsActivity`): The remote server will return a list of available products (Season Pass and
+  Multi-trip ticket) to buy for this card. This list presented in this view.
 - Checkout (`CheckoutActivity`): Simulates a payment done with a credit card.
 - Payment Validated (`PayementValidatedActivity`): Simulates the payment validation.
 - Charge (`ChargeActivity`): Presents the process of loading the product selected.
-    - Block loading if card has been swapped.
-    - Initialize Keyple plugin regarding selected Calypso card type.
-    - Connect to remote server.
-    - With remote server connected to a SAM, proceed to a card writing.
+  - Block loading if card has been swapped.
+  - Initialize Keyple plugin regarding selected Calypso card type.
+  - Connect to remote server.
+  - With remote server connected to a SAM, proceed to a card writing.
 - Charge Result (`ChargeResultActivity`): Displays if loading was successful or failed.
