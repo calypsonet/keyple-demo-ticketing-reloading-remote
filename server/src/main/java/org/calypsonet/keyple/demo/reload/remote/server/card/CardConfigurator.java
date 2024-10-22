@@ -9,6 +9,7 @@
  ****************************************************************************** */
 package org.calypsonet.keyple.demo.reload.remote.server.card;
 
+import java.util.Properties;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import org.calypsonet.keyple.demo.common.constant.RemoteServiceId;
@@ -241,8 +242,11 @@ public class CardConfigurator {
         SelectAppAndAnalyzeContractsInputDto inputData =
             readerExtension.getInputData(SelectAppAndAnalyzeContractsInputDto.class);
 
+        // Get the eventually processed selection scenario
+        Properties properties = (Properties) readerExtension.getInitialCardContent();
+
         // Execute service
-        outputData = cardService.selectAppAndAnalyzeContracts(reader, inputData);
+        outputData = cardService.selectAppAndAnalyzeContracts(reader, inputData, properties);
 
       } else if (RemoteServiceId.SELECT_APP_AND_LOAD_CONTRACT.name().equals(serviceId)) {
 
@@ -250,8 +254,11 @@ public class CardConfigurator {
         SelectAppAndLoadContractInputDto inputData =
             readerExtension.getInputData(SelectAppAndLoadContractInputDto.class);
 
+        // Get the eventually processed selection scenario
+        Properties properties = (Properties) readerExtension.getInitialCardContent();
+
         // Execute service
-        outputData = cardService.selectAppAndLoadContract(reader, inputData);
+        outputData = cardService.selectAppAndLoadContract(reader, inputData, properties);
 
       } else if (RemoteServiceId.SELECT_APP_AND_PERSONALIZE_CARD.name().equals(serviceId)) {
 
@@ -259,8 +266,11 @@ public class CardConfigurator {
         SelectAppAndPersonalizeCardInputDto inputData =
             readerExtension.getInputData(SelectAppAndPersonalizeCardInputDto.class);
 
+        // Get the eventually processed selection scenario
+        Properties properties = (Properties) readerExtension.getInitialCardContent();
+
         // Execute service
-        outputData = cardService.selectAppAndPersonalizeCard(reader, inputData);
+        outputData = cardService.selectAppAndPersonalizeCard(reader, inputData, properties);
 
       } else {
         throw new IllegalArgumentException("Service ID not recognized");

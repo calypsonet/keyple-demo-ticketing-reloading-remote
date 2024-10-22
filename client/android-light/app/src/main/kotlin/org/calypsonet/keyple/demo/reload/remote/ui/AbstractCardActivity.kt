@@ -132,6 +132,19 @@ abstract class AbstractCardActivity :
     }
   }
 
+  fun launchCardCommunicationErrorResponse() {
+    runOnUiThread {
+      changeDisplay(
+        CardReaderResponse(
+          Status.ERROR, "", 0, arrayListOf(), arrayListOf(), "", "Card communication error"),
+        finishActivity =
+          device !=
+              DeviceEnum.CONTACTLESS_CARD // /Only with NFC we can come back to 'wait for device
+        // screen'
+      )
+    }
+  }
+
   fun launchServerErrorResponse() {
     runOnUiThread {
       changeDisplay(

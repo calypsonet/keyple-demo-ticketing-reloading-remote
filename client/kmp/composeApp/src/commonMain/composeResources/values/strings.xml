@@ -1,0 +1,14 @@
+<resources>
+    <string name="contract_multi_title">Multi trip</string>
+    <string name="contract_multi_subtitle">%1$d trips left</string>
+    <string name="contract_pass_title">Season pass</string>
+    <string name="contract_pass_expired_title">Season pass - Expired</string>
+    <string name="contract_pass_subtitle">From %1$s to %2$s</string>
+    <plurals name="basket_title_multi_title">
+        <item quantity="one">%1$d trip</item>
+        <item quantity="other">%1$d trips</item>
+    </plurals>
+    <string name="basket_title_season_title">Season pass</string>
+    <string name="success_title_loaded">Title loaded</string>
+    <string name="card_empty">Card is empty</string>
+</resources>
