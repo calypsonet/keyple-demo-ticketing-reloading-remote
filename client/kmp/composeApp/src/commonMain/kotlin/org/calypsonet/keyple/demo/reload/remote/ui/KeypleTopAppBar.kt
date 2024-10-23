@@ -1,3 +1,14 @@
+/* **************************************************************************************
+ * Copyright (c) 2024 Calypso Networks Association https://calypsonet.org/
+ *
+ * See the NOTICE file(s) distributed with this work for additional information
+ * regarding copyright ownership.
+ *
+ * This program and the accompanying materials are made available under the terms of the
+ * Eclipse Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ ************************************************************************************** */
 package org.calypsonet.keyple.demo.reload.remote.ui
 
 import androidx.compose.foundation.Image
@@ -37,40 +48,45 @@ fun KeypleTopAppBar(
     showBackArrow: Boolean = true,
     onBack: () -> Unit = { navController.popBackStack() },
 ) {
-    val serverStateColor = if (appState.serverOnline) {
+  val serverStateColor =
+      if (appState.serverOnline) {
         Color.Green
-    } else {
+      } else {
         Color.Red
-    }
+      }
 
-    CenterAlignedTopAppBar(title = {
+  CenterAlignedTopAppBar(
+      title = {
         Row(
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Box(
-                modifier = Modifier.padding(12.dp).size(10.dp).clip(CircleShape)
-                    .background(serverStateColor)
-            )
+          Box(
+              modifier =
+                  Modifier.padding(12.dp)
+                      .size(10.dp)
+                      .clip(CircleShape)
+                      .background(serverStateColor))
 
-            Image(
-                imageVector = vectorResource(Res.drawable.ic_logo_keyple),
-                contentDescription = "Keyple logo",
-                modifier = Modifier.size(100.dp),
-            )
+          Image(
+              imageVector = vectorResource(Res.drawable.ic_logo_keyple),
+              contentDescription = "Keyple logo",
+              modifier = Modifier.size(100.dp),
+          )
         }
-    }, navigationIcon = {
+      },
+      navigationIcon = {
         if (showBackArrow) {
-            IconButton(onClick = { onBack() }) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
-                )
-            }
+          IconButton(onClick = { onBack() }) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = "Back",
+            )
+          }
         }
-    },
-        actions = actions,
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color.Transparent,
-        )
-    )
+      },
+      actions = actions,
+      colors =
+          TopAppBarDefaults.topAppBarColors(
+              containerColor = Color.Transparent,
+          ))
 }

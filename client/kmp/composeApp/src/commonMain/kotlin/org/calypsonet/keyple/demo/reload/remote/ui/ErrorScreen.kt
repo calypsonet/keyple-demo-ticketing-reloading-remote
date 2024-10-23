@@ -1,3 +1,14 @@
+/* **************************************************************************************
+ * Copyright (c) 2024 Calypso Networks Association https://calypsonet.org/
+ *
+ * See the NOTICE file(s) distributed with this work for additional information
+ * regarding copyright ownership.
+ *
+ * This program and the accompanying materials are made available under the terms of the
+ * Eclipse Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ ************************************************************************************** */
 package org.calypsonet.keyple.demo.reload.remote.ui
 
 import androidx.compose.foundation.Image
@@ -26,9 +37,9 @@ import org.calypsonet.keyple.demo.reload.remote.AppState
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 
 internal enum class Error {
-    FATAL,
-    WARNING,
-    INFO
+  FATAL,
+  WARNING,
+  INFO
 }
 
 internal data class ErrorDetails(
@@ -40,87 +51,75 @@ internal data class ErrorDetails(
 @Composable
 fun ErrorScreen(navController: NavController, modifier: Modifier = Modifier, appState: AppState) {
 
-    val error = Error.WARNING
+  val error = Error.WARNING
 
-    Scaffold(
-        topBar = {
-            KeypleTopAppBar(navController = navController, appState = appState)
-        },
-        modifier = modifier,
-    ) { innerPadding ->
-        Column(
-            Modifier
-                .padding(innerPadding)
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            when (error) {
-                Error.FATAL -> DisplayError(
+  Scaffold(
+      topBar = { KeypleTopAppBar(navController = navController, appState = appState) },
+      modifier = modifier,
+  ) { innerPadding ->
+    Column(
+        Modifier.padding(innerPadding).fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center) {
+          when (error) {
+            Error.FATAL ->
+                DisplayError(
                     ErrorDetails(
                         "anim_error.json",
                         "Fatal Error",
-                        "An error occurred, please try again later"
-                    )
-                )
-
-                Error.WARNING -> DisplayError(
+                        "An error occurred, please try again later"))
+            Error.WARNING ->
+                DisplayError(
                     ErrorDetails(
                         "anim_warning.json",
                         "Not valid on this network",
-                        "An error occurred, please try again later"
-                    )
-                )
-
-                Error.INFO -> DisplayError(
+                        "An error occurred, please try again later"))
+            Error.INFO ->
+                DisplayError(
                     ErrorDetails(
                         "anim_error_white.json",
                         "Fatal Error",
-                        "An error occurred, please try again later"
-                    )
-                )
-            }
+                        "An error occurred, please try again later"))
+          }
         }
-    }
+  }
 }
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-internal fun DisplayError(
-    errorDetails: ErrorDetails,
-    modifier: Modifier = Modifier
-) {
-    val composition by rememberLottieComposition {
-        LottieCompositionSpec.JsonString(
-            Res.readBytes("files/${errorDetails.animationFileName}").decodeToString()
-        )
-    }
-    val progress by animateLottieCompositionAsState(
-        composition,
-    )
+internal fun DisplayError(errorDetails: ErrorDetails, modifier: Modifier = Modifier) {
+  val composition by rememberLottieComposition {
+    LottieCompositionSpec.JsonString(
+        Res.readBytes("files/${errorDetails.animationFileName}").decodeToString())
+  }
+  val progress by
+      animateLottieCompositionAsState(
+          composition,
+      )
 
-    Image(
-        painter = rememberLottiePainter(
-            composition = composition,
-            progress = { progress },
-        ),
-        modifier = Modifier.size(200.dp),
-        contentDescription = "error animation",
-    )
+  Image(
+      painter =
+          rememberLottiePainter(
+              composition = composition,
+              progress = { progress },
+          ),
+      modifier = Modifier.size(200.dp),
+      contentDescription = "error animation",
+  )
 
-    Text(
-        text = errorDetails.message,
-        modifier = Modifier.widthIn(max = 200.dp).padding(top = 16.dp),
-        color = blue,
-        fontWeight = FontWeight.Bold,
-        textAlign = TextAlign.Center,
-    )
+  Text(
+      text = errorDetails.message,
+      modifier = Modifier.widthIn(max = 200.dp).padding(top = 16.dp),
+      color = blue,
+      fontWeight = FontWeight.Bold,
+      textAlign = TextAlign.Center,
+  )
 
-    Text(
-        text = errorDetails.error,
-        modifier = Modifier.widthIn(max = 200.dp).padding(top = 16.dp),
-        color = blue,
-        fontWeight = FontWeight.Bold,
-        textAlign = TextAlign.Center,
-    )
+  Text(
+      text = errorDetails.error,
+      modifier = Modifier.widthIn(max = 200.dp).padding(top = 16.dp),
+      color = blue,
+      fontWeight = FontWeight.Bold,
+      textAlign = TextAlign.Center,
+  )
 }

@@ -1,3 +1,14 @@
+/* **************************************************************************************
+ * Copyright (c) 2024 Calypso Networks Association https://calypsonet.org/
+ *
+ * See the NOTICE file(s) distributed with this work for additional information
+ * regarding copyright ownership.
+ *
+ * This program and the accompanying materials are made available under the terms of the
+ * Eclipse Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ ************************************************************************************** */
 package org.calypsonet.keyple.demo.reload.remote
 
 import androidx.compose.runtime.Composable
@@ -36,94 +47,77 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 @Preview
 fun App(service: KeypleService, cardRepository: CardRepository) {
-    // TODO inject with DI
-    val vm = AppViewModel(keypleService = service)
-    val serverConfigVm = ServerConfigScreenViewModel(keypleService = service)
+  // TODO inject with DI
+  val vm = AppViewModel(keypleService = service)
+  val serverConfigVm = ServerConfigScreenViewModel(keypleService = service)
 
-    val navController = rememberNavController()
+  val navController = rememberNavController()
 
-    val state = vm.state.collectAsState()
+  val state = vm.state.collectAsState()
 
-    KeypleTheme {
-        NavHost(
+  KeypleTheme {
+    NavHost(navController = navController, startDestination = Home) {
+      composable<Home> { HomeScreen(navController = navController, appState = state.value) }
+
+      composable<Settings> { SettingsScreen(navController = navController, appState = state.value) }
+
+      composable<ReadCard> {
+        ReadCardScreen(
             navController = navController,
-            startDestination = Home
-        ) {
-            composable<Home> {
-                HomeScreen(navController = navController, appState = state.value)
-            }
+            viewModel =
+                viewModel<ReadCardScreenViewModel> {
+                  ReadCardScreenViewModel(
+                      keypleService = service,
+                  )
+                },
+            appState = state.value)
+      }
 
-            composable<Settings> {
-                SettingsScreen(navController = navController, appState = state.value)
-            }
+      composable<WriteCard> { backStackEntry ->
+        val route = backStackEntry.toRoute<WriteCard>()
 
-            composable<ReadCard> {
-                ReadCardScreen(
-                    navController = navController,
-                    viewModel = viewModel<ReadCardScreenViewModel> {
-                        ReadCardScreenViewModel(
-                            keypleService = service,
-                        )
-                    },
-                    appState = state.value
-                )
-            }
+        WriteCardScreen(
+            navController = navController,
+            viewModel =
+                viewModel<WriteCardScreenViewModel> {
+                  WriteCardScreenViewModel(keypleService = service, nbTickets = route.nbTickets)
+                },
+            appState = state.value)
+      }
 
-            composable<WriteCard> { backStackEntry ->
-                val route = backStackEntry.toRoute<WriteCard>()
+      composable<PersonalizeCard> {
+        PersonalizeCardScreen(
+            navController = navController,
+            viewModel =
+                viewModel<PersonalizeCardScreenViewModel> {
+                  PersonalizeCardScreenViewModel(
+                      keypleService = service,
+                  )
+                },
+            appState = state.value)
+      }
 
-                WriteCardScreen(
-                    navController = navController,
-                    viewModel = viewModel<WriteCardScreenViewModel> {
-                        WriteCardScreenViewModel(
-                            keypleService = service,
-                            nbTickets = route.nbTickets
-                        )
-                    },
-                    appState = state.value
-                )
-            }
+      composable<Card> {
+        CardContentScreen(
+            navController = navController,
+            appState = state.value,
+            viewModel =
+                viewModel<CardContentScreenViewModel> {
+                  CardContentScreenViewModel(
+                      keypleService = service, cardRepository = cardRepository)
+                })
+      }
 
-            composable<PersonalizeCard> {
-                PersonalizeCardScreen(
-                    navController = navController,
-                    viewModel = viewModel<PersonalizeCardScreenViewModel> {
-                        PersonalizeCardScreenViewModel(
-                            keypleService = service,
-                        )
-                    },
-                    appState = state.value
-                )
-            }
+      composable<AppError> { ErrorScreen(navController = navController, appState = state.value) }
 
-            composable<Card> {
-                CardContentScreen(
-                    navController = navController,
-                    appState = state.value,
-                    viewModel = viewModel<CardContentScreenViewModel> {
-                        CardContentScreenViewModel(
-                            keypleService = service,
-                            cardRepository = cardRepository
-                        )
-                    }
-                )
-            }
+      composable<AppSuccess> {
+        SuccessScreen(navController = navController, appState = state.value)
+      }
 
-            composable<AppError> {
-                ErrorScreen(navController = navController, appState = state.value)
-            }
-
-            composable<AppSuccess> {
-                SuccessScreen(navController = navController, appState = state.value)
-            }
-
-            composable<ServerConfig> {
-                ServerConfigScreen(
-                    navController = navController,
-                    viewModel = serverConfigVm,
-                    appState = state.value
-                )
-            }
-        }
+      composable<ServerConfig> {
+        ServerConfigScreen(
+            navController = navController, viewModel = serverConfigVm, appState = state.value)
+      }
     }
+  }
 }

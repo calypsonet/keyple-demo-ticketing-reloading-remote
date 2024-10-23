@@ -1,3 +1,14 @@
+/* **************************************************************************************
+ * Copyright (c) 2024 Calypso Networks Association https://calypsonet.org/
+ *
+ * See the NOTICE file(s) distributed with this work for additional information
+ * regarding copyright ownership.
+ *
+ * This program and the accompanying materials are made available under the terms of the
+ * Eclipse Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ ************************************************************************************** */
 package org.calypsonet.keyple.demo.reload.remote.ui
 
 import androidx.compose.foundation.Image
@@ -37,62 +48,53 @@ fun SuccessScreen(
     appState: AppState,
 ) {
 
-    Scaffold(
-        topBar = {
-            KeypleTopAppBar(navController = navController, appState = appState, onBack = {
-                navController.navigate(Home) }
-            )
-        },
-        modifier = modifier,
-    ) { innerPadding ->
-        Column(
-            Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-                .background(green),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-        ) {
-            DisplaySuccess(
-                ErrorDetails(
-                    "anim_tick_white.json",
-                    stringResource(Res.string.success_title_loaded),
-                    ""
-                )
-            )
-        }
+  Scaffold(
+      topBar = {
+        KeypleTopAppBar(
+            navController = navController,
+            appState = appState,
+            onBack = { navController.navigate(Home) })
+      },
+      modifier = modifier,
+  ) { innerPadding ->
+    Column(
+        Modifier.padding(innerPadding).fillMaxSize().background(green),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+    ) {
+      DisplaySuccess(
+          ErrorDetails("anim_tick_white.json", stringResource(Res.string.success_title_loaded), ""))
     }
+  }
 }
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-internal fun DisplaySuccess(
-    details: ErrorDetails,
-    modifier: Modifier = Modifier
-) {
-    val composition by rememberLottieComposition {
-        LottieCompositionSpec.JsonString(
-            Res.readBytes("files/${details.animationFileName}").decodeToString()
-        )
-    }
-    val progress by animateLottieCompositionAsState(
-        composition,
-    )
+internal fun DisplaySuccess(details: ErrorDetails, modifier: Modifier = Modifier) {
+  val composition by rememberLottieComposition {
+    LottieCompositionSpec.JsonString(
+        Res.readBytes("files/${details.animationFileName}").decodeToString())
+  }
+  val progress by
+      animateLottieCompositionAsState(
+          composition,
+      )
 
-    Image(
-        painter = rememberLottiePainter(
-            composition = composition,
-            progress = { progress },
-        ),
-        modifier = Modifier.size(200.dp),
-        contentDescription = "animation",
-    )
+  Image(
+      painter =
+          rememberLottiePainter(
+              composition = composition,
+              progress = { progress },
+          ),
+      modifier = Modifier.size(200.dp),
+      contentDescription = "animation",
+  )
 
-    Text(
-        text = details.message,
-        modifier = Modifier.padding(36.dp),
-        color = white,
-        fontWeight = FontWeight.Bold,
-        textAlign = TextAlign.Center,
-    )
+  Text(
+      text = details.message,
+      modifier = Modifier.padding(36.dp),
+      color = white,
+      fontWeight = FontWeight.Bold,
+      textAlign = TextAlign.Center,
+  )
 }

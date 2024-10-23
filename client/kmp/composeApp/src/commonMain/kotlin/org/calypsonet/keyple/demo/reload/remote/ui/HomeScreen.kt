@@ -1,3 +1,14 @@
+/* **************************************************************************************
+ * Copyright (c) 2024 Calypso Networks Association https://calypsonet.org/
+ *
+ * See the NOTICE file(s) distributed with this work for additional information
+ * regarding copyright ownership.
+ *
+ * This program and the accompanying materials are made available under the terms of the
+ * Eclipse Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ ************************************************************************************** */
 package org.calypsonet.keyple.demo.reload.remote.ui
 
 import androidx.compose.foundation.Image
@@ -39,75 +50,61 @@ import org.jetbrains.compose.resources.vectorResource
 
 @Composable
 fun HomeScreen(navController: NavController, modifier: Modifier = Modifier, appState: AppState) {
-    Scaffold(
-        modifier = modifier,
-    ) { innerPadding ->
-        Box(
-            modifier = Modifier.padding(innerPadding)
-                .fillMaxSize()
+  Scaffold(
+      modifier = modifier,
+  ) { innerPadding ->
+    Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
+      Image(
+          imageVector = vectorResource(Res.drawable.keyple_background),
+          contentDescription = "Keyple app background",
+          contentScale = ContentScale.FillBounds,
+          modifier = Modifier.matchParentSize())
+
+      Column(
+          Modifier.align(Alignment.Center),
+          horizontalAlignment = Alignment.CenterHorizontally,
+      ) {
+        KeypleTopAppBar(
+            navController = navController,
+            appState = appState,
+            showBackArrow = false,
+            actions = {
+              IconButton(onClick = { navController.navigate(route = Settings) }) {
+                Icon(
+                    imageVector = vectorResource(Res.drawable.ic_settings),
+                    contentDescription = "Go to settings action",
+                    tint = Color.White)
+              }
+            })
+
+        Column(
+            modifier = modifier.padding(horizontal = 38.dp).sizeIn(maxWidth = 400.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Image(
-                imageVector = vectorResource(Res.drawable.keyple_background),
-                contentDescription = "Keyple app background",
-                contentScale = ContentScale.FillBounds,
-                modifier = Modifier.matchParentSize()
-            )
+          Text(
+              text = "Open Source API for Smart Ticketing",
+              modifier = Modifier.widthIn(max = 200.dp),
+              color = blue,
+              textAlign = TextAlign.Center,
+          )
 
-            Column(
-                Modifier
-                    .align(Alignment.Center),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                KeypleTopAppBar(
-                    navController = navController,
-                    appState = appState,
-                    showBackArrow = false,
-                    actions = {
-                        IconButton(onClick = {
-                            navController.navigate(route = Settings)
-                        }) {
-                            Icon(
-                                imageVector = vectorResource(Res.drawable.ic_settings),
-                                contentDescription = "Go to settings action",
-                                tint = Color.White
-                            )
-                        }
-                    })
+          Spacer(modifier = Modifier.weight(1f))
 
-                Column(
-                    modifier = modifier
-                        .padding(horizontal = 38.dp)
-                        .sizeIn(maxWidth = 400.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Text(
-                        text = "Open Source API for Smart Ticketing",
-                        modifier = Modifier.widthIn(max = 200.dp),
-                        color = blue,
-                        textAlign = TextAlign.Center,
-                    )
+          HomeCard(
+              iconRes = Res.drawable.ic_contactless_card,
+              title = "Contactless support",
+              onClick = { navController.navigate(route = ReadCard) })
 
-                    Spacer(modifier = Modifier.weight(1f))
+          Spacer(modifier = Modifier.weight(1f))
 
-                    HomeCard(
-                        iconRes = Res.drawable.ic_contactless_card,
-                        title = "Contactless support",
-                        onClick = {
-                            navController.navigate(route = ReadCard)
-                        }
-                    )
-
-                    Spacer(modifier = Modifier.weight(1f))
-
-                    Image(
-                        imageVector = vectorResource(Res.drawable.ic_logo_calypso),
-                        contentDescription = "Keyple logo",
-                        modifier = Modifier.padding(bottom = 4.dp)
-                    )
-                }
-            }
+          Image(
+              imageVector = vectorResource(Res.drawable.ic_logo_calypso),
+              contentDescription = "Keyple logo",
+              modifier = Modifier.padding(bottom = 4.dp))
         }
+      }
     }
+  }
 }
 
 @Composable
@@ -117,26 +114,25 @@ internal fun HomeCard(
     title: String,
     onClick: () -> Unit
 ) {
-    Card(
-        modifier = modifier.fillMaxWidth().padding(vertical = 8.dp).clickable { onClick() },
-        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp),
-        ) {
-        Column(
-            modifier = Modifier.padding(8.dp).padding(vertical = 48.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Image(
-                imageVector = vectorResource(iconRes),
-                modifier = Modifier.size(64.dp),
-                contentDescription = "icon for card $title",
-            )
-            Text(
-                text = title,
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center,
-                fontWeight = FontWeight.Bold,
-                color = darkBlue
-            )
-        }
+  Card(
+      modifier = modifier.fillMaxWidth().padding(vertical = 8.dp).clickable { onClick() },
+      elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp),
+  ) {
+    Column(
+        modifier = Modifier.padding(8.dp).padding(vertical = 48.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+      Image(
+          imageVector = vectorResource(iconRes),
+          modifier = Modifier.size(64.dp),
+          contentDescription = "icon for card $title",
+      )
+      Text(
+          text = title,
+          modifier = Modifier.fillMaxWidth(),
+          textAlign = TextAlign.Center,
+          fontWeight = FontWeight.Bold,
+          color = darkBlue)
     }
+  }
 }

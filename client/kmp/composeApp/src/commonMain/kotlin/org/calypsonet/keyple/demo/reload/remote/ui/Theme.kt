@@ -1,3 +1,14 @@
+/* **************************************************************************************
+ * Copyright (c) 2024 Calypso Networks Association https://calypsonet.org/
+ *
+ * See the NOTICE file(s) distributed with this work for additional information
+ * regarding copyright ownership.
+ *
+ * This program and the accompanying materials are made available under the terms of the
+ * Eclipse Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ ************************************************************************************** */
 package org.calypsonet.keyple.demo.reload.remote.ui
 
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -19,27 +30,29 @@ val lightBlue = Color(0xFFe8f3f9)
 val lightGrey = Color(0xFFd3d3d3)
 val white = Color(0xFFFFFFFF)
 
-private val LightColors = lightColorScheme(
-    primary = blue,
-    onPrimary = white,
-    onSurface = darkBlue,
-)
+private val LightColors =
+    lightColorScheme(
+        primary = blue,
+        onPrimary = white,
+        onSurface = darkBlue,
+    )
 
-private val DarkColors = lightColorScheme(
-    primary = purple,
-    onPrimary = darkBlue,
-    onSurface = darkBlue,
-)
+private val DarkColors =
+    lightColorScheme(
+        primary = purple,
+        onPrimary = darkBlue,
+        onSurface = darkBlue,
+    )
 
 @Composable
 fun KeypleTheme(
     useDarkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable() () -> Unit,
 ) {
-    val colors = if (!useDarkTheme) LightColors else DarkColors
+  val colors = if (!useDarkTheme) LightColors else DarkColors
 
-    MaterialTheme(
-        colorScheme = colors,
-        content = content,
-    )
+  MaterialTheme(
+      colorScheme = colors,
+      content = content,
+  )
 }

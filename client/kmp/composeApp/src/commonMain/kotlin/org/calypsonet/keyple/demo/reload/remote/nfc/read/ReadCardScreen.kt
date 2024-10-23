@@ -1,3 +1,14 @@
+/* **************************************************************************************
+ * Copyright (c) 2024 Calypso Networks Association https://calypsonet.org/
+ *
+ * See the NOTICE file(s) distributed with this work for additional information
+ * regarding copyright ownership.
+ *
+ * This program and the accompanying materials are made available under the terms of the
+ * Eclipse Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ ************************************************************************************** */
 package org.calypsonet.keyple.demo.reload.remote.nfc.read
 
 import androidx.compose.runtime.Composable
@@ -19,20 +30,16 @@ fun ReadCardScreen(
     modifier: Modifier = Modifier,
     appState: AppState
 ) {
-    val state = viewModel.state.collectAsState()
+  val state = viewModel.state.collectAsState()
 
-    LaunchedEffect(state.value) {
-        if (state.value is ReadCardScreenState.ShowCardContent) {
-            navController.navigate(Card)
-        }
+  LaunchedEffect(state.value) {
+    if (state.value is ReadCardScreenState.ShowCardContent) {
+      navController.navigate(Card)
     }
+  }
 
-    ReadCardScreen(
-        navController = navController,
-        state = state.value,
-        modifier = modifier,
-        appState = appState
-    )
+  ReadCardScreen(
+      navController = navController, state = state.value, modifier = modifier, appState = appState)
 }
 
 @Composable
@@ -42,27 +49,20 @@ internal fun ReadCardScreen(
     modifier: Modifier = Modifier,
     appState: AppState
 ) {
-    ScanScreen(
-        navController = navController,
-        modifier = modifier,
-        appState = appState
-    ) {
-        when (state) {
-            ReadCardScreenState.WaitForCard -> {
-                PresentCardAnimation()
-            }
-
-            ReadCardScreenState.ReadingCard -> {
-                ScanCardAnimation()
-            }
-
-            is ReadCardScreenState.DisplayError -> {
-                ReadingError(state.message)
-            }
-
-            ReadCardScreenState.ShowCardContent -> {
-                //no-op
-            }
-        }
+  ScanScreen(navController = navController, modifier = modifier, appState = appState) {
+    when (state) {
+      ReadCardScreenState.WaitForCard -> {
+        PresentCardAnimation()
+      }
+      ReadCardScreenState.ReadingCard -> {
+        ScanCardAnimation()
+      }
+      is ReadCardScreenState.DisplayError -> {
+        ReadingError(state.message)
+      }
+      ReadCardScreenState.ShowCardContent -> {
+        // no-op
+      }
     }
+  }
 }

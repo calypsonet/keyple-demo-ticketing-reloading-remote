@@ -1,3 +1,14 @@
+/* **************************************************************************************
+ * Copyright (c) 2024 Calypso Networks Association https://calypsonet.org/
+ *
+ * See the NOTICE file(s) distributed with this work for additional information
+ * regarding copyright ownership.
+ *
+ * This program and the accompanying materials are made available under the terms of the
+ * Eclipse Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ ************************************************************************************** */
 package org.calypsonet.keyple.demo.reload.remote.nfc.ui
 
 import androidx.compose.foundation.Image
@@ -29,9 +40,9 @@ import keyplelessremotedemo.composeapp.generated.resources.Res
 import keyplelessremotedemo.composeapp.generated.resources.ic_logo_calypso
 import keyplelessremotedemo.composeapp.generated.resources.keyple_background
 import org.calypsonet.keyple.demo.reload.remote.AppState
+import org.calypsonet.keyple.demo.reload.remote.ui.KeypleTopAppBar
 import org.calypsonet.keyple.demo.reload.remote.ui.blue
 import org.calypsonet.keyple.demo.reload.remote.ui.red
-import org.calypsonet.keyple.demo.reload.remote.ui.KeypleTopAppBar
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.vectorResource
 
@@ -43,149 +54,134 @@ fun ScanScreen(
     onBack: () -> Unit = { navController.popBackStack() },
     content: @Composable () -> Unit,
 ) {
-    Scaffold(
-        modifier = modifier,
-    ) { innerPadding ->
-        Box(
-            modifier = Modifier.padding(innerPadding)
-                .fillMaxSize()
+  Scaffold(
+      modifier = modifier,
+  ) { innerPadding ->
+    Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
+      Image(
+          imageVector = vectorResource(Res.drawable.keyple_background),
+          contentDescription = "Keyple app background",
+          contentScale = ContentScale.FillBounds,
+          modifier = Modifier.matchParentSize())
+      Column(
+          Modifier.fillMaxSize().align(Alignment.Center),
+          horizontalAlignment = Alignment.CenterHorizontally,
+      ) {
+        KeypleTopAppBar(
+            navController = navController,
+            appState = appState,
+            onBack = onBack,
+        )
+
+        Column(
+            modifier = modifier.padding(horizontal = 38.dp).sizeIn(maxWidth = 400.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Image(
-                imageVector = vectorResource(Res.drawable.keyple_background),
-                contentDescription = "Keyple app background",
-                contentScale = ContentScale.FillBounds,
-                modifier = Modifier.matchParentSize()
-            )
-            Column(
-                Modifier
-                    .fillMaxSize()
-                    .align(Alignment.Center),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                KeypleTopAppBar(
-                    navController = navController,
-                    appState = appState,
-                    onBack = onBack,
-                )
+          Text(
+              text = "Open Source API for Smart Ticketing",
+              modifier = Modifier.widthIn(max = 200.dp),
+              color = blue,
+              textAlign = TextAlign.Center,
+          )
 
-                Column(
-                    modifier = modifier
-                        .padding(horizontal = 38.dp)
-                        .sizeIn(maxWidth = 400.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Text(
-                        text = "Open Source API for Smart Ticketing",
-                        modifier = Modifier.widthIn(max = 200.dp),
-                        color = blue,
-                        textAlign = TextAlign.Center,
-                    )
+          Spacer(modifier = Modifier.weight(1f))
 
-                    Spacer(modifier = Modifier.weight(1f))
+          content()
 
-                    content()
+          Spacer(modifier = Modifier.weight(1f))
 
-                    Spacer(modifier = Modifier.weight(1f))
-
-                    Image(
-                        imageVector = vectorResource(Res.drawable.ic_logo_calypso),
-                        contentDescription = "Keyple logo",
-                        modifier = Modifier.padding(bottom = 4.dp)
-                    )
-                }
-            }
+          Image(
+              imageVector = vectorResource(Res.drawable.ic_logo_calypso),
+              contentDescription = "Keyple logo",
+              modifier = Modifier.padding(bottom = 4.dp))
         }
+      }
     }
+  }
 }
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
 internal fun PresentCardAnimation() {
-    val composition by rememberLottieComposition {
-        LottieCompositionSpec.JsonString(
-            Res.readBytes("files/anim_card_scan.json").decodeToString()
-        )
-    }
-    val progress by animateLottieCompositionAsState(
-        composition,
-        iterations = Compottie.IterateForever
-    )
+  val composition by rememberLottieComposition {
+    LottieCompositionSpec.JsonString(Res.readBytes("files/anim_card_scan.json").decodeToString())
+  }
+  val progress by
+      animateLottieCompositionAsState(composition, iterations = Compottie.IterateForever)
 
-    Image(
-        painter = rememberLottiePainter(
-            composition = composition,
-            progress = { progress },
-        ),
-        modifier = Modifier.size(200.dp),
-        contentDescription = "Card scan animation",
-    )
+  Image(
+      painter =
+          rememberLottiePainter(
+              composition = composition,
+              progress = { progress },
+          ),
+      modifier = Modifier.size(200.dp),
+      contentDescription = "Card scan animation",
+  )
 
-    Text(
-        text = "Please present a contactless support",
-        modifier = Modifier.widthIn(max = 200.dp).padding(top = 16.dp),
-        color = blue,
-        fontWeight = FontWeight.Bold,
-        textAlign = TextAlign.Center,
-    )
+  Text(
+      text = "Please present a contactless support",
+      modifier = Modifier.widthIn(max = 200.dp).padding(top = 16.dp),
+      color = blue,
+      fontWeight = FontWeight.Bold,
+      textAlign = TextAlign.Center,
+  )
 }
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
 internal fun ScanCardAnimation() {
-    val composition by rememberLottieComposition {
-        LottieCompositionSpec.JsonString(
-            Res.readBytes("files/anim_loading.json").decodeToString()
-        )
-    }
-    val progress by animateLottieCompositionAsState(
-        composition,
-        iterations = Compottie.IterateForever
-    )
+  val composition by rememberLottieComposition {
+    LottieCompositionSpec.JsonString(Res.readBytes("files/anim_loading.json").decodeToString())
+  }
+  val progress by
+      animateLottieCompositionAsState(composition, iterations = Compottie.IterateForever)
 
-    Image(
-        painter = rememberLottiePainter(
-            composition = composition,
-            progress = { progress },
-        ),
-        modifier = Modifier.size(200.dp),
-        contentDescription = "Card read animation",
-    )
+  Image(
+      painter =
+          rememberLottiePainter(
+              composition = composition,
+              progress = { progress },
+          ),
+      modifier = Modifier.size(200.dp),
+      contentDescription = "Card read animation",
+  )
 
-    Text(
-        text = "Read in progress",
-        modifier = Modifier.widthIn(max = 200.dp).padding(top = 16.dp),
-        color = blue,
-        fontWeight = FontWeight.Bold,
-        textAlign = TextAlign.Center,
-    )
+  Text(
+      text = "Read in progress",
+      modifier = Modifier.widthIn(max = 200.dp).padding(top = 16.dp),
+      color = blue,
+      fontWeight = FontWeight.Bold,
+      textAlign = TextAlign.Center,
+  )
 }
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
 internal fun ReadingError(errorMessage: String) {
-    val composition by rememberLottieComposition {
-        LottieCompositionSpec.JsonString(
-            Res.readBytes("files/anim_error.json").decodeToString()
-        )
-    }
-    val progress by animateLottieCompositionAsState(
-        composition,
-    )
+  val composition by rememberLottieComposition {
+    LottieCompositionSpec.JsonString(Res.readBytes("files/anim_error.json").decodeToString())
+  }
+  val progress by
+      animateLottieCompositionAsState(
+          composition,
+      )
 
-    Image(
-        painter = rememberLottiePainter(
-            composition = composition,
-            progress = { progress },
-        ),
-        modifier = Modifier.size(200.dp),
-        contentDescription = "Card scan animation",
-    )
+  Image(
+      painter =
+          rememberLottiePainter(
+              composition = composition,
+              progress = { progress },
+          ),
+      modifier = Modifier.size(200.dp),
+      contentDescription = "Card scan animation",
+  )
 
-    Text(
-        text = errorMessage,
-        modifier = Modifier.widthIn(max = 200.dp).padding(top = 16.dp),
-        color = red,
-        fontWeight = FontWeight.Bold,
-        textAlign = TextAlign.Center,
-    )
+  Text(
+      text = errorMessage,
+      modifier = Modifier.widthIn(max = 200.dp).padding(top = 16.dp),
+      color = red,
+      fontWeight = FontWeight.Bold,
+      textAlign = TextAlign.Center,
+  )
 }

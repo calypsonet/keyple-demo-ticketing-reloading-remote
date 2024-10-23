@@ -1,3 +1,14 @@
+/* **************************************************************************************
+ * Copyright (c) 2024 Calypso Networks Association https://calypsonet.org/
+ *
+ * See the NOTICE file(s) distributed with this work for additional information
+ * regarding copyright ownership.
+ *
+ * This program and the accompanying materials are made available under the terms of the
+ * Eclipse Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ ************************************************************************************** */
 package org.calypsonet.keyple.demo.reload.remote.settings
 
 import androidx.compose.foundation.Image
@@ -25,10 +36,10 @@ import keyplelessremotedemo.composeapp.generated.resources.ic_server
 import keyplelessremotedemo.composeapp.generated.resources.ic_sim_card
 import keyplelessremotedemo.composeapp.generated.resources.ic_tools
 import org.calypsonet.keyple.demo.reload.remote.AppState
-import org.calypsonet.keyple.demo.reload.remote.ui.darkBlue
 import org.calypsonet.keyple.demo.reload.remote.nav.PersonalizeCard
 import org.calypsonet.keyple.demo.reload.remote.nav.ServerConfig
 import org.calypsonet.keyple.demo.reload.remote.ui.KeypleTopAppBar
+import org.calypsonet.keyple.demo.reload.remote.ui.darkBlue
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.vectorResource
 
@@ -38,80 +49,57 @@ fun SettingsScreen(
     navController: NavController,
     appState: AppState
 ) {
-    Scaffold(
-        topBar = {
-            KeypleTopAppBar(navController = navController, appState = appState)
-        },
-        modifier = modifier,
-    ) { innerPadding ->
-        Column(
-            modifier = modifier
-                .padding(innerPadding),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = "Settings",
-                textAlign = TextAlign.Center,
-                fontWeight = FontWeight.Bold,
-            )
+  Scaffold(
+      topBar = { KeypleTopAppBar(navController = navController, appState = appState) },
+      modifier = modifier,
+  ) { innerPadding ->
+    Column(
+        modifier = modifier.padding(innerPadding),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+      Text(
+          modifier = Modifier.fillMaxWidth(),
+          text = "Settings",
+          textAlign = TextAlign.Center,
+          fontWeight = FontWeight.Bold,
+      )
 
-            Text(
-                modifier = Modifier.fillMaxWidth()
-                    .padding(bottom = 64.dp),
-                text = "version 1.0.0",
-                textAlign = TextAlign.Center,
-            )
+      Text(
+          modifier = Modifier.fillMaxWidth().padding(bottom = 64.dp),
+          text = "version 1.0.0",
+          textAlign = TextAlign.Center,
+      )
 
-            Divider(
-                modifier = Modifier.fillMaxWidth(),
-                thickness = 2.dp
-            )
+      Divider(modifier = Modifier.fillMaxWidth(), thickness = 2.dp)
 
-            SettingRow(
-                title = "Server",
-                iconRes = Res.drawable.ic_server,
-                modifier = Modifier.fillMaxWidth(),
-                onClick = {
-                    navController.navigate(route = ServerConfig)
-                }
-            )
+      SettingRow(
+          title = "Server",
+          iconRes = Res.drawable.ic_server,
+          modifier = Modifier.fillMaxWidth(),
+          onClick = { navController.navigate(route = ServerConfig) })
 
-            Divider(
-                modifier = Modifier.fillMaxWidth(),
-                thickness = 2.dp
-            )
+      Divider(modifier = Modifier.fillMaxWidth(), thickness = 2.dp)
 
-            SettingRow(
-                title = "Configuration",
-                iconRes = Res.drawable.ic_tools,
-                modifier = Modifier.fillMaxWidth(),
-                onClick = {
-                    //TODO
-                    //navController.navigate("serverConfig")
-                }
-            )
+      SettingRow(
+          title = "Configuration",
+          iconRes = Res.drawable.ic_tools,
+          modifier = Modifier.fillMaxWidth(),
+          onClick = {
+            // TODO
+            // navController.navigate("serverConfig")
+          })
 
-            Divider(
-                modifier = Modifier.fillMaxWidth(),
-                thickness = 2.dp
-            )
+      Divider(modifier = Modifier.fillMaxWidth(), thickness = 2.dp)
 
-            SettingRow(
-                title = "Personalization",
-                iconRes = Res.drawable.ic_sim_card,
-                modifier = Modifier.fillMaxWidth(),
-                onClick = {
-                    navController.navigate(PersonalizeCard)
-                }
-            )
+      SettingRow(
+          title = "Personalization",
+          iconRes = Res.drawable.ic_sim_card,
+          modifier = Modifier.fillMaxWidth(),
+          onClick = { navController.navigate(PersonalizeCard) })
 
-            Divider(
-                modifier = Modifier.fillMaxWidth(),
-                thickness = 2.dp
-            )
-        }
+      Divider(modifier = Modifier.fillMaxWidth(), thickness = 2.dp)
     }
+  }
 }
 
 @Composable
@@ -121,36 +109,29 @@ internal fun SettingRow(
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
-    Box(
-        modifier = modifier
-            .clickable {
-                onClick()
-            }
+  Box(modifier = modifier.clickable { onClick() }) {
+    Row(
+        modifier = modifier.padding(horizontal = 32.dp).padding(vertical = 16.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        Row(
-            modifier = modifier.padding(horizontal = 32.dp).padding(vertical = 16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Image(
-                imageVector = vectorResource(iconRes),
-                modifier = Modifier.size(24.dp),
-                contentDescription = "icon for card $title",
-            )
-            Text(
-                text = title,
-                modifier = Modifier.padding(start = 16.dp),
-                textAlign = TextAlign.Center,
-                fontWeight = FontWeight.Bold,
-                color = darkBlue
-            )
+      Image(
+          imageVector = vectorResource(iconRes),
+          modifier = Modifier.size(24.dp),
+          contentDescription = "icon for card $title",
+      )
+      Text(
+          text = title,
+          modifier = Modifier.padding(start = 16.dp),
+          textAlign = TextAlign.Center,
+          fontWeight = FontWeight.Bold,
+          color = darkBlue)
 
-            Spacer(modifier = Modifier.weight(1f))
+      Spacer(modifier = Modifier.weight(1f))
 
-            Image(
-                imageVector = vectorResource(Res.drawable.ic_arrow_right),
-                contentDescription = "arrow right",
-                modifier = Modifier.size(24.dp)
-            )
-        }
+      Image(
+          imageVector = vectorResource(Res.drawable.ic_arrow_right),
+          contentDescription = "arrow right",
+          modifier = Modifier.size(24.dp))
     }
+  }
 }

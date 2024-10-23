@@ -1,3 +1,14 @@
+/* **************************************************************************************
+ * Copyright (c) 2024 Calypso Networks Association https://calypsonet.org/
+ *
+ * See the NOTICE file(s) distributed with this work for additional information
+ * regarding copyright ownership.
+ *
+ * This program and the accompanying materials are made available under the terms of the
+ * Eclipse Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ ************************************************************************************** */
 package org.calypsonet.keyple.demo.reload.remote.card
 
 import androidx.compose.foundation.background
@@ -42,21 +53,25 @@ import keyplelessremotedemo.composeapp.generated.resources.contract_pass_title
 import org.calypsonet.keyple.demo.reload.remote.AppState
 import org.calypsonet.keyple.demo.reload.remote.CardContracts
 import org.calypsonet.keyple.demo.reload.remote.Contract
-import org.calypsonet.keyple.demo.reload.remote.ui.blue
-import org.calypsonet.keyple.demo.reload.remote.ui.grey
-import org.calypsonet.keyple.demo.reload.remote.ui.lightBlue
 import org.calypsonet.keyple.demo.reload.remote.nav.Home
 import org.calypsonet.keyple.demo.reload.remote.nav.WriteCard
 import org.calypsonet.keyple.demo.reload.remote.ui.KeypleTopAppBar
+import org.calypsonet.keyple.demo.reload.remote.ui.blue
+import org.calypsonet.keyple.demo.reload.remote.ui.grey
+import org.calypsonet.keyple.demo.reload.remote.ui.lightBlue
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 
 enum class TitleType {
-    SINGLE, SEASON
+  SINGLE,
+  SEASON
 }
 
 data class Title(
-    val type: TitleType, val price: Int, val quantity: Int = 1, val date: String? = null
+    val type: TitleType,
+    val price: Int,
+    val quantity: Int = 1,
+    val date: String? = null
 )
 
 @Composable
@@ -66,64 +81,55 @@ fun CardContentScreen(
     viewModel: CardContentScreenViewModel,
     modifier: Modifier = Modifier
 ) {
-    val state = viewModel.state.collectAsState()
+  val state = viewModel.state.collectAsState()
 
-    Scaffold(
-        topBar = {
-            KeypleTopAppBar(
-                navController = navController,
-                appState = appState,
-                onBack = {
-                    when (state.value) {
-                        is CardContentScreenState.DisplayContent -> navController.navigate(Home)
-                        is CardContentScreenState.ChooseTitle -> viewModel.displayContent()
-                        is CardContentScreenState.DisplayBasket -> viewModel.chooseTitle()
-                    }
-                }
-            )
-        },
-        modifier = modifier,
-    ) { innerPadding ->
+  Scaffold(
+      topBar = {
+        KeypleTopAppBar(
+            navController = navController,
+            appState = appState,
+            onBack = {
+              when (state.value) {
+                is CardContentScreenState.DisplayContent -> navController.navigate(Home)
+                is CardContentScreenState.ChooseTitle -> viewModel.displayContent()
+                is CardContentScreenState.DisplayBasket -> viewModel.chooseTitle()
+              }
+            })
+      },
+      modifier = modifier,
+  ) { innerPadding ->
+    Column(
+        modifier = Modifier.padding(innerPadding).fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+      Text(
+          text = state.value.screenTitle,
+          modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+          textAlign = TextAlign.Center,
+          fontWeight = FontWeight.Bold,
+          fontSize = 20.sp,
+      )
 
-        Column(
-            modifier = Modifier.padding(innerPadding).fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Text(
-                text = state.value.screenTitle,
-                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                textAlign = TextAlign.Center,
-                fontWeight = FontWeight.Bold,
-                fontSize = 20.sp,
-            )
-
-            when (state.value) {
-                is CardContentScreenState.DisplayContent -> {
-                    CardContent(
-                        contracts = (state.value as CardContentScreenState.DisplayContent).contracts,
-                        modifier = modifier,
-                        chooseTitle = { viewModel.chooseTitle() }
-                    )
-                }
-
-                is CardContentScreenState.ChooseTitle -> {
-                    TitleList(
-                        titles = (state.value as CardContentScreenState.ChooseTitle).titles,
-                        addToBasket = viewModel::addToBasket
-                    )
-                }
-
-                is CardContentScreenState.DisplayBasket -> {
-                    Basket(
-                        title = (state.value as CardContentScreenState.DisplayBasket).selectedTitle!!,
-                        onPay = {
-                            navController.navigate(WriteCard(nbTickets = it.quantity))
-                        }
-                    )
-                }
-            }
+      when (state.value) {
+        is CardContentScreenState.DisplayContent -> {
+          CardContent(
+              contracts = (state.value as CardContentScreenState.DisplayContent).contracts,
+              modifier = modifier,
+              chooseTitle = { viewModel.chooseTitle() })
         }
+        is CardContentScreenState.ChooseTitle -> {
+          TitleList(
+              titles = (state.value as CardContentScreenState.ChooseTitle).titles,
+              addToBasket = viewModel::addToBasket)
+        }
+        is CardContentScreenState.DisplayBasket -> {
+          Basket(
+              title = (state.value as CardContentScreenState.DisplayBasket).selectedTitle!!,
+              onPay = { navController.navigate(WriteCard(nbTickets = it.quantity)) })
+        }
+      }
     }
+  }
 }
 
 @Composable
@@ -132,43 +138,40 @@ internal fun ColumnScope.CardContent(
     chooseTitle: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    LazyColumn(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
-        items(contracts.contracts) { contract ->
-            Card(
-                modifier = Modifier.padding(16.dp).fillMaxWidth(),
-                elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = lightBlue
-                ),
-            ) {
-                Column {
-                    Text(
-                        text = getContractTitle(contract),
-                        modifier = Modifier.padding(10.dp).fillMaxWidth(),
-                        color = blue,
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center,
-                    )
+  LazyColumn(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+    items(contracts.contracts) { contract ->
+      Card(
+          modifier = Modifier.padding(16.dp).fillMaxWidth(),
+          elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp),
+          colors = CardDefaults.cardColors(containerColor = lightBlue),
+      ) {
+        Column {
+          Text(
+              text = getContractTitle(contract),
+              modifier = Modifier.padding(10.dp).fillMaxWidth(),
+              color = blue,
+              fontWeight = FontWeight.Bold,
+              textAlign = TextAlign.Center,
+          )
 
-                    Text(
-                        text = getContractSubtitle(contract),
-                        modifier = Modifier.padding(10.dp).fillMaxWidth(),
-                        color = blue,
-                        textAlign = TextAlign.Center,
-                    )
-                }
-            }
+          Text(
+              text = getContractSubtitle(contract),
+              modifier = Modifier.padding(10.dp).fillMaxWidth(),
+              color = blue,
+              textAlign = TextAlign.Center,
+          )
         }
+      }
     }
+  }
 
-    Spacer(modifier = Modifier.weight(1f))
+  Spacer(modifier = Modifier.weight(1f))
 
-    Button(
-        onClick = { chooseTitle() },
-        modifier = Modifier.sizeIn(maxWidth = 400.dp, minHeight = 100.dp).padding(16.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = blue),
-        shape = RoundedCornerShape(4.dp)
-    ) {
+  Button(
+      onClick = { chooseTitle() },
+      modifier = Modifier.sizeIn(maxWidth = 400.dp, minHeight = 100.dp).padding(16.dp),
+      colors = ButtonDefaults.buttonColors(containerColor = blue),
+      shape = RoundedCornerShape(4.dp)) {
         Text(
             "BUY TITLE",
             modifier = Modifier.fillMaxWidth(),
@@ -177,174 +180,163 @@ internal fun ColumnScope.CardContent(
             textAlign = TextAlign.Center,
             fontSize = 20.sp,
         )
-    }
+      }
 }
 
 @Composable
 fun getContractTitle(contract: Contract): String {
-    return when (contract.tarif) {
-        "MULTI_TRIP" ->  stringResource(Res.string.contract_multi_title)
-        "EXPIRED" ->  stringResource(Res.string.contract_pass_expired_title)
-        else -> stringResource(Res.string.contract_pass_title)
-    }
+  return when (contract.tarif) {
+    "MULTI_TRIP" -> stringResource(Res.string.contract_multi_title)
+    "EXPIRED" -> stringResource(Res.string.contract_pass_expired_title)
+    else -> stringResource(Res.string.contract_pass_title)
+  }
 }
 
 @Composable
 fun getContractSubtitle(contract: Contract): String {
-    return when (contract.tarif) {
-        "MULTI_TRIP" ->  stringResource(Res.string.contract_multi_subtitle, contract.counterValue)
-        else -> stringResource(Res.string.contract_pass_subtitle, contract.saleDate, contract.validityEndDate)
-    }
+  return when (contract.tarif) {
+    "MULTI_TRIP" -> stringResource(Res.string.contract_multi_subtitle, contract.counterValue)
+    else ->
+        stringResource(
+            Res.string.contract_pass_subtitle, contract.saleDate, contract.validityEndDate)
+  }
 }
 
 @Composable
 internal fun ColumnScope.Basket(title: Title, onPay: (title: Title) -> Unit) {
-    TitleCard(title = title, modifier = Modifier.padding(vertical = 48.dp), onTitleClick = {})
+  TitleCard(title = title, modifier = Modifier.padding(vertical = 48.dp), onTitleClick = {})
 
-    Box(
-        modifier = Modifier.fillMaxWidth().weight(1f).padding(4.dp).background(lightBlue),
+  Box(
+      modifier = Modifier.fillMaxWidth().weight(1f).padding(4.dp).background(lightBlue),
+  ) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            CreditCardDetails()
+      CreditCardDetails()
 
-            Button(
-                onClick = { onPay(title) },
-                modifier = Modifier.sizeIn(maxWidth = 400.dp, minHeight = 100.dp)
-                    .padding(16.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = blue),
-                shape = RoundedCornerShape(4.dp)
-            ) {
-                Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = "PAY",
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center,
-                    fontSize = 20.sp,
-                )
-            }
-        }
+      Button(
+          onClick = { onPay(title) },
+          modifier = Modifier.sizeIn(maxWidth = 400.dp, minHeight = 100.dp).padding(16.dp),
+          colors = ButtonDefaults.buttonColors(containerColor = blue),
+          shape = RoundedCornerShape(4.dp)) {
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = "PAY",
+                color = Color.White,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                fontSize = 20.sp,
+            )
+          }
     }
+  }
 }
 
 @Composable
 internal fun CreditCardDetails() {
-    Column(
-        modifier = Modifier.fillMaxWidth().padding(2.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Text(
-            text = "Credit Card Details",
-            modifier = Modifier.fillMaxWidth().padding(vertical = 24.dp),
-            textAlign = TextAlign.Center,
-            fontWeight = FontWeight.Bold,
-        )
+  Column(
+      modifier = Modifier.fillMaxWidth().padding(2.dp),
+      horizontalAlignment = Alignment.CenterHorizontally,
+  ) {
+    Text(
+        text = "Credit Card Details",
+        modifier = Modifier.fillMaxWidth().padding(vertical = 24.dp),
+        textAlign = TextAlign.Center,
+        fontWeight = FontWeight.Bold,
+    )
 
-        Card(
-            modifier = Modifier.sizeIn(maxWidth = 400.dp, minHeight = 100.dp)
-                .padding(bottom = 2.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = Color.White
-            ),
-            shape = RoundedCornerShape(4.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth().height(100.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = "Card Number",
-                    color = grey
-                )
-                Text(
-                    text = "1111.1111.1111.1111",
-                    color = blue,
-                )
-            }
+    Card(
+        modifier = Modifier.sizeIn(maxWidth = 400.dp, minHeight = 100.dp).padding(bottom = 2.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        shape = RoundedCornerShape(4.dp)) {
+          Row(
+              modifier = Modifier.fillMaxWidth().height(100.dp),
+              horizontalArrangement = Arrangement.SpaceEvenly,
+              verticalAlignment = Alignment.CenterVertically,
+          ) {
+            Text(text = "Card Number", color = grey)
+            Text(
+                text = "1111.1111.1111.1111",
+                color = blue,
+            )
+          }
         }
 
-        Card(
-            modifier = Modifier.sizeIn(maxWidth = 400.dp, minHeight = 100.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = Color.White
-            ),
-            shape = RoundedCornerShape(4.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth().height(100.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = "Expiry",
-                )
-                Text(
-                    text = "10/24",
-                    color = blue,
-                )
-                Text(
-                    text = "CVC",
-                )
-                Text(
-                    text = "123",
-                    color = blue,
-                )
-            }
+    Card(
+        modifier = Modifier.sizeIn(maxWidth = 400.dp, minHeight = 100.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        shape = RoundedCornerShape(4.dp)) {
+          Row(
+              modifier = Modifier.fillMaxWidth().height(100.dp),
+              horizontalArrangement = Arrangement.SpaceEvenly,
+              verticalAlignment = Alignment.CenterVertically,
+          ) {
+            Text(
+                text = "Expiry",
+            )
+            Text(
+                text = "10/24",
+                color = blue,
+            )
+            Text(
+                text = "CVC",
+            )
+            Text(
+                text = "123",
+                color = blue,
+            )
+          }
         }
-    }
+  }
 }
 
 @Composable
 internal fun TitleList(
-    titles: List<Title>, modifier: Modifier = Modifier, addToBasket: (Title) -> Unit
+    titles: List<Title>,
+    modifier: Modifier = Modifier,
+    addToBasket: (Title) -> Unit
 ) {
-    LazyColumn(
-        modifier = modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        items(
-            titles
-        ) { title ->
-            TitleCard(title = title, onTitleClick = addToBasket)
-        }
-    }
+  LazyColumn(
+      modifier = modifier.fillMaxSize(),
+      horizontalAlignment = Alignment.CenterHorizontally,
+      verticalArrangement = Arrangement.Center) {
+        items(titles) { title -> TitleCard(title = title, onTitleClick = addToBasket) }
+      }
 }
 
 @Composable
 internal fun TitleCard(
-    title: Title, modifier: Modifier = Modifier, onTitleClick: (title: Title) -> Unit
+    title: Title,
+    modifier: Modifier = Modifier,
+    onTitleClick: (title: Title) -> Unit
 ) {
-    Card(
-        modifier = modifier.padding(16.dp).sizeIn(maxWidth = 300.dp, minHeight = 100.dp)
-            .clickable {
-                onTitleClick(title)
-            },
-        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = lightBlue
-        ),
-        shape = RoundedCornerShape(4.dp)
-    ) {
+  Card(
+      modifier =
+          modifier.padding(16.dp).sizeIn(maxWidth = 300.dp, minHeight = 100.dp).clickable {
+            onTitleClick(title)
+          },
+      elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp),
+      colors = CardDefaults.cardColors(containerColor = lightBlue),
+      shape = RoundedCornerShape(4.dp)) {
         Column(
             modifier = Modifier.fillMaxWidth().height(100.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
         ) {
-            Text(
-                text = pluralStringResource(Res.plurals.basket_title_multi_title, title.quantity, title.quantity),
-                color = blue,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-            )
-            Text(
-                text = "${title.price},00 €", color = blue,
-                textAlign = TextAlign.Center,
-            )
+          Text(
+              text =
+                  pluralStringResource(
+                      Res.plurals.basket_title_multi_title, title.quantity, title.quantity),
+              color = blue,
+              fontWeight = FontWeight.Bold,
+              textAlign = TextAlign.Center,
+          )
+          Text(
+              text = "${title.price},00 €",
+              color = blue,
+              textAlign = TextAlign.Center,
+          )
         }
-    }
+      }
 }

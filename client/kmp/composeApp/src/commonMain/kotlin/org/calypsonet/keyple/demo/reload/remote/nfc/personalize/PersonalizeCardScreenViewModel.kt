@@ -1,3 +1,14 @@
+/* **************************************************************************************
+ * Copyright (c) 2024 Calypso Networks Association https://calypsonet.org/
+ *
+ * See the NOTICE file(s) distributed with this work for additional information
+ * regarding copyright ownership.
+ *
+ * This program and the accompanying materials are made available under the terms of the
+ * Eclipse Public License 2.0 which is available at http://www.eclipse.org/legal/epl-2.0
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ ************************************************************************************** */
 package org.calypsonet.keyple.demo.reload.remote.nfc.personalize
 
 import androidx.lifecycle.ViewModel
@@ -10,59 +21,62 @@ import org.calypso.keyple.remote.protocol.KeypleResult
 import org.calypsonet.keyple.demo.reload.remote.KeypleService
 
 sealed class PersonalizeCardScreenState {
-    data object WaitForCard : PersonalizeCardScreenState()
-    data object WritingToCard : PersonalizeCardScreenState()
-    data object DisplaySuccess : PersonalizeCardScreenState()
-    data class DisplayError(val message: String) : PersonalizeCardScreenState()
+  data object WaitForCard : PersonalizeCardScreenState()
+
+  data object WritingToCard : PersonalizeCardScreenState()
+
+  data object DisplaySuccess : PersonalizeCardScreenState()
+
+  data class DisplayError(val message: String) : PersonalizeCardScreenState()
 }
 
 class PersonalizeCardScreenViewModel(
     private val keypleService: KeypleService,
 ) : ViewModel() {
-    private var _state = MutableStateFlow<PersonalizeCardScreenState>(PersonalizeCardScreenState.WaitForCard)
-    val state = _state.asStateFlow()
+  private var _state =
+      MutableStateFlow<PersonalizeCardScreenState>(PersonalizeCardScreenState.WaitForCard)
+  val state = _state.asStateFlow()
 
-    init {
-        scan()
-    }
+  init {
+    scan()
+  }
 
-    override fun onCleared() {
-        super.onCleared()
-        keypleService.releaseReader()
-    }
+  override fun onCleared() {
+    super.onCleared()
+    keypleService.releaseReader()
+  }
 
-    private fun scan() {
-        viewModelScope.launch {
-            keypleService.updateReaderMessage("Place your card on the top of the iPhone")
-            try {
-                val cardFound = keypleService.waitCard()
-                if (cardFound) {
-                    keypleService.updateReaderMessage("Stay still...")
-                    personalizeCard()
-                } else {
-                    _state.value = PersonalizeCardScreenState.DisplayError("No card found")
-                }
-            } catch (e: Exception) {
-                _state.value = PersonalizeCardScreenState.DisplayError("Error: ${e.message}")
-            }
+  private fun scan() {
+    viewModelScope.launch {
+      keypleService.updateReaderMessage("Place your card on the top of the iPhone")
+      try {
+        val cardFound = keypleService.waitCard()
+        if (cardFound) {
+          keypleService.updateReaderMessage("Stay still...")
+          personalizeCard()
+        } else {
+          _state.value = PersonalizeCardScreenState.DisplayError("No card found")
         }
+      } catch (e: Exception) {
+        _state.value = PersonalizeCardScreenState.DisplayError("Error: ${e.message}")
+      }
     }
+  }
 
-    private suspend fun personalizeCard() {
-        _state.value = PersonalizeCardScreenState.WritingToCard
-        try {
-            when (val result = keypleService.personalizeCard()) {
-                is KeypleResult.Failure -> {
-                    _state.value = PersonalizeCardScreenState.DisplayError(result.error.message)
-                }
-
-                is KeypleResult.Success -> {
-                    _state.value = PersonalizeCardScreenState.DisplaySuccess
-                }
-            }
-        } catch (e: Exception) {
-            Napier.e("Error personalizing card", e)
-            _state.value = PersonalizeCardScreenState.DisplayError(e.message ?: "Unknown error")
+  private suspend fun personalizeCard() {
+    _state.value = PersonalizeCardScreenState.WritingToCard
+    try {
+      when (val result = keypleService.personalizeCard()) {
+        is KeypleResult.Failure -> {
+          _state.value = PersonalizeCardScreenState.DisplayError(result.error.message)
         }
+        is KeypleResult.Success -> {
+          _state.value = PersonalizeCardScreenState.DisplaySuccess
+        }
+      }
+    } catch (e: Exception) {
+      Napier.e("Error personalizing card", e)
+      _state.value = PersonalizeCardScreenState.DisplayError(e.message ?: "Unknown error")
     }
+  }
 }
