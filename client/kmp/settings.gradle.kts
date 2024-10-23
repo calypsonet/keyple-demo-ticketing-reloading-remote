@@ -3,6 +3,8 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {
     repositories {
+        mavenLocal()
+        mavenCentral()
         google {
             mavenContent {
                 includeGroupAndSubgroups("androidx")
@@ -17,6 +19,13 @@ pluginManagement {
 
 dependencyResolutionManagement {
     repositories {
+        mavenLocal()
+        mavenCentral()
+        maven(url = "https://oss.sonatype.org/content/repositories/releases")
+        maven(url = "https://s01.oss.sonatype.org/content/repositories/releases")
+        maven(url = "https://oss.sonatype.org/content/repositories/snapshots")
+        maven(url = "https://s01.oss.sonatype.org/content/repositories/snapshots")
+        maven(url = "https://nexus.coppernic.fr/repository/libs-release")
         google {
             mavenContent {
                 includeGroupAndSubgroups("androidx")
@@ -24,7 +33,6 @@ dependencyResolutionManagement {
                 includeGroupAndSubgroups("com.google")
             }
         }
-        mavenCentral()
     }
 }
 

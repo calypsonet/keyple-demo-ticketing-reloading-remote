@@ -7,6 +7,8 @@ plugins {
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlinSerialization)
+    id("org.eclipse.keyple")
+    id("com.diffplug.spotless")
 }
 
 kotlin {
@@ -119,3 +121,15 @@ android {
     }
 }
 
+///////////////////////////////////////////////////////////////////////////////
+//  TASKS CONFIGURATION
+///////////////////////////////////////////////////////////////////////////////
+tasks {
+    spotless {
+        kotlin {
+            target("**/*.kt")
+            ktfmt()
+            licenseHeaderFile("${project.rootDir}/LICENSE_HEADER")
+        }
+    }
+}

@@ -8,3 +8,12 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform) apply false
     alias(libs.plugins.jetbrains.kotlin.android) apply false
 }
+
+buildscript {
+    dependencies {
+        classpath(libs.spotless.plugin.gradle)
+        classpath("org.eclipse.keyple:keyple-gradle:0.2.+") { isChanging = true }
+        classpath(libs.jaxb.api)
+        classpath(libs.jaxb.impl)
+    }
+}
