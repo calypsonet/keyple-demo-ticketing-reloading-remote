@@ -21,7 +21,7 @@ import io.github.alexzhirkevich.compottie.LottieCompositionSpec
 import io.github.alexzhirkevich.compottie.animateLottieCompositionAsState
 import io.github.alexzhirkevich.compottie.rememberLottieComposition
 import io.github.alexzhirkevich.compottie.rememberLottiePainter
-import keypleremotemobile.composeapp.generated.resources.Res
+import keyplelessremotedemo.composeapp.generated.resources.Res
 import org.calypsonet.keyple.demo.reload.remote.AppState
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 

@@ -25,7 +25,7 @@ kotlin {
         iosSimulatorArm64()
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
-            baseName = "ComposeApp"
+            baseName = "KeypleDemo"
             isStatic = true
         }
     }
@@ -34,8 +34,8 @@ kotlin {
         val desktopMain by getting
 
         commonMain.dependencies {
-            implementation(projects.libkeypleremote)
-            implementation(projects.libiso7816nfcreader)
+            implementation(projects.keypleLessDistributedClientKmpLib)
+            implementation(projects.keypleLessReaderNfcmobileKmpLib)
 
             implementation(libs.kotlinx.serialization)
             implementation(libs.ktor.serialization.kotlinx.json)

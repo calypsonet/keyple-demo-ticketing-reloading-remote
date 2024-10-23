@@ -19,11 +19,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import keypleremotemobile.composeapp.generated.resources.Res
-import keypleremotemobile.composeapp.generated.resources.ic_arrow_right
-import keypleremotemobile.composeapp.generated.resources.ic_server
-import keypleremotemobile.composeapp.generated.resources.ic_sim_card
-import keypleremotemobile.composeapp.generated.resources.ic_tools
+import keyplelessremotedemo.composeapp.generated.resources.Res
+import keyplelessremotedemo.composeapp.generated.resources.ic_arrow_right
+import keyplelessremotedemo.composeapp.generated.resources.ic_server
+import keyplelessremotedemo.composeapp.generated.resources.ic_sim_card
+import keyplelessremotedemo.composeapp.generated.resources.ic_tools
 import org.calypsonet.keyple.demo.reload.remote.AppState
 import org.calypsonet.keyple.demo.reload.remote.ui.darkBlue
 import org.calypsonet.keyple.demo.reload.remote.nav.PersonalizeCard

@@ -1,4 +1,4 @@
-rootProject.name = "KeypleRemoteMobile"
+rootProject.name = "KeypleLessRemoteDemo"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {
@@ -29,5 +29,5 @@ dependencyResolutionManagement {
 }
 
 include(":composeApp")
-include(":libkeypleremote")
-include(":libiso7816nfcreader")
+include(":keyple-less-distributed-client-kmp-lib")
+include(":keyple-less-reader-nfcmobile-kmp-lib")

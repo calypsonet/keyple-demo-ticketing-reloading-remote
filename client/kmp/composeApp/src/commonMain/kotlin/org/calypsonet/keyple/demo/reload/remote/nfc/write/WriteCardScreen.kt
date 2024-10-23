@@ -12,8 +12,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.navigation.NavController
-import keypleremotemobile.composeapp.generated.resources.Res
-import keypleremotemobile.composeapp.generated.resources.success_title_loaded
+import keyplelessremotedemo.composeapp.generated.resources.Res
+import keyplelessremotedemo.composeapp.generated.resources.success_title_loaded
 import org.calypsonet.keyple.demo.reload.remote.AppState
 import org.calypsonet.keyple.demo.reload.remote.nav.AppSuccess
 import org.calypsonet.keyple.demo.reload.remote.nav.Home

@@ -25,9 +25,9 @@ import io.github.alexzhirkevich.compottie.LottieCompositionSpec
 import io.github.alexzhirkevich.compottie.animateLottieCompositionAsState
 import io.github.alexzhirkevich.compottie.rememberLottieComposition
 import io.github.alexzhirkevich.compottie.rememberLottiePainter
-import keypleremotemobile.composeapp.generated.resources.Res
-import keypleremotemobile.composeapp.generated.resources.ic_logo_calypso
-import keypleremotemobile.composeapp.generated.resources.keyple_background
+import keyplelessremotedemo.composeapp.generated.resources.Res
+import keyplelessremotedemo.composeapp.generated.resources.ic_logo_calypso
+import keyplelessremotedemo.composeapp.generated.resources.keyple_background
 import org.calypsonet.keyple.demo.reload.remote.AppState
 import org.calypsonet.keyple.demo.reload.remote.ui.blue
 import org.calypsonet.keyple.demo.reload.remote.ui.red

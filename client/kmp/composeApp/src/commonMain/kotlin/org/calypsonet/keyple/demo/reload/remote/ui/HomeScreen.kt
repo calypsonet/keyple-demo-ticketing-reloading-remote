@@ -26,11 +26,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import keypleremotemobile.composeapp.generated.resources.Res
-import keypleremotemobile.composeapp.generated.resources.ic_contactless_card
-import keypleremotemobile.composeapp.generated.resources.ic_logo_calypso
-import keypleremotemobile.composeapp.generated.resources.ic_settings
-import keypleremotemobile.composeapp.generated.resources.keyple_background
+import keyplelessremotedemo.composeapp.generated.resources.Res
+import keyplelessremotedemo.composeapp.generated.resources.ic_contactless_card
+import keyplelessremotedemo.composeapp.generated.resources.ic_logo_calypso
+import keyplelessremotedemo.composeapp.generated.resources.ic_settings
+import keyplelessremotedemo.composeapp.generated.resources.keyple_background
 import org.calypsonet.keyple.demo.reload.remote.AppState
 import org.calypsonet.keyple.demo.reload.remote.nav.ReadCard
 import org.calypsonet.keyple.demo.reload.remote.nav.Settings
