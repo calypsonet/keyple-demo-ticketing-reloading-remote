@@ -36,8 +36,8 @@ kotlin {
         val desktopMain by getting
 
         commonMain.dependencies {
-            implementation(projects.keypleLessDistributedClientKmpLib)
-            implementation(projects.keypleLessReaderNfcmobileKmpLib)
+            implementation(libs.keyple.less.reader)
+            implementation(libs.keyple.less.distributed)
 
             implementation(libs.kotlinx.serialization)
             implementation(libs.ktor.serialization.kotlinx.json)
@@ -50,7 +50,6 @@ kotlin {
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
-
 
             implementation(libs.koin.core)
             implementation(libs.koin.compose)

@@ -12,7 +12,6 @@ pluginManagement {
                 includeGroupAndSubgroups("com.google")
             }
         }
-        mavenCentral()
         gradlePluginPortal()
     }
 }
@@ -37,5 +36,3 @@ dependencyResolutionManagement {
 }
 
 include(":composeApp")
-include(":keyple-less-distributed-client-kmp-lib")
-include(":keyple-less-reader-nfcmobile-kmp-lib")

@@ -10,6 +10,17 @@ plugins {
 }
 
 buildscript {
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven(url = "https://oss.sonatype.org/content/repositories/releases")
+        maven(url = "https://s01.oss.sonatype.org/content/repositories/releases")
+        maven(url = "https://oss.sonatype.org/content/repositories/snapshots")
+        maven(url = "https://s01.oss.sonatype.org/content/repositories/snapshots")
+        maven(url = "https://nexus.coppernic.fr/repository/libs-release")
+    }
+
     dependencies {
         classpath(libs.spotless.plugin.gradle)
         classpath("org.eclipse.keyple:keyple-gradle:0.2.+") { isChanging = true }
