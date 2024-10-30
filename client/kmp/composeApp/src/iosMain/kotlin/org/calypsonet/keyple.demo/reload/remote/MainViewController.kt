@@ -14,7 +14,7 @@ package org.calypsonet.keyple.demo.reload.remote
 import androidx.compose.ui.window.ComposeUIViewController
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
-import org.calypso.keyple.iso7816nfcreader.LocalNfcReader
+import org.eclipse.keyple.keyplelessreaderlib.LocalNfcReader
 import platform.UIKit.UIDevice
 
 val dataStrore = createDataStore(DataStorePathProducer())

@@ -17,8 +17,8 @@ import io.github.aakira.napier.Napier
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import org.calypso.keyple.remote.protocol.KeypleResult
 import org.calypsonet.keyple.demo.reload.remote.KeypleService
+import org.eclipse.keyple.distributed.protocol.KeypleResult
 
 sealed class ReadCardScreenState {
   data object WaitForCard : ReadCardScreenState()

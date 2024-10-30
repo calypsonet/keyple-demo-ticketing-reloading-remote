@@ -15,7 +15,7 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
-import org.calypso.keyple.iso7816nfcreader.LocalNfcReader
+import org.eclipse.keyple.keyplelessreaderlib.LocalNfcReader
 
 fun main() = application {
   initLogger()
