@@ -7,7 +7,7 @@ xcuserdata
 local.properties
 .idea
 .fleet
-.DS_Store
+**/.DS_Store
 captures
 .externalNativeBuild
 .cxx
