@@ -36,7 +36,6 @@ kotlin {
         val desktopMain by getting
 
         commonMain.dependencies {
-            implementation(libs.keyple.less.reader)
             implementation(libs.keyple.less.distributed)
 
             implementation(libs.kotlinx.serialization)

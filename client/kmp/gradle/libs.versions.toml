@@ -80,7 +80,6 @@ okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 compottie = { module = "io.github.alexzhirkevich:compottie", version.ref = "compottie" }
 spotless-plugin-gradle = { module = "com.diffplug.spotless:spotless-plugin-gradle", version.ref = "spotlessPluginGradle" }
 
-keyple-less-reader = { module = "org.eclipse.keyple:keypleLessReaderNfcMobileLib", version.ref = "keyple-less" }
 keyple-less-distributed = { module = "org.eclipse.keyple:keypleLessDistributedClientLib", version.ref = "keyple-less" }
 
 [plugins]
