@@ -45,16 +45,19 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import keyplelessremotedemo.composeapp.generated.resources.Res
 import keyplelessremotedemo.composeapp.generated.resources.basket_title_multi_title
+import keyplelessremotedemo.composeapp.generated.resources.basket_title_season_title
+import keyplelessremotedemo.composeapp.generated.resources.card_empty
 import keyplelessremotedemo.composeapp.generated.resources.contract_multi_subtitle
 import keyplelessremotedemo.composeapp.generated.resources.contract_multi_title
 import keyplelessremotedemo.composeapp.generated.resources.contract_pass_expired_title
 import keyplelessremotedemo.composeapp.generated.resources.contract_pass_subtitle
 import keyplelessremotedemo.composeapp.generated.resources.contract_pass_title
+import kotlinx.serialization.Serializable
 import org.calypsonet.keyple.demo.reload.remote.AppState
 import org.calypsonet.keyple.demo.reload.remote.CardContracts
 import org.calypsonet.keyple.demo.reload.remote.Contract
 import org.calypsonet.keyple.demo.reload.remote.nav.Home
-import org.calypsonet.keyple.demo.reload.remote.nav.WriteCard
+import org.calypsonet.keyple.demo.reload.remote.nav.WriteTitleCard
 import org.calypsonet.keyple.demo.reload.remote.ui.KeypleTopAppBar
 import org.calypsonet.keyple.demo.reload.remote.ui.blue
 import org.calypsonet.keyple.demo.reload.remote.ui.grey
@@ -62,11 +65,13 @@ import org.calypsonet.keyple.demo.reload.remote.ui.lightBlue
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 
+@Serializable
 enum class TitleType {
   SINGLE,
   SEASON
 }
 
+@Serializable
 data class Title(
     val type: TitleType,
     val price: Int,
@@ -99,9 +104,9 @@ fun CardContentScreen(
       modifier = modifier,
   ) { innerPadding ->
     Column(
-        modifier = Modifier.padding(innerPadding).fillMaxWidth(),
+        modifier = Modifier.padding(innerPadding).fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
+        ) {
       Text(
           text = state.value.screenTitle,
           modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
@@ -125,7 +130,7 @@ fun CardContentScreen(
         is CardContentScreenState.DisplayBasket -> {
           Basket(
               title = (state.value as CardContentScreenState.DisplayBasket).selectedTitle!!,
-              onPay = { navController.navigate(WriteCard(nbTickets = it.quantity)) })
+              onPay = { navController.navigate(WriteTitleCard(title = it)) })
         }
       }
     }
@@ -138,6 +143,16 @@ internal fun ColumnScope.CardContent(
     chooseTitle: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    if (contracts.contracts.isEmpty()) {
+        Spacer(modifier = Modifier.weight(1f))
+        Text(
+                text = stringResource(Res.string.card_empty),
+                modifier = Modifier.padding(10.dp).fillMaxWidth(),
+                color = blue,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+            )
+    }
   LazyColumn(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
     items(contracts.contracts) { contract ->
       Card(
@@ -325,9 +340,7 @@ internal fun TitleCard(
             verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
         ) {
           Text(
-              text =
-                  pluralStringResource(
-                      Res.plurals.basket_title_multi_title, title.quantity, title.quantity),
+              text = getShopTitleDisplayName(title),
               color = blue,
               fontWeight = FontWeight.Bold,
               textAlign = TextAlign.Center,
@@ -339,4 +352,13 @@ internal fun TitleCard(
           )
         }
       }
+}
+
+@Composable
+fun getShopTitleDisplayName(title: Title): String {
+    if (title.type == TitleType.SINGLE) {
+        return pluralStringResource(
+            Res.plurals.basket_title_multi_title, title.quantity, title.quantity)
+    }
+    return stringResource(Res.string.basket_title_season_title)
 }

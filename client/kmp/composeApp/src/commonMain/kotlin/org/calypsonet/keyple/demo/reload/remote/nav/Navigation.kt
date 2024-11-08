@@ -12,6 +12,7 @@
 package org.calypsonet.keyple.demo.reload.remote.nav
 
 import kotlinx.serialization.Serializable
+import org.calypsonet.keyple.demo.reload.remote.card.Title
 
 @Serializable data object Home
 
@@ -34,7 +35,16 @@ enum class ScanNavArgs(val value: String) {
 
 @Serializable data class Scan(val action: String = ScanNavArgs.READ_CONTRACTS.value)
 
-@Serializable data class WriteCard(val nbTickets: Int = 0)
+@Serializable data class WriteTitleCard(val type: Int,
+                                        val price: Int,
+                                        val quantity: Int = 1,
+                                        val date: String? = null) {
+  companion object {
+    operator fun invoke(title: Title): WriteTitleCard {
+      return WriteTitleCard(title.type.ordinal, title.price, title.quantity, title.date)
+    }
+  }
+}
 
 @Serializable data object PersonalizeCard
 

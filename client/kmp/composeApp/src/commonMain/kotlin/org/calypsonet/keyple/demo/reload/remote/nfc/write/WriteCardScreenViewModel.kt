@@ -18,6 +18,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.calypsonet.keyple.demo.reload.remote.KeypleService
+import org.calypsonet.keyple.demo.reload.remote.card.TitleType
+import org.calypsonet.keyple.demo.reload.remote.nav.WriteTitleCard
 import org.eclipse.keyple.distributed.protocol.KeypleResult
 
 sealed class WriteCardScreenState {
@@ -31,8 +33,8 @@ sealed class WriteCardScreenState {
 }
 
 class WriteCardScreenViewModel(
-    private val keypleService: KeypleService,
-    private val nbTickets: Int,
+  private val keypleService: KeypleService,
+  private val title: WriteTitleCard,
 ) : ViewModel() {
   private var _state = MutableStateFlow<WriteCardScreenState>(WriteCardScreenState.WaitForCard)
   val state = _state.asStateFlow()
@@ -53,7 +55,7 @@ class WriteCardScreenViewModel(
         val cardFound = keypleService.waitCard()
         if (cardFound) {
           keypleService.updateReaderMessage("Stay still...")
-          writeTitle(nbTickets)
+          writeTitle(title)
         } else {
           _state.value = WriteCardScreenState.DisplayError("No card found")
         }
@@ -63,28 +65,12 @@ class WriteCardScreenViewModel(
     }
   }
 
-  private suspend fun personalizeCard() {
-    _state.value = WriteCardScreenState.WritingToCard
-    try {
-      when (val result = keypleService.personalizeCard()) {
-        is KeypleResult.Failure -> {
-          _state.value = WriteCardScreenState.DisplayError(result.error.message)
-        }
-        is KeypleResult.Success -> {
-          // _state.value = WriteCardScreenState.ShowCardContent
-        }
-      }
-    } catch (e: Exception) {
-      Napier.e("Error personalizing card", e)
-      _state.value = WriteCardScreenState.DisplayError(e.message ?: "Unknown error")
-    }
-  }
-
-  private suspend fun writeTitle(nbUnits: Int) {
+  private suspend fun writeTitle(title: WriteTitleCard) {
     _state.value = WriteCardScreenState.WritingToCard
 
     try {
-      when (val result = keypleService.selectCardAndIncreaseContractCounter(nbUnits)) {
+      val result = if (title.type == TitleType.SEASON.ordinal) writePassTitle() else writeMultiTripTitle(title.quantity)
+      when (result) {
         is KeypleResult.Failure -> {
           _state.value = WriteCardScreenState.DisplayError(result.error.message)
         }
@@ -96,5 +82,13 @@ class WriteCardScreenViewModel(
       Napier.e("Error writing to card", e)
       _state.value = WriteCardScreenState.DisplayError(e.message ?: "Unknown error")
     }
+  }
+
+  private suspend fun writePassTitle() : KeypleResult<String>  {
+    return keypleService.selectCardAndWriteContract(ticketNumber = 1, code = PriorityCode.SEASON_PASS)
+  }
+
+  private suspend fun writeMultiTripTitle(nbUnits: Int) : KeypleResult<String> {
+    return keypleService.selectCardAndIncreaseContractCounter(nbUnits)
   }
 }

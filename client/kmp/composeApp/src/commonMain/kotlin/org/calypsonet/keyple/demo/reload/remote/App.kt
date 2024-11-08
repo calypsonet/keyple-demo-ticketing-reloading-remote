@@ -28,7 +28,7 @@ import org.calypsonet.keyple.demo.reload.remote.nav.PersonalizeCard
 import org.calypsonet.keyple.demo.reload.remote.nav.ReadCard
 import org.calypsonet.keyple.demo.reload.remote.nav.ServerConfig
 import org.calypsonet.keyple.demo.reload.remote.nav.Settings
-import org.calypsonet.keyple.demo.reload.remote.nav.WriteCard
+import org.calypsonet.keyple.demo.reload.remote.nav.WriteTitleCard
 import org.calypsonet.keyple.demo.reload.remote.nfc.personalize.PersonalizeCardScreen
 import org.calypsonet.keyple.demo.reload.remote.nfc.personalize.PersonalizeCardScreenViewModel
 import org.calypsonet.keyple.demo.reload.remote.nfc.read.ReadCardScreen
@@ -73,14 +73,14 @@ fun App(service: KeypleService, cardRepository: CardRepository) {
             appState = state.value)
       }
 
-      composable<WriteCard> { backStackEntry ->
-        val route = backStackEntry.toRoute<WriteCard>()
+      composable<WriteTitleCard> { backStackEntry ->
+        val route = backStackEntry.toRoute<WriteTitleCard>()
 
         WriteCardScreen(
             navController = navController,
             viewModel =
                 viewModel<WriteCardScreenViewModel> {
-                  WriteCardScreenViewModel(keypleService = service, nbTickets = route.nbTickets)
+                  WriteCardScreenViewModel(keypleService = service, title = route)
                 },
             appState = state.value)
       }

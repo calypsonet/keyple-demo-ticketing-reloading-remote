@@ -51,9 +51,9 @@ import org.calypsonet.keyple.demo.reload.remote.nfc.write.WriteContract
 
 const val SELECT_APP_AND_READ_CONTRACTS = "SELECT_APP_AND_READ_CONTRACTS"
 const val SELECT_APP_AND_INCREASE_CONTRACT_COUNTER = "SELECT_APP_AND_INCREASE_CONTRACT_COUNTER"
-const val PERSONALIZE_CARD = "PERSONALIZE_CARD"
+const val SELECT_APP_AND_PERSONALIZE_CARD = "SELECT_APP_AND_PERSONALIZE_CARD"
 const val READ_CARD_AND_ANALYZE_CONTRACTS = "READ_CARD_AND_ANALYZE_CONTRACTS"
-const val READ_CARD_AND_WRITE_CONTRACT = "READ_CARD_AND_WRITE_CONTRACT"
+const val SELECT_APP_AND_LOAD_CONTRACT = "SELECT_APP_AND_LOAD_CONTRACT"
 
 private val SERVER_IP_KEY = stringPreferencesKey("server_ip_key")
 private val SERVER_PORT_KEY = intPreferencesKey("server_port_key")
@@ -268,7 +268,7 @@ class KeypleService(
   suspend fun personalizeCard(): KeypleResult<String> {
     return withContext(Dispatchers.IO) {
       remoteService?.let {
-        val result = executeService(it, PERSONALIZE_CARD, InputData(), InputData.serializer())
+        val result = executeService(it, SELECT_APP_AND_PERSONALIZE_CARD, SelectAppAndPersonalizeCardInputDto(), SelectAppAndPersonalizeCardInputDto.serializer())
         when (result) {
           is KeypleResult.Failure -> {
             return@withContext KeypleResult.Failure(result.error)
@@ -290,7 +290,7 @@ class KeypleService(
         val result =
             executeService(
                 it,
-                READ_CARD_AND_WRITE_CONTRACT,
+                SELECT_APP_AND_LOAD_CONTRACT,
                 WriteContract(contractTariff = code, ticketToLoad = ticketNumber),
                 WriteContract.serializer())
         when (result) {
@@ -314,8 +314,8 @@ class KeypleService(
         val result =
             executeService(
                 it,
-                SELECT_APP_AND_INCREASE_CONTRACT_COUNTER,
-                WriteContract(contractTariff = code, ticketToLoad = ticketNumber),
+                SELECT_APP_AND_LOAD_CONTRACT,
+                WriteContract(contractTariff = code.ordinal, ticketToLoad = ticketNumber),
                 WriteContract.serializer())
         when (result) {
           is KeypleResult.Failure -> {

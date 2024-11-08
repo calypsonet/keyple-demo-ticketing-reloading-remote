@@ -18,6 +18,8 @@ import kotlinx.serialization.json.Json
 
 @Serializable class InputData
 
+@Serializable data class SelectAppAndPersonalizeCardInputDto(val pluginType: String = "Android NFC")
+
 @Serializable
 data class OutputData(
     val items: List<String>?,

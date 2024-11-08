@@ -66,7 +66,7 @@ internal fun PersonalizeCardScreen(
           }
           PersonalizeCardScreenState.DisplaySuccess -> {
             Text(
-                text = "card personalized",
+                text = "Card is now personalized",
                 modifier = Modifier.widthIn(max = 200.dp).padding(top = 16.dp),
                 color = blue,
                 fontWeight = FontWeight.Bold,
