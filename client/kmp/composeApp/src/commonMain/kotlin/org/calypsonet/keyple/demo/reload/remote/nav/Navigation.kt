@@ -38,10 +38,11 @@ enum class ScanNavArgs(val value: String) {
 @Serializable data class WriteTitleCard(val type: Int,
                                         val price: Int,
                                         val quantity: Int = 1,
-                                        val date: String? = null) {
+                                        val date: String? = null,
+                                        val cardSerial: String) {
   companion object {
-    operator fun invoke(title: Title): WriteTitleCard {
-      return WriteTitleCard(title.type.ordinal, title.price, title.quantity, title.date)
+    operator fun invoke(title: Title, cardSerial: String = ""): WriteTitleCard {
+      return WriteTitleCard(title.type.ordinal, title.price, title.quantity, title.date, cardSerial)
     }
   }
 }

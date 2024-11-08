@@ -25,6 +25,7 @@ enum class PriorityCode {
 
 @Serializable
 data class WriteContract(
+    val applicationSerialNumber: String,
     val contractTariff: PriorityCode,
     val pluginType: String = "Android NFC",
     val ticketToLoad: Int

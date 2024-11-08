@@ -21,7 +21,8 @@ import org.calypsonet.keyple.demo.reload.remote.CardRepository
 import org.calypsonet.keyple.demo.reload.remote.KeypleService
 
 sealed class CardContentScreenState(val screenTitle: String) {
-  data class DisplayContent(val contracts: CardContracts = CardContracts()) :
+  data class DisplayContent(
+      val contracts: CardContracts = CardContracts()) :
       CardContentScreenState("Content")
 
   data class ChooseTitle(val titles: List<Title> = emptyList()) :
@@ -65,4 +66,8 @@ class CardContentScreenViewModel(
   fun addToBasket(title: Title) {
     _state.value = CardContentScreenState.DisplayBasket(title)
   }
+
+    fun getCardSerial(): String {
+        return cardRepository.getCardSerial()
+    }
 }

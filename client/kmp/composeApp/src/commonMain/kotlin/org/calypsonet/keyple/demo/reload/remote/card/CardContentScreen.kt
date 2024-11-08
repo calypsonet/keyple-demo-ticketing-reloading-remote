@@ -130,7 +130,7 @@ fun CardContentScreen(
         is CardContentScreenState.DisplayBasket -> {
           Basket(
               title = (state.value as CardContentScreenState.DisplayBasket).selectedTitle!!,
-              onPay = { navController.navigate(WriteTitleCard(title = it)) })
+              onPay = { navController.navigate(WriteTitleCard(title = it, cardSerial = viewModel.getCardSerial())) })
         }
       }
     }

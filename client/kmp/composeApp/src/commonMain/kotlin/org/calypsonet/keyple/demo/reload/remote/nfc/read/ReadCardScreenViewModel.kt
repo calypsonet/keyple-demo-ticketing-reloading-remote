@@ -64,9 +64,6 @@ class ReadCardScreenViewModel(
   }
 
   private suspend fun readContracts() {
-    //        _state.value = ReadCardScreenState.ShowCardContent
-    //        return
-
     _state.value = ReadCardScreenState.ReadingCard
     try {
       when (val result = keypleService.selectCardAndReadContracts()) {

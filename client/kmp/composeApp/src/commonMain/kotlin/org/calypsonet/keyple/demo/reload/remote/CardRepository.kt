@@ -13,6 +13,15 @@ package org.calypsonet.keyple.demo.reload.remote
 
 class CardRepository {
   private var cardContracts: CardContracts? = null
+  private var cardSerial = ""
+
+  fun getCardSerial(): String {
+    return cardSerial
+  }
+
+  fun saveCardSerial(serial: String) {
+    cardSerial = serial
+  }
 
   fun getCardContracts(): CardContracts {
     return cardContracts ?: CardContracts()

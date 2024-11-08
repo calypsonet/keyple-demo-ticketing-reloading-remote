@@ -18,7 +18,18 @@ import kotlinx.serialization.json.Json
 
 @Serializable class InputData
 
-@Serializable data class SelectAppAndPersonalizeCardInputDto(val pluginType: String = "Android NFC")
+@Serializable
+data class GenericSelectAppInputDto(
+    val pluginType: String = "Android NFC"
+)
+
+@Serializable
+data class SelectAppAndAnalyzeContractsOutputDto(
+    val applicationSerialNumber: String,
+    val validContracts: List<ContractInfo>,
+    val message: String,
+    val statusCode: Int,
+)
 
 @Serializable
 data class OutputData(
@@ -26,6 +37,14 @@ data class OutputData(
     val statusCode: Int,
     val message: String,
 )
+
+@Serializable
+data class ContractInfo(
+    val title: String,
+    val description: String,
+    val isValid: Boolean,
+)
+
 
 class CardContractsBuilder {
   fun build(content: String): CardContracts {

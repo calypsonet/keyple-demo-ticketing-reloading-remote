@@ -25,7 +25,6 @@ import io.ktor.client.request.get
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -45,14 +44,13 @@ import org.eclipse.keyple.distributed.protocol.KeypleError
 import org.eclipse.keyple.distributed.protocol.KeypleRemoteService
 import org.eclipse.keyple.distributed.protocol.KeypleResult
 import org.eclipse.keyple.distributed.protocol.LogLevel
-import org.calypsonet.keyple.demo.reload.remote.nfc.write.AnalyzeContracts
 import org.calypsonet.keyple.demo.reload.remote.nfc.write.PriorityCode
 import org.calypsonet.keyple.demo.reload.remote.nfc.write.WriteContract
 
 const val SELECT_APP_AND_READ_CONTRACTS = "SELECT_APP_AND_READ_CONTRACTS"
 const val SELECT_APP_AND_INCREASE_CONTRACT_COUNTER = "SELECT_APP_AND_INCREASE_CONTRACT_COUNTER"
 const val SELECT_APP_AND_PERSONALIZE_CARD = "SELECT_APP_AND_PERSONALIZE_CARD"
-const val READ_CARD_AND_ANALYZE_CONTRACTS = "READ_CARD_AND_ANALYZE_CONTRACTS"
+const val SELECT_APP_AND_ANALYZE_CONTRACTS = "SELECT_APP_AND_ANALYZE_CONTRACTS"
 const val SELECT_APP_AND_LOAD_CONTRACT = "SELECT_APP_AND_LOAD_CONTRACT"
 
 private val SERVER_IP_KEY = stringPreferencesKey("server_ip_key")
@@ -111,7 +109,6 @@ class KeypleService(
     launchPingJob()
   }
 
-  // TODO maybe move this to a dedicated repository
   private fun loadServerConfig() {
     runBlocking {
       val preferences = dataStore.data.first()
@@ -197,12 +194,32 @@ class KeypleService(
     remoteService?.releaseReader()
   }
 
+  suspend fun selectCardAndAnalyseContracts(): KeypleResult<SelectAppAndAnalyzeContractsOutputDto> {
+    return withContext(Dispatchers.IO) {
+      cardRepository.clear()
+      remoteService?.let { service ->
+        val result: KeypleResult<SelectAppAndAnalyzeContractsOutputDto> =
+          executeService(service, SELECT_APP_AND_ANALYZE_CONTRACTS, GenericSelectAppInputDto(), GenericSelectAppInputDto.serializer(), SelectAppAndAnalyzeContractsOutputDto.serializer())
+
+        when (result) {
+          is KeypleResult.Failure -> {
+            return@withContext KeypleResult.Failure(result.error)
+          }
+          is KeypleResult.Success -> {
+            cardRepository.saveCardSerial(result.data.applicationSerialNumber)
+            return@withContext KeypleResult.Success(result.data)
+          }
+        }
+      } ?: throw IllegalStateException("Remote service not initialized")
+    }
+  }
+
   suspend fun selectCardAndReadContracts(): KeypleResult<CardContracts> {
     return withContext(Dispatchers.IO) {
       cardRepository.clear()
       remoteService?.let { service ->
         val result: KeypleResult<String> =
-            executeService(
+            executeServiceWithGenericOutput(
                 service, SELECT_APP_AND_READ_CONTRACTS, InputData(), InputData.serializer())
 
         when (result) {
@@ -212,6 +229,7 @@ class KeypleService(
           is KeypleResult.Success -> {
             val contracts = CardContractsBuilder().build(result.data)
             cardRepository.saveCardContracts(contracts)
+            cardRepository.saveCardSerial(result.data)
             return@withContext KeypleResult.Success(contracts)
           }
         }
@@ -219,36 +237,11 @@ class KeypleService(
     }
   }
 
-  suspend fun readCardAndAnalyzeContracts(payload: AnalyzeContracts): KeypleResult<CardContracts> {
-    return withContext(Dispatchers.IO) {
-      cardRepository.clear()
-      remoteService?.let { service ->
-        val result =
-            executeService(
-                service, READ_CARD_AND_ANALYZE_CONTRACTS, payload, AnalyzeContracts.serializer())
-
-        when (result) {
-          is KeypleResult.Failure -> {
-            return@withContext KeypleResult.Failure(result.error)
-          }
-          is KeypleResult.Success -> {
-            val contracts = CardContractsBuilder().build(result.data)
-
-            cardRepository.saveCardContracts(contracts)
-            return@withContext KeypleResult.Success(contracts)
-          }
-        }
-      } ?: throw IllegalStateException("Remote service not initialized")
-    }
-  }
-
-  // TODO define what we want to return here?
-  // TODO check how we should pass inputdata?
   suspend fun selectCardAndIncreaseContractCounter(nbUnits: Int): KeypleResult<String> {
     return withContext(Dispatchers.IO) {
       remoteService?.let {
         val result =
-            executeService(
+            executeServiceWithGenericOutput(
                 it,
                 SELECT_APP_AND_INCREASE_CONTRACT_COUNTER,
                 InputDataIncreaseCounter(nbUnits.toString()),
@@ -268,31 +261,7 @@ class KeypleService(
   suspend fun personalizeCard(): KeypleResult<String> {
     return withContext(Dispatchers.IO) {
       remoteService?.let {
-        val result = executeService(it, SELECT_APP_AND_PERSONALIZE_CARD, SelectAppAndPersonalizeCardInputDto(), SelectAppAndPersonalizeCardInputDto.serializer())
-        when (result) {
-          is KeypleResult.Failure -> {
-            return@withContext KeypleResult.Failure(result.error)
-          }
-          is KeypleResult.Success -> {
-            return@withContext KeypleResult.Success("Success")
-          }
-        }
-      } ?: throw IllegalStateException("Remote service not initialized")
-    }
-  }
-
-  suspend fun readCardAndWriteContracts(
-      ticketNumber: Int,
-      code: PriorityCode
-  ): KeypleResult<String> {
-    return withContext(Dispatchers.IO) {
-      remoteService?.let {
-        val result =
-            executeService(
-                it,
-                SELECT_APP_AND_LOAD_CONTRACT,
-                WriteContract(contractTariff = code, ticketToLoad = ticketNumber),
-                WriteContract.serializer())
+        val result = executeServiceWithGenericOutput(it, SELECT_APP_AND_PERSONALIZE_CARD, GenericSelectAppInputDto(), GenericSelectAppInputDto.serializer())
         when (result) {
           is KeypleResult.Failure -> {
             return@withContext KeypleResult.Failure(result.error)
@@ -312,10 +281,14 @@ class KeypleService(
     return withContext(Dispatchers.IO) {
       remoteService?.let {
         val result =
-            executeService(
+            executeServiceWithGenericOutput(
                 it,
                 SELECT_APP_AND_LOAD_CONTRACT,
-                WriteContract(contractTariff = code.ordinal, ticketToLoad = ticketNumber),
+                WriteContract(
+                  applicationSerialNumber = cardRepository.getCardSerial(),
+                  contractTariff = code,
+                  ticketToLoad = ticketNumber
+                ),
                 WriteContract.serializer())
         when (result) {
           is KeypleResult.Failure -> {
@@ -329,11 +302,11 @@ class KeypleService(
     }
   }
 
-  private suspend fun <T> executeService(
+  private suspend fun <T> executeServiceWithGenericOutput(
       remote: KeypleRemoteService,
       service: String,
       inputData: T? = null,
-      inputSerializer: KSerializer<T>
+      inputSerializer: KSerializer<T>,
   ): KeypleResult<String> {
     when (val result =
         remote.executeRemoteService(service, inputData, inputSerializer, OutputData.serializer())) {
@@ -355,6 +328,26 @@ class KeypleService(
         } else {
           return KeypleResult.Success("")
         }
+      }
+    }
+  }
+
+
+  private suspend fun <T, R> executeService(
+    remote: KeypleRemoteService,
+    service: String,
+    inputData: T? = null,
+    inputSerializer: KSerializer<T>,
+    outputSerializer: KSerializer<R>,
+  ): KeypleResult<R> {
+    when (val result =
+      remote.executeRemoteService(service, inputData, inputSerializer, outputSerializer)) {
+      is KeypleResult.Failure -> {
+        Napier.e(tag = TAG, message = "Error executing service: ${result.error}")
+        return KeypleResult.Failure(result.error)
+      }
+      is KeypleResult.Success -> {
+          return KeypleResult.Success(result.data!!)
       }
     }
   }
