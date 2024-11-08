@@ -21,14 +21,16 @@ kotlin {
 
     jvm("desktop")
 
-    listOf(
-        iosX64(),
-        iosArm64(),
-        iosSimulatorArm64()
-    ).forEach { iosTarget ->
-        iosTarget.binaries.framework {
-            baseName = "KeypleDemo"
-            isStatic = true
+    if (System.getProperty("os.name").lowercase().contains("mac")) {
+        listOf(
+            iosX64(),
+            iosArm64(),
+            iosSimulatorArm64()
+        ).forEach { iosTarget ->
+            iosTarget.binaries.framework {
+                baseName = "KeypleDemo"
+                isStatic = true
+            }
         }
     }
     
