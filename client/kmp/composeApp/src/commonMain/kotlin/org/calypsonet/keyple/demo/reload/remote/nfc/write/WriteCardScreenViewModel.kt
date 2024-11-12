@@ -85,15 +85,10 @@ class WriteCardScreenViewModel(
   }
 
   private suspend fun writePassTitle() : KeypleResult<String>  {
-    val result = keypleService.selectCardAndAnalyseContracts()
-    if (result is KeypleResult.Success) {
-       return keypleService.selectCardAndWriteContract(ticketNumber = 1, code = PriorityCode.SEASON_PASS)
-    } else {
-      return KeypleResult.Failure((result as KeypleResult.Failure).error)
-    }
+    return keypleService.selectCardAndWriteContract(ticketNumber = 1, code = PriorityCode.SEASON_PASS)
   }
 
   private suspend fun writeMultiTripTitle(nbUnits: Int) : KeypleResult<String> {
-    return keypleService.selectCardAndIncreaseContractCounter(nbUnits)
+    return keypleService.selectCardAndWriteContract(ticketNumber = nbUnits, code = PriorityCode.MULTI_TRIP)
   }
 }

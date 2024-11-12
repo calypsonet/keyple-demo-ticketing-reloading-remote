@@ -54,14 +54,14 @@ import keyplelessremotedemo.composeapp.generated.resources.contract_pass_subtitl
 import keyplelessremotedemo.composeapp.generated.resources.contract_pass_title
 import kotlinx.serialization.Serializable
 import org.calypsonet.keyple.demo.reload.remote.AppState
-import org.calypsonet.keyple.demo.reload.remote.CardContracts
-import org.calypsonet.keyple.demo.reload.remote.Contract
+import org.calypsonet.keyple.demo.reload.remote.ContractInfo
 import org.calypsonet.keyple.demo.reload.remote.nav.Home
 import org.calypsonet.keyple.demo.reload.remote.nav.WriteTitleCard
 import org.calypsonet.keyple.demo.reload.remote.ui.KeypleTopAppBar
 import org.calypsonet.keyple.demo.reload.remote.ui.blue
 import org.calypsonet.keyple.demo.reload.remote.ui.grey
 import org.calypsonet.keyple.demo.reload.remote.ui.lightBlue
+import org.jetbrains.annotations.Contract
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -139,11 +139,11 @@ fun CardContentScreen(
 
 @Composable
 internal fun ColumnScope.CardContent(
-    contracts: CardContracts,
+    contracts: List<ContractInfo>,
     chooseTitle: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    if (contracts.contracts.isEmpty()) {
+    if (contracts.isEmpty()) {
         Spacer(modifier = Modifier.weight(1f))
         Text(
                 text = stringResource(Res.string.card_empty),
@@ -154,7 +154,7 @@ internal fun ColumnScope.CardContent(
             )
     }
   LazyColumn(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
-    items(contracts.contracts) { contract ->
+    items(contracts) { contract ->
       Card(
           modifier = Modifier.padding(16.dp).fillMaxWidth(),
           elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp),
@@ -162,7 +162,7 @@ internal fun ColumnScope.CardContent(
       ) {
         Column {
           Text(
-              text = getContractTitle(contract),
+              text = contract.title,
               modifier = Modifier.padding(10.dp).fillMaxWidth(),
               color = blue,
               fontWeight = FontWeight.Bold,
@@ -170,7 +170,7 @@ internal fun ColumnScope.CardContent(
           )
 
           Text(
-              text = getContractSubtitle(contract),
+              text = contract.description,
               modifier = Modifier.padding(10.dp).fillMaxWidth(),
               color = blue,
               textAlign = TextAlign.Center,
@@ -196,25 +196,6 @@ internal fun ColumnScope.CardContent(
             fontSize = 20.sp,
         )
       }
-}
-
-@Composable
-fun getContractTitle(contract: Contract): String {
-  return when (contract.tarif) {
-    "MULTI_TRIP" -> stringResource(Res.string.contract_multi_title)
-    "EXPIRED" -> stringResource(Res.string.contract_pass_expired_title)
-    else -> stringResource(Res.string.contract_pass_title)
-  }
-}
-
-@Composable
-fun getContractSubtitle(contract: Contract): String {
-  return when (contract.tarif) {
-    "MULTI_TRIP" -> stringResource(Res.string.contract_multi_subtitle, contract.counterValue)
-    else ->
-        stringResource(
-            Res.string.contract_pass_subtitle, contract.saleDate, contract.validityEndDate)
-  }
 }
 
 @Composable

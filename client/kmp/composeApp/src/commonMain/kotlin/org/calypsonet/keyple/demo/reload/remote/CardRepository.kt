@@ -12,7 +12,7 @@
 package org.calypsonet.keyple.demo.reload.remote
 
 class CardRepository {
-  private var cardContracts: CardContracts? = null
+  private var cardContracts: List<ContractInfo>? = null
   private var cardSerial = ""
 
   fun getCardSerial(): String {
@@ -23,11 +23,11 @@ class CardRepository {
     cardSerial = serial
   }
 
-  fun getCardContracts(): CardContracts {
-    return cardContracts ?: CardContracts()
+  fun getCardContracts(): List<ContractInfo> {
+    return cardContracts ?: emptyList()
   }
 
-  fun saveCardContracts(contracts: CardContracts) {
+  fun saveCardContracts(contracts: List<ContractInfo>) {
     cardContracts = contracts
   }
 

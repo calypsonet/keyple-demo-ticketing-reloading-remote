@@ -47,8 +47,6 @@ import org.eclipse.keyple.distributed.protocol.LogLevel
 import org.calypsonet.keyple.demo.reload.remote.nfc.write.PriorityCode
 import org.calypsonet.keyple.demo.reload.remote.nfc.write.WriteContract
 
-const val SELECT_APP_AND_READ_CONTRACTS = "SELECT_APP_AND_READ_CONTRACTS"
-const val SELECT_APP_AND_INCREASE_CONTRACT_COUNTER = "SELECT_APP_AND_INCREASE_CONTRACT_COUNTER"
 const val SELECT_APP_AND_PERSONALIZE_CARD = "SELECT_APP_AND_PERSONALIZE_CARD"
 const val SELECT_APP_AND_ANALYZE_CONTRACTS = "SELECT_APP_AND_ANALYZE_CONTRACTS"
 const val SELECT_APP_AND_LOAD_CONTRACT = "SELECT_APP_AND_LOAD_CONTRACT"
@@ -199,7 +197,13 @@ class KeypleService(
       cardRepository.clear()
       remoteService?.let { service ->
         val result: KeypleResult<SelectAppAndAnalyzeContractsOutputDto> =
-          executeService(service, SELECT_APP_AND_ANALYZE_CONTRACTS, GenericSelectAppInputDto(), GenericSelectAppInputDto.serializer(), SelectAppAndAnalyzeContractsOutputDto.serializer())
+          executeService(
+            service,
+            SELECT_APP_AND_ANALYZE_CONTRACTS,
+            GenericSelectAppInputDto(),
+            GenericSelectAppInputDto.serializer(),
+            SelectAppAndAnalyzeContractsOutputDto.serializer()
+          )
 
         when (result) {
           is KeypleResult.Failure -> {
@@ -207,51 +211,8 @@ class KeypleService(
           }
           is KeypleResult.Success -> {
             cardRepository.saveCardSerial(result.data.applicationSerialNumber)
+            cardRepository.saveCardContracts(result.data.validContracts)
             return@withContext KeypleResult.Success(result.data)
-          }
-        }
-      } ?: throw IllegalStateException("Remote service not initialized")
-    }
-  }
-
-  suspend fun selectCardAndReadContracts(): KeypleResult<CardContracts> {
-    return withContext(Dispatchers.IO) {
-      cardRepository.clear()
-      remoteService?.let { service ->
-        val result: KeypleResult<String> =
-            executeServiceWithGenericOutput(
-                service, SELECT_APP_AND_READ_CONTRACTS, InputData(), InputData.serializer())
-
-        when (result) {
-          is KeypleResult.Failure -> {
-            return@withContext KeypleResult.Failure(result.error)
-          }
-          is KeypleResult.Success -> {
-            val contracts = CardContractsBuilder().build(result.data)
-            cardRepository.saveCardContracts(contracts)
-            cardRepository.saveCardSerial(result.data)
-            return@withContext KeypleResult.Success(contracts)
-          }
-        }
-      } ?: throw IllegalStateException("Remote service not initialized")
-    }
-  }
-
-  suspend fun selectCardAndIncreaseContractCounter(nbUnits: Int): KeypleResult<String> {
-    return withContext(Dispatchers.IO) {
-      remoteService?.let {
-        val result =
-            executeServiceWithGenericOutput(
-                it,
-                SELECT_APP_AND_INCREASE_CONTRACT_COUNTER,
-                InputDataIncreaseCounter(nbUnits.toString()),
-                InputDataIncreaseCounter.serializer())
-        when (result) {
-          is KeypleResult.Failure -> {
-            return@withContext KeypleResult.Failure(result.error)
-          }
-          is KeypleResult.Success -> {
-            return@withContext KeypleResult.Success("Success")
           }
         }
       } ?: throw IllegalStateException("Remote service not initialized")
