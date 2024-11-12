@@ -61,7 +61,6 @@ import org.calypsonet.keyple.demo.reload.remote.ui.KeypleTopAppBar
 import org.calypsonet.keyple.demo.reload.remote.ui.blue
 import org.calypsonet.keyple.demo.reload.remote.ui.grey
 import org.calypsonet.keyple.demo.reload.remote.ui.lightBlue
-import org.jetbrains.annotations.Contract
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 
