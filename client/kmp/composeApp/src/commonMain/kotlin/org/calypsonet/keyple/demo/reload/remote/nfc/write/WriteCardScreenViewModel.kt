@@ -33,8 +33,8 @@ sealed class WriteCardScreenState {
 }
 
 class WriteCardScreenViewModel(
-  private val keypleService: KeypleService,
-  private val title: WriteTitleCard,
+    private val keypleService: KeypleService,
+    private val title: WriteTitleCard,
 ) : ViewModel() {
   private var _state = MutableStateFlow<WriteCardScreenState>(WriteCardScreenState.WaitForCard)
   val state = _state.asStateFlow()
@@ -69,7 +69,9 @@ class WriteCardScreenViewModel(
     _state.value = WriteCardScreenState.WritingToCard
 
     try {
-      val result = if (title.type == TitleType.SEASON.ordinal) writePassTitle() else writeMultiTripTitle(title.quantity)
+      val result =
+          if (title.type == TitleType.SEASON.ordinal) writePassTitle()
+          else writeMultiTripTitle(title.quantity)
       when (result) {
         is KeypleResult.Failure -> {
           _state.value = WriteCardScreenState.DisplayError(result.error.message)
@@ -84,11 +86,13 @@ class WriteCardScreenViewModel(
     }
   }
 
-  private suspend fun writePassTitle() : KeypleResult<String>  {
-    return keypleService.selectCardAndWriteContract(ticketNumber = 1, code = PriorityCode.SEASON_PASS)
+  private suspend fun writePassTitle(): KeypleResult<String> {
+    return keypleService.selectCardAndWriteContract(
+        ticketNumber = 1, code = PriorityCode.SEASON_PASS)
   }
 
-  private suspend fun writeMultiTripTitle(nbUnits: Int) : KeypleResult<String> {
-    return keypleService.selectCardAndWriteContract(ticketNumber = nbUnits, code = PriorityCode.MULTI_TRIP)
+  private suspend fun writeMultiTripTitle(nbUnits: Int): KeypleResult<String> {
+    return keypleService.selectCardAndWriteContract(
+        ticketNumber = nbUnits, code = PriorityCode.MULTI_TRIP)
   }
 }

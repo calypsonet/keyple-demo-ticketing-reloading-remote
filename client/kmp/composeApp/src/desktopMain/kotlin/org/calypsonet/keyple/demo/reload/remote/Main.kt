@@ -11,22 +11,31 @@
  ************************************************************************************** */
 package org.calypsonet.keyple.demo.reload.remote
 
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import io.github.aakira.napier.Napier
 import org.eclipse.keyple.keyplelessreaderlib.LocalNfcReader
 
-fun main() = application {
+fun main(args: Array<String>) = application {
   initLogger()
+  var filter = "*"
 
-  val windowState = rememberWindowState(placement = WindowPlacement.Floating)
+  val windowState = rememberWindowState(placement = WindowPlacement.Floating, width = 500.dp, height = 850.dp)
+  for (arg: String in args) {
+    if (arg.startsWith("-filter=")) {
+      filter = arg.removePrefix("-filter=")
+      Napier.d("Filter reader with: $filter")
+    }
+  }
 
   // TODO move all this to a DI module
   val cardRepository = CardRepository()
   val keypleService =
       KeypleService(
-          reader = LocalNfcReader(),
+          reader = LocalNfcReader(filter),
           clientId = "SOMEID",
           dataStore = createDataStore(DataStorePathProducer()),
           cardRepository = cardRepository)

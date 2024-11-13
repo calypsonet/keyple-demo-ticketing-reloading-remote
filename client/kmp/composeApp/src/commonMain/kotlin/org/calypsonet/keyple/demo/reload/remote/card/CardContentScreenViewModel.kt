@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import org.calypsonet.keyple.demo.reload.remote.CardRepository
 import org.calypsonet.keyple.demo.reload.remote.ContractInfo
-import org.calypsonet.keyple.demo.reload.remote.KeypleService
 
 sealed class CardContentScreenState(val screenTitle: String) {
   data class DisplayContent(val contracts: List<ContractInfo> = emptyList()) :
@@ -30,9 +29,7 @@ sealed class CardContentScreenState(val screenTitle: String) {
   data class DisplayBasket(val selectedTitle: Title?) : CardContentScreenState("Basket")
 }
 
-class CardContentScreenViewModel(
-    private val cardRepository: CardRepository
-) : ViewModel() {
+class CardContentScreenViewModel(private val cardRepository: CardRepository) : ViewModel() {
 
   private var _state =
       MutableStateFlow<CardContentScreenState>(
@@ -65,7 +62,7 @@ class CardContentScreenViewModel(
     _state.value = CardContentScreenState.DisplayBasket(title)
   }
 
-    fun getCardSerial(): String {
-        return cardRepository.getCardSerial()
-    }
+  fun getCardSerial(): String {
+    return cardRepository.getCardSerial()
+  }
 }

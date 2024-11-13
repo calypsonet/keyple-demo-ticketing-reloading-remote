@@ -12,16 +12,12 @@
 package org.calypsonet.keyple.demo.reload.remote
 
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
 
 @Serializable data class InputDataIncreaseCounter(val counterIncrement: String = "1")
 
 @Serializable class InputData
 
-@Serializable
-data class GenericSelectAppInputDto(
-    val pluginType: String = "Android NFC"
-)
+@Serializable data class GenericSelectAppInputDto(val pluginType: String = "Android NFC")
 
 @Serializable
 data class SelectAppAndAnalyzeContractsOutputDto(

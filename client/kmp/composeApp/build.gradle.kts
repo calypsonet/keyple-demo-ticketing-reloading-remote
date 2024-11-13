@@ -1,3 +1,4 @@
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
@@ -64,7 +65,6 @@ kotlin {
             implementation(libs.ktor.client.content.negotiation)
         }
 
-
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
         }
@@ -118,6 +118,23 @@ android {
     }
     dependencies {
         debugImplementation(compose.uiTooling)
+    }
+}
+
+tasks.withType<JavaExec>().configureEach {
+    val customArgs: String? by project
+    args = customArgs?.split(" ") ?: emptyList()
+}
+
+compose.desktop {
+    application {
+        mainClass = "MainKt"
+
+        nativeDistributions {
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            packageName = "KeypleDemo"
+            packageVersion = "1.0.0"
+        }
     }
 }
 

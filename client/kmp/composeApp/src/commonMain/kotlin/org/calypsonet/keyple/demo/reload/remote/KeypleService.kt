@@ -38,15 +38,15 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import org.eclipse.keyple.keyplelessreaderlib.LocalNfcReader
+import org.calypsonet.keyple.demo.reload.remote.nfc.write.PriorityCode
+import org.calypsonet.keyple.demo.reload.remote.nfc.write.WriteContract
 import org.eclipse.keyple.distributed.network.KeypleServerConfig
 import org.eclipse.keyple.distributed.network.ServerIOException
 import org.eclipse.keyple.distributed.protocol.KeypleError
 import org.eclipse.keyple.distributed.protocol.KeypleRemoteService
 import org.eclipse.keyple.distributed.protocol.KeypleResult
 import org.eclipse.keyple.distributed.protocol.LogLevel
-import org.calypsonet.keyple.demo.reload.remote.nfc.write.PriorityCode
-import org.calypsonet.keyple.demo.reload.remote.nfc.write.WriteContract
+import org.eclipse.keyple.keyplelessreaderlib.LocalNfcReader
 
 const val SELECT_APP_AND_PERSONALIZE_CARD = "SELECT_APP_AND_PERSONALIZE_CARD"
 const val SELECT_APP_AND_ANALYZE_CONTRACTS = "SELECT_APP_AND_ANALYZE_CONTRACTS"
@@ -198,13 +198,12 @@ class KeypleService(
       cardRepository.clear()
       remoteService?.let { service ->
         val result: KeypleResult<SelectAppAndAnalyzeContractsOutputDto> =
-          executeService(
-            service,
-            SELECT_APP_AND_ANALYZE_CONTRACTS,
-            GenericSelectAppInputDto(),
-            GenericSelectAppInputDto.serializer(),
-            SelectAppAndAnalyzeContractsOutputDto.serializer()
-          )
+            executeService(
+                service,
+                SELECT_APP_AND_ANALYZE_CONTRACTS,
+                GenericSelectAppInputDto(),
+                GenericSelectAppInputDto.serializer(),
+                SelectAppAndAnalyzeContractsOutputDto.serializer())
 
         when (result) {
           is KeypleResult.Failure -> {
@@ -223,7 +222,12 @@ class KeypleService(
   suspend fun personalizeCard(): KeypleResult<String> {
     return withContext(Dispatchers.IO) {
       remoteService?.let {
-        val result = executeServiceWithGenericOutput(it, SELECT_APP_AND_PERSONALIZE_CARD, GenericSelectAppInputDto(), GenericSelectAppInputDto.serializer())
+        val result =
+            executeServiceWithGenericOutput(
+                it,
+                SELECT_APP_AND_PERSONALIZE_CARD,
+                GenericSelectAppInputDto(),
+                GenericSelectAppInputDto.serializer())
         when (result) {
           is KeypleResult.Failure -> {
             return@withContext KeypleResult.Failure(result.error)
@@ -247,10 +251,9 @@ class KeypleService(
                 it,
                 SELECT_APP_AND_LOAD_CONTRACT,
                 WriteContract(
-                  applicationSerialNumber = cardRepository.getCardSerial(),
-                  contractTariff = code,
-                  ticketToLoad = ticketNumber
-                ),
+                    applicationSerialNumber = cardRepository.getCardSerial(),
+                    contractTariff = code,
+                    ticketToLoad = ticketNumber),
                 WriteContract.serializer())
         when (result) {
           is KeypleResult.Failure -> {
@@ -294,22 +297,21 @@ class KeypleService(
     }
   }
 
-
   private suspend fun <T, R> executeService(
-    remote: KeypleRemoteService,
-    service: String,
-    inputData: T? = null,
-    inputSerializer: KSerializer<T>,
-    outputSerializer: KSerializer<R>,
+      remote: KeypleRemoteService,
+      service: String,
+      inputData: T? = null,
+      inputSerializer: KSerializer<T>,
+      outputSerializer: KSerializer<R>,
   ): KeypleResult<R> {
     when (val result =
-      remote.executeRemoteService(service, inputData, inputSerializer, outputSerializer)) {
+        remote.executeRemoteService(service, inputData, inputSerializer, outputSerializer)) {
       is KeypleResult.Failure -> {
         Napier.e(tag = TAG, message = "Error executing service: ${result.error}")
         return KeypleResult.Failure(result.error)
       }
       is KeypleResult.Success -> {
-          return KeypleResult.Success(result.data!!)
+        return KeypleResult.Success(result.data!!)
       }
     }
   }

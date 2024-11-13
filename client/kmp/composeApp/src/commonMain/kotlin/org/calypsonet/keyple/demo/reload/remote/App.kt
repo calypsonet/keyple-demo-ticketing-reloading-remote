@@ -104,8 +104,7 @@ fun App(service: KeypleService, cardRepository: CardRepository) {
             viewModel =
                 viewModel<CardContentScreenViewModel> {
                   CardContentScreenViewModel(cardRepository = cardRepository)
-                }
-        )
+                })
       }
 
       composable<AppError> { ErrorScreen(navController = navController, appState = state.value) }
