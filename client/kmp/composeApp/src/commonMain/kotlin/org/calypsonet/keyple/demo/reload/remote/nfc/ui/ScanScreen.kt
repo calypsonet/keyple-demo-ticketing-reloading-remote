@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Scaffold
@@ -27,7 +26,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -35,12 +33,12 @@ import io.github.alexzhirkevich.compottie.Compottie
 import io.github.alexzhirkevich.compottie.LottieCompositionSpec
 import io.github.alexzhirkevich.compottie.animateLottieCompositionAsState
 import io.github.alexzhirkevich.compottie.rememberLottieComposition
-import io.github.alexzhirkevich.compottie.rememberLottiePainter
 import keyplelessremotedemo.composeapp.generated.resources.Res
 import keyplelessremotedemo.composeapp.generated.resources.ic_logo_calypso
 import keyplelessremotedemo.composeapp.generated.resources.keyple_background
 import org.calypsonet.keyple.demo.reload.remote.AppState
 import org.calypsonet.keyple.demo.reload.remote.ui.KeypleTopAppBar
+import org.calypsonet.keyple.demo.reload.remote.ui.ScreenAnimByPlatform
 import org.calypsonet.keyple.demo.reload.remote.ui.blue
 import org.calypsonet.keyple.demo.reload.remote.ui.red
 import org.jetbrains.compose.resources.ExperimentalResourceApi
@@ -109,23 +107,7 @@ internal fun PresentCardAnimation() {
   val progress by
       animateLottieCompositionAsState(composition, iterations = Compottie.IterateForever)
 
-  Image(
-      painter =
-          rememberLottiePainter(
-              composition = composition,
-              progress = { progress },
-          ),
-      modifier = Modifier.size(200.dp),
-      contentDescription = "Card scan animation",
-  )
-
-  Text(
-      text = "Please present a contactless support",
-      modifier = Modifier.widthIn(max = 200.dp).padding(top = 16.dp),
-      color = blue,
-      fontWeight = FontWeight.Bold,
-      textAlign = TextAlign.Center,
-  )
+  ScreenAnimByPlatform("Please present a contactless support", blue, composition, progress)
 }
 
 @OptIn(ExperimentalResourceApi::class)
@@ -137,23 +119,7 @@ internal fun ScanCardAnimation() {
   val progress by
       animateLottieCompositionAsState(composition, iterations = Compottie.IterateForever)
 
-  Image(
-      painter =
-          rememberLottiePainter(
-              composition = composition,
-              progress = { progress },
-          ),
-      modifier = Modifier.size(200.dp),
-      contentDescription = "Card read animation",
-  )
-
-  Text(
-      text = "Read in progress",
-      modifier = Modifier.widthIn(max = 200.dp).padding(top = 16.dp),
-      color = blue,
-      fontWeight = FontWeight.Bold,
-      textAlign = TextAlign.Center,
-  )
+  ScreenAnimByPlatform("Read in progress", blue, composition, progress)
 }
 
 @OptIn(ExperimentalResourceApi::class)
@@ -167,21 +133,5 @@ internal fun ReadingError(errorMessage: String) {
           composition,
       )
 
-  Image(
-      painter =
-          rememberLottiePainter(
-              composition = composition,
-              progress = { progress },
-          ),
-      modifier = Modifier.size(200.dp),
-      contentDescription = "Card scan animation",
-  )
-
-  Text(
-      text = errorMessage,
-      modifier = Modifier.widthIn(max = 200.dp).padding(top = 16.dp),
-      color = red,
-      fontWeight = FontWeight.Bold,
-      textAlign = TextAlign.Center,
-  )
+  ScreenAnimByPlatform(errorMessage, red, composition, progress)
 }

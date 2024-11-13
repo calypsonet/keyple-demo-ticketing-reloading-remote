@@ -23,7 +23,8 @@ fun main(args: Array<String>) = application {
   initLogger()
   var filter = "*"
 
-  val windowState = rememberWindowState(placement = WindowPlacement.Floating, width = 500.dp, height = 850.dp)
+  val windowState =
+      rememberWindowState(placement = WindowPlacement.Floating, width = 500.dp, height = 850.dp)
   for (arg: String in args) {
     if (arg.startsWith("-filter=")) {
       filter = arg.removePrefix("-filter=")

@@ -11,27 +11,22 @@
  ************************************************************************************** */
 package org.calypsonet.keyple.demo.reload.remote.ui
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
+import io.github.alexzhirkevich.compottie.LottieComposition
 import io.github.alexzhirkevich.compottie.LottieCompositionSpec
 import io.github.alexzhirkevich.compottie.animateLottieCompositionAsState
 import io.github.alexzhirkevich.compottie.rememberLottieComposition
-import io.github.alexzhirkevich.compottie.rememberLottiePainter
 import keyplelessremotedemo.composeapp.generated.resources.Res
 import keyplelessremotedemo.composeapp.generated.resources.success_title_loaded
 import org.calypsonet.keyple.demo.reload.remote.AppState
@@ -80,21 +75,13 @@ internal fun DisplaySuccess(details: ErrorDetails, modifier: Modifier = Modifier
           composition,
       )
 
-  Image(
-      painter =
-          rememberLottiePainter(
-              composition = composition,
-              progress = { progress },
-          ),
-      modifier = Modifier.size(200.dp),
-      contentDescription = "animation",
-  )
-
-  Text(
-      text = details.message,
-      modifier = Modifier.padding(36.dp),
-      color = white,
-      fontWeight = FontWeight.Bold,
-      textAlign = TextAlign.Center,
-  )
+  ScreenAnimByPlatform(details.message, white, composition, progress)
 }
+
+@Composable
+expect fun ScreenAnimByPlatform(
+    message: String,
+    textColor: Color,
+    composition: LottieComposition?,
+    progress: Float
+)
