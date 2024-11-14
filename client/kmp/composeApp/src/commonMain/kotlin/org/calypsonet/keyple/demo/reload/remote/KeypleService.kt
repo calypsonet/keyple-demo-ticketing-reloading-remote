@@ -40,12 +40,12 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.calypsonet.keyple.demo.reload.remote.nfc.write.PriorityCode
 import org.calypsonet.keyple.demo.reload.remote.nfc.write.WriteContract
-import org.eclipse.keyple.distributed.network.KeypleServerConfig
-import org.eclipse.keyple.distributed.network.ServerIOException
-import org.eclipse.keyple.distributed.protocol.KeypleError
-import org.eclipse.keyple.distributed.protocol.KeypleRemoteService
-import org.eclipse.keyple.distributed.protocol.KeypleResult
-import org.eclipse.keyple.distributed.protocol.LogLevel
+import org.eclipse.keyple.keypleless.distributed.client.network.KeypleServerConfig
+import org.eclipse.keyple.keypleless.distributed.client.network.ServerIOException
+import org.eclipse.keyple.keypleless.distributed.client.protocol.KeypleError
+import org.eclipse.keyple.keypleless.distributed.client.protocol.KeypleRemoteService
+import org.eclipse.keyple.keypleless.distributed.client.protocol.KeypleResult
+import org.eclipse.keyple.keypleless.distributed.client.protocol.LogLevel
 import org.eclipse.keyple.keyplelessreaderlib.LocalNfcReader
 
 const val SELECT_APP_AND_PERSONALIZE_CARD = "SELECT_APP_AND_PERSONALIZE_CARD"

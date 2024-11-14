@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.calypsonet.keyple.demo.reload.remote.KeypleService
-import org.eclipse.keyple.distributed.protocol.KeypleResult
+import org.eclipse.keyple.keypleless.distributed.client.protocol.KeypleResult
 
 sealed class ReadCardScreenState {
   data object WaitForCard : ReadCardScreenState()

@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 import org.calypsonet.keyple.demo.reload.remote.KeypleService
 import org.calypsonet.keyple.demo.reload.remote.card.TitleType
 import org.calypsonet.keyple.demo.reload.remote.nav.WriteTitleCard
-import org.eclipse.keyple.distributed.protocol.KeypleResult
+import org.eclipse.keyple.keypleless.distributed.client.protocol.KeypleResult
 
 sealed class WriteCardScreenState {
   data object WaitForCard : WriteCardScreenState()
