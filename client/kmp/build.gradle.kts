@@ -23,8 +23,5 @@ buildscript {
 
     dependencies {
         classpath(libs.spotless.plugin.gradle)
-        classpath("org.eclipse.keyple:keyple-gradle:0.2.+") { isChanging = true }
-        classpath(libs.jaxb.api)
-        classpath(libs.jaxb.impl)
     }
 }

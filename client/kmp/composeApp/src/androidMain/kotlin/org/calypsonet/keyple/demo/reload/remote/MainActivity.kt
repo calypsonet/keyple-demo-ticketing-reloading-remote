@@ -16,7 +16,7 @@ import android.os.Bundle
 import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import org.eclipse.keyple.keyplelessreaderlib.LocalNfcReader
+import org.eclipse.keyple.keypleless.reader.nfcmobile.LocalNfcReader
 
 class MainActivity : ComponentActivity() {
   @SuppressLint("HardwareIds")
