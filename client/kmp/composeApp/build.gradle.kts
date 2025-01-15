@@ -39,6 +39,7 @@ kotlin {
 
         commonMain.dependencies {
             implementation(libs.keyple.less.distributed)
+            implementation(libs.keyple.less.reader)
 
             implementation(libs.kotlinx.serialization)
             implementation(libs.ktor.serialization.kotlinx.json)
@@ -62,6 +63,14 @@ kotlin {
             implementation(libs.compottie)
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.client.logging)
+            implementation(libs.ktor.client.auth)
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.serialization.kotlinx.json)
+
+
+
+            implementation(libs.napier)
         }
 
         iosMain.dependencies {

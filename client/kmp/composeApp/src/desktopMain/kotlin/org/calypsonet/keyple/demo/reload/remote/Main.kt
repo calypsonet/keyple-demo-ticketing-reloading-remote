@@ -17,7 +17,8 @@ import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import io.github.aakira.napier.Napier
-import org.eclipse.keyple.keyplelessreaderlib.LocalNfcReader
+import org.eclipse.keyple.keypleless.reader.nfcmobile.LocalNfcReader
+import org.eclipse.keyple.keypleless.reader.nfcmobile.MultiplatformReader
 
 fun main(args: Array<String>) = application {
   initLogger()
@@ -36,7 +37,7 @@ fun main(args: Array<String>) = application {
   val cardRepository = CardRepository()
   val keypleService =
       KeypleService(
-          reader = LocalNfcReader(filter),
+          reader = MultiplatformReader(LocalNfcReader(filter)),
           clientId = "SOMEID",
           dataStore = createDataStore(DataStorePathProducer()),
           cardRepository = cardRepository)

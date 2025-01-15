@@ -37,15 +37,17 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import org.calypsonet.keyple.demo.reload.remote.network.KeypleServerConfig
+import org.calypsonet.keyple.demo.reload.remote.network.SimpleHttpNetworkClient
+import org.calypsonet.keyple.demo.reload.remote.network.buildHttpClient
 import org.calypsonet.keyple.demo.reload.remote.nfc.write.PriorityCode
 import org.calypsonet.keyple.demo.reload.remote.nfc.write.WriteContract
-import org.eclipse.keyple.keypleless.distributed.client.network.KeypleServerConfig
-import org.eclipse.keyple.keypleless.distributed.client.network.ServerIOException
 import org.eclipse.keyple.keypleless.distributed.client.protocol.KeypleError
-import org.eclipse.keyple.keypleless.distributed.client.protocol.KeypleRemoteService
 import org.eclipse.keyple.keypleless.distributed.client.protocol.KeypleResult
+import org.eclipse.keyple.keypleless.distributed.client.protocol.KeypleTerminal
 import org.eclipse.keyple.keypleless.distributed.client.protocol.LogLevel
-import org.eclipse.keyple.keypleless.reader.nfcmobile.LocalNfcReader
+import org.eclipse.keyple.keypleless.distributed.client.spi.LocalReader
+import org.eclipse.keyple.keypleless.distributed.client.spi.ServerIOException
 
 const val SELECT_APP_AND_PERSONALIZE_CARD = "SELECT_APP_AND_PERSONALIZE_CARD"
 const val SELECT_APP_AND_ANALYZE_CONTRACTS = "SELECT_APP_AND_ANALYZE_CONTRACTS"
@@ -65,7 +67,7 @@ data class KeypleServiceState(
 private const val TAG = "KeypleService"
 
 class KeypleService(
-    private val reader: LocalNfcReader,
+    private val reader: LocalReader,
     private val clientId: String,
     private val dataStore: DataStore<Preferences>,
     private val cardRepository: CardRepository
@@ -75,7 +77,7 @@ class KeypleService(
   val state = _state.asStateFlow()
 
   private var serverConfig: KeypleServerConfig? = null
-  private var remoteService: KeypleRemoteService? = null
+  private var remoteService: KeypleTerminal? = null
   private val httpClient = HttpClient {
     install(ContentNegotiation) {
       json(
@@ -97,12 +99,10 @@ class KeypleService(
 
   fun start() {
     loadServerConfig()
-    remoteService =
-        KeypleRemoteService(
-            localNfcReader = reader,
-            clientId = clientId,
-            config = serverConfig!!,
-        )
+
+      val server = SimpleHttpNetworkClient(serverConfig!!, buildHttpClient(serverConfig!!.logLevel))
+
+      remoteService = KeypleTerminal(reader = reader, clientId = clientId, networkClient = server)
 
     launchPingJob()
   }
@@ -267,7 +267,7 @@ class KeypleService(
   }
 
   private suspend fun <T> executeServiceWithGenericOutput(
-      remote: KeypleRemoteService,
+      remote: KeypleTerminal,
       service: String,
       inputData: T? = null,
       inputSerializer: KSerializer<T>,
@@ -297,7 +297,7 @@ class KeypleService(
   }
 
   private suspend fun <T, R> executeService(
-      remote: KeypleRemoteService,
+      remote: KeypleTerminal,
       service: String,
       inputData: T? = null,
       inputSerializer: KSerializer<T>,

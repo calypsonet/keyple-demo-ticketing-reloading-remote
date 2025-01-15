@@ -24,9 +24,10 @@ val cardRepository = CardRepository()
 val remoteService =
     KeypleService(
         reader =
-            LocalNfcReader() { error ->
-              return@LocalNfcReader "Error: ${error.message}"
-            },
+            MultiplatformReader(
+                LocalNfcReader() { error ->
+                  return@LocalNfcReader "Error: ${error.message}"
+                }),
         clientId = UIDevice.currentDevice.identifierForVendor?.UUIDString() ?: "anon",
         cardRepository = cardRepository,
         dataStore = dataStrore)

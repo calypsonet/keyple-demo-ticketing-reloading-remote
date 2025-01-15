@@ -17,6 +17,7 @@ import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import org.eclipse.keyple.keypleless.reader.nfcmobile.LocalNfcReader
+import org.eclipse.keyple.keypleless.reader.nfcmobile.MultiplatformReader
 
 class MainActivity : ComponentActivity() {
   @SuppressLint("HardwareIds")
@@ -27,7 +28,7 @@ class MainActivity : ComponentActivity() {
     val cardRepository = CardRepository()
     val keypleService =
         KeypleService(
-            reader = LocalNfcReader(this),
+            reader = MultiplatformReader(LocalNfcReader(this)),
             clientId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID),
             dataStore = createDataStore(DataStorePathProducer(applicationContext)),
             cardRepository = cardRepository)
