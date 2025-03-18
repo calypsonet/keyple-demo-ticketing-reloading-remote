@@ -14,10 +14,10 @@ package org.calypsonet.keyple.demo.reload.remote
 import androidx.compose.ui.window.ComposeUIViewController
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
-import org.eclipse.keyple.keyplelessreaderlib.LocalNfcReader
+import org.eclipse.keyple.keypleless.reader.nfcmobile.*
 import platform.UIKit.UIDevice
 
-val dataStrore = createDataStore(DataStorePathProducer())
+val dataStore = createDataStore(DataStorePathProducer())
 
 val cardRepository = CardRepository()
 
@@ -30,7 +30,7 @@ val remoteService =
                 }),
         clientId = UIDevice.currentDevice.identifierForVendor?.UUIDString() ?: "anon",
         cardRepository = cardRepository,
-        dataStore = dataStrore)
+        dataStore = dataStore)
 
 val logger = Napier.base(DebugAntilog())
 

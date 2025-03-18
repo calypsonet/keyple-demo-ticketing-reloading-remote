@@ -14,6 +14,8 @@ package org.calypsonet.keyple.demo.reload.remote.nfc.read
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.github.aakira.napier.Napier
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -50,13 +52,13 @@ class ReadCardScreenViewModel(
     viewModelScope.launch {
       keypleService.updateReaderMessage("Place your card on the top of the iPhone")
       try {
-        val cardFound = keypleService.waitCard()
-        if (cardFound) {
+        keypleService.waitForCard {
           keypleService.updateReaderMessage("Stay still...")
-          readContracts()
-        } else {
-          _state.value = ReadCardScreenState.DisplayError("No card found")
+          viewModelScope.launch(Dispatchers.IO) {
+            readContracts()
+          }
         }
+        //_state.value = ReadCardScreenState.DisplayError("No card found")
       } catch (e: Exception) {
         _state.value = ReadCardScreenState.DisplayError("Error: ${e.message}")
       }

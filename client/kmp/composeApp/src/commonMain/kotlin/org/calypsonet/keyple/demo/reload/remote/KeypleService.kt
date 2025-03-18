@@ -25,6 +25,7 @@ import io.ktor.client.request.get
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -182,6 +183,10 @@ class KeypleService(
     return withContext(Dispatchers.IO) {
       return@withContext remoteService?.waitForCard() ?: false
     }
+  }
+
+  fun waitForCard(cardConnected: () -> Unit) {
+    this.remoteService?.waitForCard(cardConnected)
   }
 
   fun updateReaderMessage(msg: String) {
