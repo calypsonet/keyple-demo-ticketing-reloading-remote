@@ -21,9 +21,9 @@ import org.calypsonet.keyple.demo.reload.remote.data.model.Status
 import org.eclipse.keyple.core.service.KeyplePluginException
 import org.eclipse.keyple.core.service.Plugin
 import org.eclipse.keyple.distributed.LocalServiceClient
-import org.eclipse.keyple.plugin.android.nfc.AndroidNfcPlugin
+import org.eclipse.keyple.plugin.android.nfc.AndroidNfcConfig
+import org.eclipse.keyple.plugin.android.nfc.AndroidNfcConstants
 import org.eclipse.keyple.plugin.android.nfc.AndroidNfcPluginFactoryProvider
-import org.eclipse.keyple.plugin.android.nfc.AndroidNfcReader
 import org.eclipse.keyple.plugin.android.nfc.AndroidNfcSupportedProtocols
 import org.eclipse.keyple.plugin.android.omapi.AndroidOmapiPlugin
 import org.eclipse.keyple.plugin.android.omapi.AndroidOmapiPluginFactoryProvider
@@ -50,7 +50,7 @@ abstract class AbstractCardActivity :
         when (device) {
           DeviceEnum.CONTACTLESS_CARD -> {
             pluginType = "Android NFC"
-            AndroidNfcReader.READER_NAME
+            AndroidNfcConstants.READER_NAME
           }
           DeviceEnum.SIM -> {
             pluginType = "Android OMAPI"
@@ -77,7 +77,8 @@ abstract class AbstractCardActivity :
   fun initAndActivateAndroidKeypleNfcReader() {
     val plugin: Plugin? =
         readerRepository.registerPlugin(
-            AndroidNfcPluginFactoryProvider(this@AbstractCardActivity).getFactory())
+            AndroidNfcPluginFactoryProvider.provideFactory(
+                AndroidNfcConfig(this@AbstractCardActivity)))
 
     if (plugin == null) {
       return
@@ -101,7 +102,7 @@ abstract class AbstractCardActivity :
         .stopCardDetection()
     (readerRepository.getReader(selectedDeviceReaderName) as ConfigurableCardReader)
         .deactivateProtocol(AndroidNfcSupportedProtocols.ISO_14443_4.name)
-    readerRepository.unregisterPlugin(AndroidNfcPlugin.PLUGIN_NAME)
+    readerRepository.unregisterPlugin(AndroidNfcConstants.PLUGIN_NAME)
   }
 
   /**
