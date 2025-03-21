@@ -112,8 +112,12 @@ public class CardRepository {
     logger.info("Open Calypso Session (LOAD)...");
     cardTransactionManager
         .prepareOpenSecureSession(WriteAccessLevel.LOAD)
-        .prepareReadRecord(CardConstant.SFI_ENVIRONMENT_AND_HOLDER, 1)
-        .prepareReadRecord(CardConstant.SFI_EVENTS_LOG, 1)
+        .prepareReadRecords(
+            CardConstant.SFI_ENVIRONMENT_AND_HOLDER,
+            1,
+            1,
+            CardConstant.ENVIRONMENT_HOLDER_RECORD_SIZE_BYTES)
+        .prepareReadRecords(CardConstant.SFI_EVENTS_LOG, 1, 1, CardConstant.EVENT_RECORD_SIZE_BYTES)
         .prepareReadRecords(
             CardConstant.SFI_CONTRACTS, 1, contractCount, CardConstant.CONTRACT_RECORD_SIZE_BYTES)
         .prepareReadCounter(CardConstant.SFI_COUNTERS, contractCount)

@@ -122,10 +122,10 @@ dependencies {
     implementation("org.eclipse.keypop:keypop-reader-java-api:2.0.1")
     implementation("org.eclipse.keyple:keyple-common-java-api:2.0.1")
     implementation("org.eclipse.keyple:keyple-util-java-lib:2.4.0")
-    implementation("org.eclipse.keyple:keyple-service-java-lib:3.3.3")
+    implementation("org.eclipse.keyple:keyple-service-java-lib:3.3.5")
     implementation("org.eclipse.keyple:keyple-distributed-network-java-lib:2.5.1")
-    implementation("org.eclipse.keyple:keyple-distributed-local-java-lib:2.5.1")
-    implementation("org.eclipse.keyple:keyple-plugin-android-nfc-java-lib:2.2.0")
+    implementation("org.eclipse.keyple:keyple-distributed-local-java-lib:2.5.2")
+    implementation("org.eclipse.keyple:keyple-plugin-android-nfc-java-lib:3.0.0")
     implementation("org.eclipse.keyple:keyple-plugin-android-omapi-java-lib:2.1.0")
     // End Keyple configuration
 
