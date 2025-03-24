@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
+### Added
+- Added the `GET` REST resource `/export-card-selection-scenario` to allow the client to retrieve an exported card
+  selection scenario.
+### Upgraded
+- keyple-demo-common-lib `2.0.1-SNAPSHOT` -> keyple-demo-ticketing-common-lib `2.1.0-SNAPSHOT`
+  (import/export card selection scenario)
 
 ## [2024.10.21]
 ### Added

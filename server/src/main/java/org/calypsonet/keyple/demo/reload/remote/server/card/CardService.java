@@ -393,11 +393,19 @@ public class CardService {
       CardReader cardReader, SelectAppAndAnalyzeContractsInputDto inputData) {
 
     String pluginType = inputData.getPluginType();
+    String processedCardSelectionScenarioJsonString =
+        inputData.getProcessedCardSelectionScenarioJsonString();
 
     // Select application
     CalypsoCard calypsoCard;
     try {
-      calypsoCard = cardRepository.selectCard(cardReader);
+      if (processedCardSelectionScenarioJsonString != null) {
+        calypsoCard =
+            cardRepository.importProcessedCardSelectionScenario(
+                processedCardSelectionScenarioJsonString);
+      } else {
+        calypsoCard = cardRepository.selectCard(cardReader);
+      }
     } catch (RuntimeException e) {
       logger.error(AN_ERROR_OCCURRED_WHILE_ANALYZING_THE_CONTRACTS, e.getMessage(), e);
       activityService.push(
@@ -517,11 +525,19 @@ public class CardService {
       CardReader cardReader, SelectAppAndLoadContractInputDto inputData) {
 
     String pluginType = inputData.getPluginType();
+    String processedCardSelectionScenarioJsonString =
+        inputData.getProcessedCardSelectionScenarioJsonString();
 
     // Select application
     CalypsoCard calypsoCard;
     try {
-      calypsoCard = cardRepository.selectCard(cardReader);
+      if (processedCardSelectionScenarioJsonString != null) {
+        calypsoCard =
+            cardRepository.importProcessedCardSelectionScenario(
+                processedCardSelectionScenarioJsonString);
+      } else {
+        calypsoCard = cardRepository.selectCard(cardReader);
+      }
     } catch (RuntimeException e) {
       logger.error(AN_ERROR_OCCURRED_WHILE_WRITING_THE_CONTRACT, e.getMessage(), e);
       activityService.push(
@@ -575,11 +591,19 @@ public class CardService {
       CardReader cardReader, SelectAppAndPersonalizeCardInputDto inputData) {
 
     String pluginType = inputData.getPluginType();
+    String processedCardSelectionScenarioJsonString =
+        inputData.getProcessedCardSelectionScenarioJsonString();
 
     // Select application
     CalypsoCard calypsoCard;
     try {
-      calypsoCard = cardRepository.selectCard(cardReader);
+      if (processedCardSelectionScenarioJsonString != null) {
+        calypsoCard =
+            cardRepository.importProcessedCardSelectionScenario(
+                processedCardSelectionScenarioJsonString);
+      } else {
+        calypsoCard = cardRepository.selectCard(cardReader);
+      }
     } catch (RuntimeException e) {
       logger.error(AN_ERROR_OCCURRED_WHILE_INITIALIZING_THE_CARD, e.getMessage(), e);
       activityService.push(

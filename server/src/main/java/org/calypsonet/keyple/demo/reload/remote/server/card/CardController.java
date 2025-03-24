@@ -26,6 +26,20 @@ import org.eclipse.keypop.reader.ReaderCommunicationException;
 public class CardController {
 
   @Inject CardConfigurator cardConfigurator;
+  @Inject CardRepository cardRepository;
+
+  /**
+   * Returns the exported card selection scenario, as a JSON string.
+   *
+   * @return A JSON string containing the exported card selection scenario.
+   */
+  @GET
+  @Path("/export-card-selection-scenario")
+  @Produces(MediaType.APPLICATION_JSON)
+  public Response exportCardSelectionScenario() {
+    String cardSelectionScenarioJsonString = cardRepository.exportCardSelectionScenario();
+    return Response.ok(cardSelectionScenarioJsonString).build();
+  }
 
   /**
    * The endpoint access associated with the remote plugin server.
