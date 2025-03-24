@@ -84,6 +84,30 @@ public class CardRepository {
     return cardSelectionManager;
   }
 
+  String exportCardSelectionScenario() {
+    return createCardSelectionManager().exportCardSelectionScenario();
+  }
+
+  CalypsoCard importProcessedCardSelectionScenario(
+      String processedCardSelectionScenarioJsonString) {
+
+    // Prepare the card selection scenario
+    CardSelectionManager cardSelectionManager = createCardSelectionManager();
+
+    // Import the processed card selection scenario
+    CardSelectionResult cardSelectionResult =
+        cardSelectionManager.importProcessedCardSelectionScenario(
+            processedCardSelectionScenarioJsonString);
+
+    // Check the selection result.
+    if (cardSelectionResult.getActiveSmartCard() == null) {
+      throw new IllegalStateException("Selection error: AID not found");
+    }
+
+    // Get the SmartCard resulting of the selection.
+    return (CalypsoCard) cardSelectionResult.getActiveSmartCard();
+  }
+
   CalypsoCard selectCard(CardReader cardReader) {
 
     CardSelectionManager cardSelectionManager = createCardSelectionManager();
