@@ -250,8 +250,14 @@ public class CardConfigurator {
         SelectAppAndAnalyzeContractsInputDto inputData =
             readerExtension.getInputData(SelectAppAndAnalyzeContractsInputDto.class);
 
+        // Get the processed selection scenario
+        String processedCardSelectionScenarioJsonString =
+            (String) readerExtension.getInitialCardContent();
+
         // Execute service
-        outputData = cardService.selectAppAndAnalyzeContracts(reader, inputData);
+        outputData =
+            cardService.selectAppAndAnalyzeContracts(
+                reader, inputData, processedCardSelectionScenarioJsonString);
 
       } else if (RemoteServiceId.SELECT_APP_AND_LOAD_CONTRACT.name().equals(serviceId)) {
 
@@ -259,8 +265,14 @@ public class CardConfigurator {
         SelectAppAndLoadContractInputDto inputData =
             readerExtension.getInputData(SelectAppAndLoadContractInputDto.class);
 
+        // Get the processed selection scenario
+        String processedCardSelectionScenarioJsonString =
+            (String) readerExtension.getInitialCardContent();
+
         // Execute service
-        outputData = cardService.selectAppAndLoadContract(reader, inputData);
+        outputData =
+            cardService.selectAppAndLoadContract(
+                reader, inputData, processedCardSelectionScenarioJsonString);
 
       } else if (RemoteServiceId.SELECT_APP_AND_PERSONALIZE_CARD.name().equals(serviceId)) {
 
@@ -268,8 +280,14 @@ public class CardConfigurator {
         SelectAppAndPersonalizeCardInputDto inputData =
             readerExtension.getInputData(SelectAppAndPersonalizeCardInputDto.class);
 
+        // Get the processed selection scenario
+        String processedCardSelectionScenarioJsonString =
+            (String) readerExtension.getInitialCardContent();
+
         // Execute service
-        outputData = cardService.selectAppAndPersonalizeCard(reader, inputData);
+        outputData =
+            cardService.selectAppAndPersonalizeCard(
+                reader, inputData, processedCardSelectionScenarioJsonString);
 
       } else {
         throw new IllegalArgumentException("Service ID not recognized");

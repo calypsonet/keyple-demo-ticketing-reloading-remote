@@ -390,11 +390,11 @@ public class CardService {
   }
 
   SelectAppAndAnalyzeContractsOutputDto selectAppAndAnalyzeContracts(
-      CardReader cardReader, SelectAppAndAnalyzeContractsInputDto inputData) {
+      CardReader cardReader,
+      SelectAppAndAnalyzeContractsInputDto inputData,
+      String processedCardSelectionScenarioJsonString) {
 
     String pluginType = inputData.getPluginType();
-    String processedCardSelectionScenarioJsonString =
-        inputData.getProcessedCardSelectionScenarioJsonString();
 
     // Select application
     CalypsoCard calypsoCard;
@@ -522,11 +522,11 @@ public class CardService {
   }
 
   SelectAppAndLoadContractOutputDto selectAppAndLoadContract(
-      CardReader cardReader, SelectAppAndLoadContractInputDto inputData) {
+      CardReader cardReader,
+      SelectAppAndLoadContractInputDto inputData,
+      String processedCardSelectionScenarioJsonString) {
 
     String pluginType = inputData.getPluginType();
-    String processedCardSelectionScenarioJsonString =
-        inputData.getProcessedCardSelectionScenarioJsonString();
 
     // Select application
     CalypsoCard calypsoCard;
@@ -588,11 +588,11 @@ public class CardService {
   }
 
   SelectAppAndPersonalizeCardOutputDto selectAppAndPersonalizeCard(
-      CardReader cardReader, SelectAppAndPersonalizeCardInputDto inputData) {
+      CardReader cardReader,
+      SelectAppAndPersonalizeCardInputDto inputData,
+      String processedCardSelectionScenarioJsonString) {
 
     String pluginType = inputData.getPluginType();
-    String processedCardSelectionScenarioJsonString =
-        inputData.getProcessedCardSelectionScenarioJsonString();
 
     // Select application
     CalypsoCard calypsoCard;
