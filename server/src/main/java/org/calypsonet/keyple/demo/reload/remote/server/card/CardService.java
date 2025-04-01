@@ -70,6 +70,8 @@ public class CardService {
   private static final String CARD_NOT_PERSONALIZED = "Card not personalized.";
   private static final String ENVIRONMENT_EXPIRED = "Environment expired.";
   private static final String RUNTIME_EXCEPTION = "Runtime exception: ";
+  private static final String PROCESSED_CARD_SELECTION_SCENARIO_JSON_STRING =
+      "processedCardSelectionScenarioJsonString";
 
   private final DateTimeFormatter dateTimeFormatter =
       DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.ENGLISH);
@@ -392,9 +394,13 @@ public class CardService {
   SelectAppAndAnalyzeContractsOutputDto selectAppAndAnalyzeContracts(
       CardReader cardReader,
       SelectAppAndAnalyzeContractsInputDto inputData,
-      String processedCardSelectionScenarioJsonString) {
+      Properties properties) {
 
     String pluginType = inputData.getPluginType();
+    String processedCardSelectionScenarioJsonString =
+        properties != null
+            ? properties.getProperty(PROCESSED_CARD_SELECTION_SCENARIO_JSON_STRING)
+            : null;
 
     // Select application
     CalypsoCard calypsoCard;
@@ -522,11 +528,13 @@ public class CardService {
   }
 
   SelectAppAndLoadContractOutputDto selectAppAndLoadContract(
-      CardReader cardReader,
-      SelectAppAndLoadContractInputDto inputData,
-      String processedCardSelectionScenarioJsonString) {
+      CardReader cardReader, SelectAppAndLoadContractInputDto inputData, Properties properties) {
 
     String pluginType = inputData.getPluginType();
+    String processedCardSelectionScenarioJsonString =
+        properties != null
+            ? properties.getProperty(PROCESSED_CARD_SELECTION_SCENARIO_JSON_STRING)
+            : null;
 
     // Select application
     CalypsoCard calypsoCard;
@@ -588,11 +596,13 @@ public class CardService {
   }
 
   SelectAppAndPersonalizeCardOutputDto selectAppAndPersonalizeCard(
-      CardReader cardReader,
-      SelectAppAndPersonalizeCardInputDto inputData,
-      String processedCardSelectionScenarioJsonString) {
+      CardReader cardReader, SelectAppAndPersonalizeCardInputDto inputData, Properties properties) {
 
     String pluginType = inputData.getPluginType();
+    String processedCardSelectionScenarioJsonString =
+        properties != null
+            ? properties.getProperty(PROCESSED_CARD_SELECTION_SCENARIO_JSON_STRING)
+            : null;
 
     // Select application
     CalypsoCard calypsoCard;

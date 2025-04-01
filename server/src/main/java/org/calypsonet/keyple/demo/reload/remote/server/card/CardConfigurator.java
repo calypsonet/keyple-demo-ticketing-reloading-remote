@@ -9,6 +9,7 @@
  ****************************************************************************** */
 package org.calypsonet.keyple.demo.reload.remote.server.card;
 
+import java.util.Properties;
 import java.util.regex.Pattern;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -250,14 +251,11 @@ public class CardConfigurator {
         SelectAppAndAnalyzeContractsInputDto inputData =
             readerExtension.getInputData(SelectAppAndAnalyzeContractsInputDto.class);
 
-        // Get the processed selection scenario
-        String processedCardSelectionScenarioJsonString =
-            (String) readerExtension.getInitialCardContent();
+        // Get the eventually processed selection scenario
+        Properties properties = (Properties) readerExtension.getInitialCardContent();
 
         // Execute service
-        outputData =
-            cardService.selectAppAndAnalyzeContracts(
-                reader, inputData, processedCardSelectionScenarioJsonString);
+        outputData = cardService.selectAppAndAnalyzeContracts(reader, inputData, properties);
 
       } else if (RemoteServiceId.SELECT_APP_AND_LOAD_CONTRACT.name().equals(serviceId)) {
 
@@ -265,14 +263,11 @@ public class CardConfigurator {
         SelectAppAndLoadContractInputDto inputData =
             readerExtension.getInputData(SelectAppAndLoadContractInputDto.class);
 
-        // Get the processed selection scenario
-        String processedCardSelectionScenarioJsonString =
-            (String) readerExtension.getInitialCardContent();
+        // Get the eventually processed selection scenario
+        Properties properties = (Properties) readerExtension.getInitialCardContent();
 
         // Execute service
-        outputData =
-            cardService.selectAppAndLoadContract(
-                reader, inputData, processedCardSelectionScenarioJsonString);
+        outputData = cardService.selectAppAndLoadContract(reader, inputData, properties);
 
       } else if (RemoteServiceId.SELECT_APP_AND_PERSONALIZE_CARD.name().equals(serviceId)) {
 
@@ -280,14 +275,11 @@ public class CardConfigurator {
         SelectAppAndPersonalizeCardInputDto inputData =
             readerExtension.getInputData(SelectAppAndPersonalizeCardInputDto.class);
 
-        // Get the processed selection scenario
-        String processedCardSelectionScenarioJsonString =
-            (String) readerExtension.getInitialCardContent();
+        // Get the eventually processed selection scenario
+        Properties properties = (Properties) readerExtension.getInitialCardContent();
 
         // Execute service
-        outputData =
-            cardService.selectAppAndPersonalizeCard(
-                reader, inputData, processedCardSelectionScenarioJsonString);
+        outputData = cardService.selectAppAndPersonalizeCard(reader, inputData, properties);
 
       } else {
         throw new IllegalArgumentException("Service ID not recognized");
