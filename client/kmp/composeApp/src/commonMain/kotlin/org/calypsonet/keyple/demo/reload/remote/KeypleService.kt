@@ -101,11 +101,12 @@ class KeypleService(
   fun start() {
     loadServerConfig()
 
-      val server = SimpleHttpNetworkClient(serverConfig!!, buildHttpClient(serverConfig!!.logLevel))
+    val server = SimpleHttpNetworkClient(serverConfig!!, buildHttpClient(serverConfig!!.logLevel))
 
-      remoteService = KeypleTerminal(reader = reader, clientId = clientId, networkClient = server)
+    remoteService = KeypleTerminal(reader = reader, clientId = clientId, networkClient = server)
 
     launchPingJob()
+    launchGetCardSelectionScenarioJob()
   }
 
   private fun loadServerConfig() {
@@ -154,7 +155,6 @@ class KeypleService(
     pingJob?.cancel()
     pingJob =
         remoteService?.let {
-          // TODO setup a proper app scope for this or maybe dont do it here?
           GlobalScope.launch {
             while (true) {
               try {
@@ -171,9 +171,33 @@ class KeypleService(
         }
   }
 
+  private fun launchGetCardSelectionScenarioJob() {
+    remoteService?.let {
+      GlobalScope.launch {
+        try {
+          val scenarioJsonString = retrieveSelectionScenarioJson()
+          Napier.d("Card Selection Scenario retrieved: $scenarioJsonString")
+          remoteService?.setCardSelectionScenarioJsonString(scenarioJsonString)
+        } catch (e: Exception) {
+          Napier.e("Error getting card selection scenario: ${e.message}")
+        }
+      }
+    }
+  }
+
   private suspend fun pingServer(): String {
     return try {
       httpClient.get("${serverConfig?.baseUrl()}/card/sam-status") {}.body<String>()
+    } catch (e: Exception) {
+      throw ServerIOException("Comm error: ${e.message}")
+    }
+  }
+
+  private suspend fun retrieveSelectionScenarioJson(): String {
+    return try {
+      httpClient
+          .get("${serverConfig?.baseUrl()}/card/export-card-selection-scenario") {}
+          .body<String>()
     } catch (e: Exception) {
       throw ServerIOException("Comm error: ${e.message}")
     }
