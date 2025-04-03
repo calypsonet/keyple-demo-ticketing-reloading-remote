@@ -34,7 +34,6 @@ import keyplelessremotedemo.composeapp.generated.resources.Res
 import keyplelessremotedemo.composeapp.generated.resources.ic_arrow_right
 import keyplelessremotedemo.composeapp.generated.resources.ic_server
 import keyplelessremotedemo.composeapp.generated.resources.ic_sim_card
-import keyplelessremotedemo.composeapp.generated.resources.ic_tools
 import org.calypsonet.keyple.demo.reload.remote.AppState
 import org.calypsonet.keyple.demo.reload.remote.nav.PersonalizeCard
 import org.calypsonet.keyple.demo.reload.remote.nav.ServerConfig

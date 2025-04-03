@@ -47,9 +47,11 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 @Preview
 fun App(service: KeypleService, cardRepository: CardRepository) {
-  // TODO inject with DI
-  val vm = AppViewModel(keypleService = service)
-  val serverConfigVm = ServerConfigScreenViewModel(keypleService = service)
+  val vm = viewModel<AppViewModel> { AppViewModel(keypleService = service) }
+  val serverConfigVm =
+      viewModel<ServerConfigScreenViewModel> {
+        ServerConfigScreenViewModel(keypleService = service)
+      }
 
   val navController = rememberNavController()
 

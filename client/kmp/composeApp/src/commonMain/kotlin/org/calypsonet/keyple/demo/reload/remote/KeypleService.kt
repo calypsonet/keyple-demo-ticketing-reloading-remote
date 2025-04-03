@@ -163,7 +163,7 @@ class KeypleService(
                 Napier.d("Ping response: $response")
               } catch (e: Exception) {
                 Napier.e("Error pinging server: ${e.message}")
-                _state.value = _state.value.copy(serverReachable = true)
+                _state.value = _state.value.copy(serverReachable = false)
               }
               kotlinx.coroutines.delay(5000)
             }
