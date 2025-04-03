@@ -81,17 +81,6 @@ fun SettingsScreen(
       Divider(modifier = Modifier.fillMaxWidth(), thickness = 2.dp)
 
       SettingRow(
-          title = "Configuration",
-          iconRes = Res.drawable.ic_tools,
-          modifier = Modifier.fillMaxWidth(),
-          onClick = {
-            // TODO
-            // navController.navigate("serverConfig")
-          })
-
-      Divider(modifier = Modifier.fillMaxWidth(), thickness = 2.dp)
-
-      SettingRow(
           title = "Personalization",
           iconRes = Res.drawable.ic_sim_card,
           modifier = Modifier.fillMaxWidth(),
