@@ -24,13 +24,14 @@ val cardRepository = CardRepository()
 val remoteService =
     KeypleService(
         reader =
-            MultiplatformReader(
+            MultiplatformNfcReader(
                 LocalNfcReader() { error ->
                   return@LocalNfcReader "Error: ${error.message}"
                 }),
         clientId = UIDevice.currentDevice.identifierForVendor?.UUIDString() ?: "anon",
         cardRepository = cardRepository,
-        dataStore = dataStore)
+        dataStore = dataStore,
+        buzzer = Buzzer(PlatformBuzzer()))
 
 val logger = Napier.base(DebugAntilog())
 

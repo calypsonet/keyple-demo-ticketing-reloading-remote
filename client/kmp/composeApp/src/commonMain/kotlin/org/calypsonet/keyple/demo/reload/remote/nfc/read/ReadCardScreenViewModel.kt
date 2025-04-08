@@ -54,6 +54,7 @@ class ReadCardScreenViewModel(
       try {
         keypleService.waitForCard {
           keypleService.updateReaderMessage("Stay still...")
+          keypleService.buzzer()
           viewModelScope.launch(Dispatchers.IO) { readContracts() }
         }
         // _state.value = ReadCardScreenState.DisplayError("No card found")

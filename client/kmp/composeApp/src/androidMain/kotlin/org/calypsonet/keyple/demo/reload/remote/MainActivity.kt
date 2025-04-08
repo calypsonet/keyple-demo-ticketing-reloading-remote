@@ -17,21 +17,21 @@ import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import org.eclipse.keyple.keypleless.reader.nfcmobile.LocalNfcReader
-import org.eclipse.keyple.keypleless.reader.nfcmobile.MultiplatformReader
+import org.eclipse.keyple.keypleless.reader.nfcmobile.MultiplatformNfcReader
 
 class MainActivity : ComponentActivity() {
   @SuppressLint("HardwareIds")
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
-    // TODO move all this to a DI module
     val cardRepository = CardRepository()
     val keypleService =
         KeypleService(
-            reader = MultiplatformReader(LocalNfcReader(this)),
+            reader = MultiplatformNfcReader(LocalNfcReader(this)),
             clientId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID),
             dataStore = createDataStore(DataStorePathProducer(applicationContext)),
-            cardRepository = cardRepository)
+            cardRepository = cardRepository,
+            buzzer = Buzzer(PlatformBuzzer(applicationContext)))
 
     setContent { App(keypleService, cardRepository) }
   }

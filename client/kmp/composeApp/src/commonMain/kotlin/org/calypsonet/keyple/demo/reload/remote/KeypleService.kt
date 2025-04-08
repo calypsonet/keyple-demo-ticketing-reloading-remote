@@ -71,7 +71,8 @@ class KeypleService(
     private val reader: LocalReader,
     private val clientId: String,
     private val dataStore: DataStore<Preferences>,
-    private val cardRepository: CardRepository
+    private val cardRepository: CardRepository,
+    private val buzzer: Buzzer
 ) {
 
   private var _state: MutableStateFlow<KeypleServiceState> = MutableStateFlow(KeypleServiceState())
@@ -203,9 +204,15 @@ class KeypleService(
     }
   }
 
+  fun buzzer() {
+    buzzer.beepAndVibrate()
+  }
+
   suspend fun waitCard(): Boolean {
     return withContext(Dispatchers.IO) {
-      return@withContext remoteService?.waitForCard() ?: false
+      val result = remoteService?.waitForCard() ?: false
+      buzzer()
+      return@withContext result
     }
   }
 
