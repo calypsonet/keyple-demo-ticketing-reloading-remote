@@ -332,6 +332,12 @@ class KeypleService(
     }
   }
 
+  private val json = Json {
+    ignoreUnknownKeys = true
+    encodeDefaults = true
+    explicitNulls = false
+  }
+
   private suspend fun <T, R> executeService(
       remote: KeypleTerminal,
       service: String,
@@ -339,14 +345,19 @@ class KeypleService(
       inputSerializer: KSerializer<T>,
       outputSerializer: KSerializer<R>,
   ): KeypleResult<R> {
-    when (val result =
-        remote.executeRemoteService(service, inputData, inputSerializer, outputSerializer)) {
+
+    var inputDataStr: String? = null
+    inputData?.let { inputDataStr = json.encodeToString(inputSerializer, inputData) }
+
+    when (val result = remote.executeRemoteService(service, inputDataStr)) {
       is KeypleResult.Failure -> {
         Napier.e(tag = TAG, message = "Error executing service: ${result.error}")
         return KeypleResult.Failure(result.error)
       }
       is KeypleResult.Success -> {
-        return KeypleResult.Success(result.data!!)
+        val resStr: String = result.data!!
+        val res = Json.decodeFromString(outputSerializer, resStr)
+        return KeypleResult.Success(res)
       }
     }
   }
