@@ -69,7 +69,7 @@ internal fun WriteCardScreen(
             ReadingError(state.message)
           }
           WriteCardScreenState.ShowTransactionSuccess -> {
-            navController.navigate(AppSuccess)
+            navController.navigate(AppSuccess) { popUpTo(Home) }
           }
         }
       }

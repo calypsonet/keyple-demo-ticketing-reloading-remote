@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import org.calypsonet.keyple.demo.reload.remote.AppState
 import org.calypsonet.keyple.demo.reload.remote.nav.Card
+import org.calypsonet.keyple.demo.reload.remote.nav.Home
 import org.calypsonet.keyple.demo.reload.remote.nfc.ui.PresentCardAnimation
 import org.calypsonet.keyple.demo.reload.remote.nfc.ui.ReadingError
 import org.calypsonet.keyple.demo.reload.remote.nfc.ui.ScanCardAnimation
@@ -34,7 +35,7 @@ fun ReadCardScreen(
 
   LaunchedEffect(state.value) {
     if (state.value is ReadCardScreenState.ShowCardContent) {
-      navController.navigate(Card)
+      navController.navigate(Card) { popUpTo(Home) }
     }
   }
 
