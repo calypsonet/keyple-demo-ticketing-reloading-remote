@@ -138,9 +138,12 @@ class CardReaderActivity : AbstractCardActivity() {
             }
           } // success,
           1 -> {
+            launchCardCommunicationErrorResponse()
+          } // Card communication error,
+          2 -> {
             launchServerErrorResponse()
           } // server not ready,
-          in 2..4 -> {
+          in 3..5 -> {
             launchInvalidCardResponse(selectAppAndAnalyzeContractsOutputDto.message)
           } // card rejected, not personalized, expired environment
         }

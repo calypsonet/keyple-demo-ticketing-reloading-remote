@@ -133,9 +133,12 @@ class PersonalizationActivity : AbstractCardActivity() {
             }
           } // success,
           1 -> {
+            launchCardCommunicationErrorResponse()
+          } // Card communication error,
+          2 -> {
             launchServerErrorResponse()
           } // server not ready,
-          2 -> {
+          3 -> {
             launchInvalidCardResponse(selectAppAndPersonalizeCardOutputDto.message)
           } // card rejected
         }

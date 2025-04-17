@@ -30,6 +30,7 @@ import org.eclipse.keyple.core.service.resource.CardResource;
 import org.eclipse.keyple.core.service.resource.CardResourceServiceProvider;
 import org.eclipse.keyple.core.util.HexUtil;
 import org.eclipse.keypop.calypso.card.card.CalypsoCard;
+import org.eclipse.keypop.calypso.card.transaction.CardIOException;
 import org.eclipse.keypop.reader.CardReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -253,7 +254,7 @@ public class CardService {
 
     if (!CardConstant.Companion.getALLOWED_FILE_STRUCTURES()
         .contains(calypsoCard.getApplicationSubtype())) {
-      return new AnalyzeContractsOutputDto(Collections.emptyList(), 2);
+      return new AnalyzeContractsOutputDto(Collections.emptyList(), 3);
     }
 
     CardResource samResource =
@@ -278,7 +279,7 @@ public class CardService {
               .setStatus(FAIL)
               .setType(SECURED_READ)
               .setCardSerialNumber(appSerialNumber));
-      return new AnalyzeContractsOutputDto(Collections.emptyList(), 3);
+      return new AnalyzeContractsOutputDto(Collections.emptyList(), 4);
     } catch (ExpiredEnvironmentException e) {
       logger.error(AN_ERROR_OCCURRED_WHILE_ANALYZING_THE_CONTRACTS, e.getMessage());
       activityService.push(
@@ -287,7 +288,16 @@ public class CardService {
               .setStatus(FAIL)
               .setType(SECURED_READ)
               .setCardSerialNumber(appSerialNumber));
-      return new AnalyzeContractsOutputDto(Collections.emptyList(), 4);
+      return new AnalyzeContractsOutputDto(Collections.emptyList(), 5);
+    } catch (CardIOException e) {
+      logger.error(AN_ERROR_OCCURRED_WHILE_ANALYZING_THE_CONTRACTS, e.getMessage(), e);
+      activityService.push(
+              new Activity()
+                      .setPlugin(pluginType)
+                      .setStatus(FAIL)
+                      .setType(SECURED_READ)
+                      .setCardSerialNumber(appSerialNumber));
+      return new AnalyzeContractsOutputDto(Collections.emptyList(), 1);
     } catch (RuntimeException e) {
       logger.error(AN_ERROR_OCCURRED_WHILE_ANALYZING_THE_CONTRACTS, e.getMessage(), e);
       activityService.push(
@@ -296,7 +306,7 @@ public class CardService {
               .setStatus(FAIL)
               .setType(SECURED_READ)
               .setCardSerialNumber(appSerialNumber));
-      return new AnalyzeContractsOutputDto(Collections.emptyList(), 1);
+      return new AnalyzeContractsOutputDto(Collections.emptyList(), 2);
     } finally {
       CardResourceServiceProvider.getService().releaseCardResource(samResource);
     }
@@ -310,7 +320,7 @@ public class CardService {
 
     if (!CardConstant.Companion.getALLOWED_FILE_STRUCTURES()
         .contains(calypsoCard.getApplicationSubtype())) {
-      return new WriteContractOutputDto(2);
+      return new WriteContractOutputDto(3);
     }
 
     logger.info("Inserted card application serial number: {}", appSerialNumber);
@@ -322,7 +332,7 @@ public class CardService {
       Card card = cardRepository.readCard(cardReader, calypsoCard, samResource);
       if (card == null) {
         // If card has not been read previously, throw error
-        return new WriteContractOutputDto(3);
+        return new WriteContractOutputDto(4);
       }
       // logger.info("{}", card); deactivate until LocalDate is properly processed by KeypleUtil
       insertNewContract(inputData.getContractTariff(), inputData.getTicketToLoad(), card);
@@ -339,6 +349,16 @@ public class CardService {
                           ? ": " + inputData.getTicketToLoad()
                           : "")));
       return new WriteContractOutputDto(statusCode);
+    } catch (CardIOException e) {
+      logger.error(AN_ERROR_OCCURRED_WHILE_WRITING_THE_CONTRACT, e.getMessage(), e);
+      activityService.push(
+              new Activity()
+                      .setPlugin(pluginType)
+                      .setStatus(FAIL)
+                      .setType(RELOAD)
+                      .setCardSerialNumber(appSerialNumber)
+                      .setContractLoaded(""));
+      return new WriteContractOutputDto(1);
     } catch (RuntimeException e) {
       logger.error(AN_ERROR_OCCURRED_WHILE_WRITING_THE_CONTRACT, e.getMessage(), e);
       activityService.push(
@@ -348,7 +368,7 @@ public class CardService {
               .setType(RELOAD)
               .setCardSerialNumber(appSerialNumber)
               .setContractLoaded(""));
-      return new WriteContractOutputDto(1);
+      return new WriteContractOutputDto(2);
     } finally {
       CardResourceServiceProvider.getService().releaseCardResource(samResource);
     }
@@ -362,7 +382,7 @@ public class CardService {
 
     if (!CardConstant.Companion.getALLOWED_FILE_STRUCTURES()
         .contains(calypsoCard.getApplicationSubtype())) {
-      return new CardIssuanceOutputDto(2);
+      return new CardIssuanceOutputDto(3);
     }
 
     CardResource samResource =
@@ -377,6 +397,15 @@ public class CardService {
               .setType(ISSUANCE)
               .setCardSerialNumber(appSerialNumber));
       return new CardIssuanceOutputDto(0);
+    } catch (CardIOException e) {
+      logger.error(AN_ERROR_OCCURRED_WHILE_INITIALIZING_THE_CARD, e.getMessage(), e);
+      activityService.push(
+              new Activity()
+                      .setPlugin(pluginType)
+                      .setStatus(FAIL)
+                      .setType(ISSUANCE)
+                      .setCardSerialNumber(appSerialNumber));
+      return new CardIssuanceOutputDto(1);
     } catch (RuntimeException e) {
       logger.error(AN_ERROR_OCCURRED_WHILE_INITIALIZING_THE_CARD, e.getMessage(), e);
       activityService.push(
@@ -385,7 +414,7 @@ public class CardService {
               .setStatus(FAIL)
               .setType(ISSUANCE)
               .setCardSerialNumber(appSerialNumber));
-      return new CardIssuanceOutputDto(1);
+      return new CardIssuanceOutputDto(2);
     } finally {
       CardResourceServiceProvider.getService().releaseCardResource(samResource);
     }
@@ -412,6 +441,16 @@ public class CardService {
       } else {
         calypsoCard = cardRepository.selectCard(cardReader);
       }
+    } catch (CardIOException e) {
+      logger.error(AN_ERROR_OCCURRED_WHILE_ANALYZING_THE_CONTRACTS, e.getMessage(), e);
+      activityService.push(
+              new Activity()
+                      .setPlugin(pluginType)
+                      .setStatus(FAIL)
+                      .setType(SECURED_READ)
+                      .setCardSerialNumber(""));
+      return new SelectAppAndAnalyzeContractsOutputDto(
+              "", Collections.emptyList(), 1, e.getMessage());
     } catch (RuntimeException e) {
       logger.error(AN_ERROR_OCCURRED_WHILE_ANALYZING_THE_CONTRACTS, e.getMessage(), e);
       activityService.push(
@@ -421,7 +460,7 @@ public class CardService {
               .setType(SECURED_READ)
               .setCardSerialNumber(""));
       return new SelectAppAndAnalyzeContractsOutputDto(
-          "", Collections.emptyList(), 1, e.getMessage());
+          "", Collections.emptyList(), 2, e.getMessage());
     }
 
     // Analyze contracts
@@ -506,18 +545,21 @@ public class CardService {
         message = "Success";
         break;
       case 1:
-        message = "Server error";
+        message = "Card communication error";
         break;
       case 2:
+        message = "Server error";
+        break;
+      case 3:
         message =
             "Invalid card\nFile structure "
                 + HexUtil.toHex(calypsoCard.getApplicationSubtype())
                 + "h not supported";
         break;
-      case 3:
+      case 4:
         message = "Environment error: wrong version number";
         break;
-      case 4:
+      case 5:
         message = "Environment error: end date expired";
         break;
       default:
@@ -546,6 +588,15 @@ public class CardService {
       } else {
         calypsoCard = cardRepository.selectCard(cardReader);
       }
+    } catch (CardIOException e) {
+      logger.error(AN_ERROR_OCCURRED_WHILE_WRITING_THE_CONTRACT, e.getMessage(), e);
+      activityService.push(
+              new Activity()
+                      .setPlugin(pluginType)
+                      .setStatus(FAIL)
+                      .setType(SECURED_READ)
+                      .setCardSerialNumber(""));
+      return new SelectAppAndLoadContractOutputDto(1, e.getMessage());
     } catch (RuntimeException e) {
       logger.error(AN_ERROR_OCCURRED_WHILE_WRITING_THE_CONTRACT, e.getMessage(), e);
       activityService.push(
@@ -554,7 +605,7 @@ public class CardService {
               .setStatus(FAIL)
               .setType(SECURED_READ)
               .setCardSerialNumber(""));
-      return new SelectAppAndLoadContractOutputDto(1, e.getMessage());
+      return new SelectAppAndLoadContractOutputDto(2, e.getMessage());
     }
 
     String selectedApplicationSerialNumber =
@@ -581,9 +632,12 @@ public class CardService {
         message = "Success";
         break;
       case 1:
-        message = "Server error";
+        message = "Card communication error";
         break;
       case 2:
+        message = "Server error";
+        break;
+      case 3:
         message =
             "Invalid card\nFile structure "
                 + HexUtil.toHex(calypsoCard.getApplicationSubtype())
@@ -614,6 +668,15 @@ public class CardService {
       } else {
         calypsoCard = cardRepository.selectCard(cardReader);
       }
+    } catch (CardIOException e) {
+      logger.error(AN_ERROR_OCCURRED_WHILE_INITIALIZING_THE_CARD, e.getMessage(), e);
+      activityService.push(
+              new Activity()
+                      .setPlugin(pluginType)
+                      .setStatus(FAIL)
+                      .setType(SECURED_READ)
+                      .setCardSerialNumber(""));
+      return new SelectAppAndPersonalizeCardOutputDto(1, e.getMessage());
     } catch (RuntimeException e) {
       logger.error(AN_ERROR_OCCURRED_WHILE_INITIALIZING_THE_CARD, e.getMessage(), e);
       activityService.push(
@@ -622,7 +685,7 @@ public class CardService {
               .setStatus(FAIL)
               .setType(SECURED_READ)
               .setCardSerialNumber(""));
-      return new SelectAppAndPersonalizeCardOutputDto(1, e.getMessage());
+      return new SelectAppAndPersonalizeCardOutputDto(2, e.getMessage());
     }
 
     // Init card
@@ -638,9 +701,12 @@ public class CardService {
         message = "Success";
         break;
       case 1:
-        message = "Server error";
+        message = "Card communication error";
         break;
       case 2:
+        message = "Server error";
+        break;
+      case 3:
         message =
             "Invalid card\nFile structure "
                 + HexUtil.toHex(calypsoCard.getApplicationSubtype())
