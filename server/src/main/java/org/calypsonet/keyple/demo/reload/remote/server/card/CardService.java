@@ -292,11 +292,11 @@ public class CardService {
     } catch (CardIOException e) {
       logger.error(AN_ERROR_OCCURRED_WHILE_ANALYZING_THE_CONTRACTS, e.getMessage(), e);
       activityService.push(
-              new Activity()
-                      .setPlugin(pluginType)
-                      .setStatus(FAIL)
-                      .setType(SECURED_READ)
-                      .setCardSerialNumber(appSerialNumber));
+          new Activity()
+              .setPlugin(pluginType)
+              .setStatus(FAIL)
+              .setType(SECURED_READ)
+              .setCardSerialNumber(appSerialNumber));
       return new AnalyzeContractsOutputDto(Collections.emptyList(), 1);
     } catch (RuntimeException e) {
       logger.error(AN_ERROR_OCCURRED_WHILE_ANALYZING_THE_CONTRACTS, e.getMessage(), e);
@@ -352,12 +352,12 @@ public class CardService {
     } catch (CardIOException e) {
       logger.error(AN_ERROR_OCCURRED_WHILE_WRITING_THE_CONTRACT, e.getMessage(), e);
       activityService.push(
-              new Activity()
-                      .setPlugin(pluginType)
-                      .setStatus(FAIL)
-                      .setType(RELOAD)
-                      .setCardSerialNumber(appSerialNumber)
-                      .setContractLoaded(""));
+          new Activity()
+              .setPlugin(pluginType)
+              .setStatus(FAIL)
+              .setType(RELOAD)
+              .setCardSerialNumber(appSerialNumber)
+              .setContractLoaded(""));
       return new WriteContractOutputDto(1);
     } catch (RuntimeException e) {
       logger.error(AN_ERROR_OCCURRED_WHILE_WRITING_THE_CONTRACT, e.getMessage(), e);
@@ -400,11 +400,11 @@ public class CardService {
     } catch (CardIOException e) {
       logger.error(AN_ERROR_OCCURRED_WHILE_INITIALIZING_THE_CARD, e.getMessage(), e);
       activityService.push(
-              new Activity()
-                      .setPlugin(pluginType)
-                      .setStatus(FAIL)
-                      .setType(ISSUANCE)
-                      .setCardSerialNumber(appSerialNumber));
+          new Activity()
+              .setPlugin(pluginType)
+              .setStatus(FAIL)
+              .setType(ISSUANCE)
+              .setCardSerialNumber(appSerialNumber));
       return new CardIssuanceOutputDto(1);
     } catch (RuntimeException e) {
       logger.error(AN_ERROR_OCCURRED_WHILE_INITIALIZING_THE_CARD, e.getMessage(), e);
@@ -444,13 +444,13 @@ public class CardService {
     } catch (CardIOException e) {
       logger.error(AN_ERROR_OCCURRED_WHILE_ANALYZING_THE_CONTRACTS, e.getMessage(), e);
       activityService.push(
-              new Activity()
-                      .setPlugin(pluginType)
-                      .setStatus(FAIL)
-                      .setType(SECURED_READ)
-                      .setCardSerialNumber(""));
+          new Activity()
+              .setPlugin(pluginType)
+              .setStatus(FAIL)
+              .setType(SECURED_READ)
+              .setCardSerialNumber(""));
       return new SelectAppAndAnalyzeContractsOutputDto(
-              "", Collections.emptyList(), 1, e.getMessage());
+          "", Collections.emptyList(), 1, e.getMessage());
     } catch (RuntimeException e) {
       logger.error(AN_ERROR_OCCURRED_WHILE_ANALYZING_THE_CONTRACTS, e.getMessage(), e);
       activityService.push(
@@ -591,11 +591,11 @@ public class CardService {
     } catch (CardIOException e) {
       logger.error(AN_ERROR_OCCURRED_WHILE_WRITING_THE_CONTRACT, e.getMessage(), e);
       activityService.push(
-              new Activity()
-                      .setPlugin(pluginType)
-                      .setStatus(FAIL)
-                      .setType(SECURED_READ)
-                      .setCardSerialNumber(""));
+          new Activity()
+              .setPlugin(pluginType)
+              .setStatus(FAIL)
+              .setType(SECURED_READ)
+              .setCardSerialNumber(""));
       return new SelectAppAndLoadContractOutputDto(1, e.getMessage());
     } catch (RuntimeException e) {
       logger.error(AN_ERROR_OCCURRED_WHILE_WRITING_THE_CONTRACT, e.getMessage(), e);
@@ -671,11 +671,11 @@ public class CardService {
     } catch (CardIOException e) {
       logger.error(AN_ERROR_OCCURRED_WHILE_INITIALIZING_THE_CARD, e.getMessage(), e);
       activityService.push(
-              new Activity()
-                      .setPlugin(pluginType)
-                      .setStatus(FAIL)
-                      .setType(SECURED_READ)
-                      .setCardSerialNumber(""));
+          new Activity()
+              .setPlugin(pluginType)
+              .setStatus(FAIL)
+              .setType(SECURED_READ)
+              .setCardSerialNumber(""));
       return new SelectAppAndPersonalizeCardOutputDto(1, e.getMessage());
     } catch (RuntimeException e) {
       logger.error(AN_ERROR_OCCURRED_WHILE_INITIALIZING_THE_CARD, e.getMessage(), e);
