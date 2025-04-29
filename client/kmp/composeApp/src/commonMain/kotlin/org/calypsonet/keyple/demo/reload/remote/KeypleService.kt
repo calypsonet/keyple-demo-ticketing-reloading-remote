@@ -311,7 +311,7 @@ class KeypleService(
     when (val result =
         remote.executeRemoteService(service, inputData, inputSerializer, OutputData.serializer())) {
       is KeypleResult.Failure -> {
-        Napier.e(tag = TAG, message = "Error executing service: ${result.error}")
+        Napier.e(tag = TAG, message = "Error executing service: ${result.error} ${result.data}")
         return KeypleResult.Failure(result.error)
       }
       is KeypleResult.Success -> {
@@ -351,7 +351,7 @@ class KeypleService(
 
     when (val result = remote.executeRemoteService(service, inputDataStr)) {
       is KeypleResult.Failure -> {
-        Napier.e(tag = TAG, message = "Error executing service: ${result.error}")
+        Napier.e(tag = TAG, message = "Error executing service: ${result.error}, ${result.data}")
         return KeypleResult.Failure(result.error)
       }
       is KeypleResult.Success -> {
