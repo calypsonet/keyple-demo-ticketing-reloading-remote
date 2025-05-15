@@ -13,10 +13,10 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("org.eclipse.keypop:keypop-gradle:0.1.+") { isChanging = true }
+        classpath("org.eclipse.keyple:keyple-gradle:0.2.+") { isChanging = true }
     }
 }
-apply(plugin = "org.eclipse.keypop")
+apply(plugin = "org.eclipse.keyple")
 
 ///////////////////////////////////////////////////////////////////////////////
 //  APP CONFIGURATION
