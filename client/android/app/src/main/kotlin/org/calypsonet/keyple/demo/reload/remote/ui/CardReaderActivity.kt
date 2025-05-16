@@ -158,18 +158,21 @@ class CardReaderActivity : AbstractCardActivity() {
             }
           } // success,
           1 -> {
+            launchCardCommunicationErrorResponse()
+          } // Card communication error,
+          2 -> {
             launchServerErrorResponse()
           } // server not ready,
-          2 -> {
+          3 -> {
             launchInvalidCardResponse(
                 String.format(
                     getString(R.string.card_invalid_structure),
                     HexUtil.toHex(calypsoCard!!.applicationSubtype)))
           } // card rejected
-          3 -> {
+          4 -> {
             launchInvalidCardResponse(getString(R.string.card_not_personalized))
           } // card not personalized
-          4 -> {
+          5 -> {
             launchInvalidCardResponse(getString(R.string.expired_environment))
           } // expired environment
         }

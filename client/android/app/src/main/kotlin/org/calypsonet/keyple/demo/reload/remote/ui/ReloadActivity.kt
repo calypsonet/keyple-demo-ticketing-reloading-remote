@@ -144,9 +144,12 @@ class ReloadActivity : AbstractCardActivity() {
             }
           }
           1 -> {
+            launchCardCommunicationErrorResponse()
+          } // Card communication error,
+          2 -> {
             launchServerErrorResponse()
           } // server not ready,
-          2 -> {
+          3 -> {
             launchInvalidCardResponse(
                 String.format(
                     getString(R.string.card_invalid_structure),

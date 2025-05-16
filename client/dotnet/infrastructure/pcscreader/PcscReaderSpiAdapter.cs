@@ -202,7 +202,7 @@ namespace App.infrastructure.pcscreader
             }
             try
             {
-                // Disconnect the reader 
+                // Disconnect the reader
                 _reader.Disconnect(SCardReaderDisposition.Leave);
             }
             catch (PCSCException ex) when (ex.SCardError == SCardError.CommunicationError)

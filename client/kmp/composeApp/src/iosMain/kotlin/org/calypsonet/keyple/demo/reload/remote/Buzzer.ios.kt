@@ -1,0 +1,21 @@
+/* ******************************************************************************
+ * Copyright (c) 2025 Calypso Networks Association https://calypsonet.org/
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the BSD 3-Clause License which is available at
+ * https://opensource.org/licenses/BSD-3-Clause.
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ ****************************************************************************** */
+package org.calypsonet.keyple.demo.reload.remote
+
+import platform.AudioToolbox.AudioServicesPlaySystemSound
+import platform.AudioToolbox.kSystemSoundID_Vibrate
+
+actual class PlatformBuzzer {
+  actual fun vibrate() {
+    AudioServicesPlaySystemSound(kSystemSoundID_Vibrate)
+  }
+
+  actual fun beep() {}
+}
