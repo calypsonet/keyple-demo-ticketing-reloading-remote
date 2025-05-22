@@ -19,13 +19,12 @@ import org.eclipse.keyple.core.service.SmartCardServiceProvider;
 import org.eclipse.keyple.distributed.MessageDto;
 import org.eclipse.keyple.distributed.RemotePluginServer;
 import org.eclipse.keyple.distributed.SyncNodeServer;
-import org.eclipse.keypop.reader.CardReader;
-import org.eclipse.keypop.reader.ReaderCommunicationException;
 
 @Path("/card")
 public class CardController {
 
   @Inject CardConfigurator cardConfigurator;
+  @Inject CardSamObserver cardSamObserver;
 
   /**
    * The endpoint access associated with the remote plugin server.
@@ -59,16 +58,8 @@ public class CardController {
   @Path("/sam-status")
   @Produces(MediaType.APPLICATION_JSON)
   public Response getSamStatus() {
-    boolean isSamReady;
-    try {
-      CardReader samReader = cardConfigurator.getSamReader();
-      isSamReady = samReader != null && samReader.isCardPresent(); // ping sam
-    } catch (ReaderCommunicationException e) {
-      // reader is disconnected
-      isSamReady = false;
-    }
     JsonObject jsonObject = new JsonObject();
-    jsonObject.addProperty("isSamReady", isSamReady);
+    jsonObject.addProperty("isSamReady", cardSamObserver.isSamAvailable());
     return Response.ok(jsonObject.toString()).build();
   }
 }

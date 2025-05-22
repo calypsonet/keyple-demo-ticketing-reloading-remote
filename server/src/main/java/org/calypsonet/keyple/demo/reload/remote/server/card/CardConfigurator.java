@@ -9,7 +9,6 @@
  ****************************************************************************** */
 package org.calypsonet.keyple.demo.reload.remote.server.card;
 
-import java.util.regex.Pattern;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import org.calypsonet.keyple.demo.common.constant.RemoteServiceId;
@@ -46,19 +45,8 @@ public class CardConfigurator {
   @ConfigProperty(name = "sam.pcsc.reader.filter")
   String samReaderFilter;
 
+  @Inject CardSamObserver cardSamObserver;
   @Inject CardService cardService;
-
-  public CardReader getSamReader() {
-    Pattern p = Pattern.compile(samReaderFilter);
-    for (Plugin plugin : SmartCardServiceProvider.getService().getPlugins()) {
-      for (CardReader reader : plugin.getReaders()) {
-        if (p.matcher(reader.getName()).matches()) {
-          return reader;
-        }
-      }
-    }
-    return null;
-  }
 
   public void init() {
     initSamPlugin();
@@ -75,6 +63,9 @@ public class CardConfigurator {
     }
     // Set up the associated card resource service
     setupCardResourceService(plugin);
+
+    // Start monitoring the SAM reader
+    cardSamObserver.startMonitoring();
   }
 
   private void setupCardResourceService(Plugin plugin) {
