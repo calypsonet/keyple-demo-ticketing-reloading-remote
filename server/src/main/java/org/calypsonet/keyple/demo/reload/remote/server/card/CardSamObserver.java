@@ -33,20 +33,38 @@ public class CardSamObserver
         CardReaderObservationExceptionHandlerSpi,
         PluginObserverSpi,
         PluginObservationExceptionHandlerSpi {
+
   private static final Logger logger = LoggerFactory.getLogger(CardSamObserver.class);
-  private ObservablePlugin plugin;
-  private ObservableCardReader reader;
-  private boolean isSamAvailable = true; // The SAM must be inserted by default
 
   @ConfigProperty(name = "sam.pcsc.reader.filter")
   String samReaderFilter;
 
   @Inject CardConfigurator cardConfigurator;
 
+  private ObservablePlugin plugin;
+  private ObservableCardReader reader;
+  private boolean isSamAvailable = true; // The SAM must be inserted by default
+
+  @Override
+  public void onPluginObservationError(String pluginName, Throwable e) {
+    logger.error(
+        "An error occurred while observing the SAM plugin {}: {}", pluginName, e.getMessage(), e);
+  }
+
   @Override
   public void onReaderObservationError(String contextInfo, String readerName, Throwable e) {
     logger.error(
-        "An error occurred while observing the SAM reader {}:{}", contextInfo, readerName, e);
+        "An error occurred while observing the SAM reader {}/{}: {}",
+        contextInfo,
+        readerName,
+        e.getMessage(),
+        e);
+  }
+
+  @Override
+  public void onPluginEvent(PluginEvent pluginEvent) {
+    logger.info("Plugin event received {} {}", pluginEvent.getType(), pluginEvent.getPluginName());
+    restartReaderMonitoring();
   }
 
   @Override
@@ -58,75 +76,72 @@ public class CardSamObserver
     logger.debug("SAM availability set to {}", isSamAvailable);
   }
 
-  public boolean isSamAvailable() {
-    logger.debug("Checking SAM availability: {}", isSamAvailable);
+  boolean isSamAvailable() {
+    logger.trace("Checking SAM availability: {}", isSamAvailable);
     return isSamAvailable;
   }
 
-  @Override
-  public void onPluginObservationError(String pluginName, Throwable e) {
-    logger.error("An error occurred while observing the SAM plugin {}", pluginName, e);
-  }
-
-  @Override
-  public void onPluginEvent(PluginEvent pluginEvent) {
-    logger.info("Plugin event received {} {}", pluginEvent.getType(), pluginEvent.getPluginName());
-    restartMonitoring();
-  }
-
   void startMonitoring() {
-    logger.info("Start monitoring SAM reader");
+    logger.info("Start SAM plugin and reader monitoring");
     isSamAvailable = false;
-
-    initSamPluginAndReader();
-
+    reader = searchReader();
+    if (reader == null) {
+      throw new IllegalStateException("SAM reader not found");
+    }
+    logger.info(
+        "Starting SAM plugin monitoring (only once at server startup): {}", plugin.getName());
     plugin.setPluginObservationExceptionHandler(this);
     plugin.addObserver(this);
-    reader.setReaderObservationExceptionHandler(this);
-    reader.addObserver(this);
-
-    logger.info("Starting card detection on reader: {}", reader.getName());
-    reader.startCardDetection(ObservableCardReader.DetectionMode.REPEATING);
+    startReaderMonitoring();
   }
 
-  private void restartMonitoring() {
-    logger.info("Restart monitoring SAM reader");
+  private void restartReaderMonitoring() {
+    logger.info("Restart SAM reader monitoring");
     isSamAvailable = false;
-
-    logger.debug("Removing existing reader observer.");
-    reader.removeObserver(this);
-    reader.stopCardDetection();
-
-    initSamPluginAndReader();
-
+    if (reader != null) {
+      logger.info("Stopping current SAM reader monitoring");
+      reader.removeObserver(this);
+      reader.stopCardDetection();
+    }
+    reader = searchReader(plugin);
     if (reader == null) {
-      logger.warn("SAM plugin or reader not found. Monitoring not started.");
+      logger.warn("SAM reader not found. SAM reader monitoring not restarted");
       return;
     }
+    startReaderMonitoring();
+  }
 
+  private void startReaderMonitoring() {
+    logger.info("Starting SAM reader monitoring: {}", reader.getName());
     reader.setReaderObservationExceptionHandler(this);
     reader.addObserver(this);
-
-    logger.info("Starting card detection on reader: {}", reader.getName());
     reader.startCardDetection(ObservableCardReader.DetectionMode.REPEATING);
   }
 
-  private void initSamPluginAndReader() {
-    logger.info("Initializing SAM plugin and reader using filter: {}", samReaderFilter);
-    Pattern p = Pattern.compile(samReaderFilter);
+  private ObservableCardReader searchReader() {
+    logger.info("Search SAM plugin and reader using filter: {}", samReaderFilter);
     for (Plugin plugin : SmartCardServiceProvider.getService().getPlugins()) {
-      logger.debug("Checking plugin: {}", plugin.getName());
-      for (CardReader reader : plugin.getReaders()) {
-        logger.debug("Checking reader: {}", reader.getName());
-        if (p.matcher(reader.getName()).matches()) {
-          logger.info("Matching reader found: {}", reader.getName());
-          this.plugin = (ObservablePlugin) plugin;
-          this.reader = (ObservableCardReader) reader;
-          return;
-        }
+      reader = searchReader(plugin);
+      if (reader != null) {
+        this.plugin = (ObservablePlugin) plugin;
+        return reader;
       }
     }
+    return null;
+  }
 
-    logger.warn("No matching SAM reader found.");
+  private ObservableCardReader searchReader(Plugin plugin) {
+    logger.info(
+        "Search SAM reader for plugin {} using filter: {}", plugin.getName(), samReaderFilter);
+    Pattern p = Pattern.compile(samReaderFilter);
+    for (CardReader reader : plugin.getReaders()) {
+      logger.debug("Checking reader: {}", reader.getName());
+      if (p.matcher(reader.getName()).matches()) {
+        logger.info("Matching reader found: {}", reader.getName());
+        return (ObservableCardReader) reader;
+      }
+    }
+    logger.warn("No matching SAM reader found");
+    return null;
   }
 }
