@@ -29,30 +29,27 @@ jobs:
           dotnet-version: 7.0.x
       - name: Update permissions
         working-directory: .
-        run: chmod +x ./client/android/gradlew ./client/android-light/gradlew ./server/gradlew ./.github/scripts/*.sh
-      - name: Check version client Android
-        working-directory: ./client/android/
+        run: chmod +x ./client/keyple-mobile-android/gradlew ./server/gradlew ./.github/scripts/*.sh
+      - name: Check version client Keyple Mobile Android
+        working-directory: ./client/keyple-mobile-android/
         run: ../../.github/scripts/check_version.sh
       - name: Check version server
         working-directory: ./server/
         run: ../.github/scripts/check_version.sh
       - name: Check code format, build and test client .NET
-        working-directory: ./client/dotnet
+        working-directory: ./client/pc-dotnet
         run: |
           dotnet restore
           dotnet format --verify-no-changes App.sln
           dotnet build --no-restore
           dotnet test --no-build --verbosity normal
-      - name: Build and Test client Android
-        working-directory: ./client/android/
-        run: ./gradlew clean build test --info --stacktrace
-      - name: Build and Test client Android Light
-        working-directory: ./client/android-light/
-        run: ./gradlew clean build test --info --stacktrace
+      - name: Build and Test client Keyple Mobile Android
+        working-directory: ./client/keyple-mobile-android/
+        run: ./gradlew clean build --info --stacktrace
       - name: Build and Test server
         working-directory: ./server/
         run: |
           cd ./dashboard-app
           npm install
           cd ..
-          ./gradlew clean build test --info --stacktrace
+          ./gradlew clean build --info --stacktrace
