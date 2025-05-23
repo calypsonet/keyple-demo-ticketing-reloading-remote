@@ -23,7 +23,7 @@ import org.eclipse.keyple.distributed.SyncNodeServer;
 @Path("/card")
 public class CardController {
 
-  @Inject CardConfigurator cardConfigurator;
+  @Inject CardRepository cardRepository;
   @Inject CardSamObserver cardSamObserver;
 
   /**
