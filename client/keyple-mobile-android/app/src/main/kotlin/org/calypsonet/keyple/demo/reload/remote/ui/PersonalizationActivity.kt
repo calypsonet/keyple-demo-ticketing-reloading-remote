@@ -31,7 +31,9 @@ import org.calypsonet.keyple.demo.reload.remote.databinding.ActivityPersonalizat
 import org.calypsonet.keyple.demo.reload.remote.di.scopes.ActivityScoped
 import org.calypsonet.keyple.demo.reload.remote.domain.TicketingService
 import org.eclipse.keyple.core.util.HexUtil
+import org.eclipse.keypop.calypso.card.card.CalypsoCard
 import org.eclipse.keypop.reader.CardReaderEvent
+import org.eclipse.keypop.storagecard.card.StorageCard
 import timber.log.Timber
 
 @ActivityScoped
@@ -99,7 +101,7 @@ class PersonalizationActivity : AbstractCardActivity() {
 
   override fun changeDisplay(
       cardReaderResponse: CardReaderResponse,
-      applicationSerialNumber: String?,
+      uniqueIdentifier: String?,
       finishActivity: Boolean?
   ) {
     val intent = Intent(this, ReloadResultActivity::class.java)
@@ -128,34 +130,51 @@ class PersonalizationActivity : AbstractCardActivity() {
   ) {
     withContext(Dispatchers.IO) {
       try {
-        val calypsoCard =
-            ticketingService.getCalypsoCard(selectedDeviceReaderName, aidEnums, protocol)
+        val smartCard = ticketingService.getSmartCard(selectedDeviceReaderName, aidEnums)
         val cardIssuanceInput = CardIssuanceInputDto(pluginType)
         val cardIssuanceOutput =
             localServiceClient.executeRemoteService(
                 RemoteServiceId.PERSONALIZE_CARD.name,
                 selectedDeviceReaderName,
-                calypsoCard,
+                smartCard,
                 cardIssuanceInput,
                 CardIssuanceOutputDto::class.java)
         when (cardIssuanceOutput.statusCode) {
           0 -> {
             runOnUiThread {
-              changeDisplay(
-                  CardReaderResponse(Status.SUCCESS, "", 0, arrayListOf(), arrayListOf(), ""),
-                  applicationSerialNumber = HexUtil.toHex(calypsoCard!!.applicationSerialNumber),
-                  finishActivity = true)
+              when (smartCard) {
+                is CalypsoCard -> {
+                  changeDisplay(
+                      CardReaderResponse(Status.SUCCESS, "", 0, arrayListOf(), arrayListOf(), ""),
+                      uniqueIdentifier = HexUtil.toHex(smartCard!!.applicationSerialNumber),
+                      finishActivity = true)
+                }
+                is StorageCard -> {
+                  changeDisplay(
+                      CardReaderResponse(Status.SUCCESS, "", 0, arrayListOf(), arrayListOf(), ""),
+                      uniqueIdentifier = HexUtil.toHex(smartCard!!.uid),
+                      finishActivity = true)
+                }
+              }
             }
           } // success,
           1 -> {
             launchServerErrorResponse()
           } // server not ready,
           2 -> {
-            launchInvalidCardResponse(
-                String.format(
-                    getString(R.string.card_invalid_structure),
-                    HexUtil.toHex(calypsoCard!!.applicationSubtype)))
-          } // card rejected
+            when (smartCard) {
+              is CalypsoCard -> {
+                launchInvalidCardResponse(
+                    String.format(
+                        getString(R.string.card_invalid_structure),
+                        HexUtil.toHex(smartCard!!.applicationSubtype)))
+              }
+              is StorageCard -> {
+                launchInvalidCardResponse(getString(R.string.storage_card_invalid))
+              }
+              else -> {}
+            } // card rejected
+          }
         }
       } catch (e: IllegalStateException) {
         Timber.e(e)
