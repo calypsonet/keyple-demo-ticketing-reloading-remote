@@ -128,12 +128,12 @@ dependencies {
     implementation("org.eclipse.keyple:keyple-distributed-network-java-lib:2.5.1")
     implementation("org.eclipse.keyple:keyple-distributed-local-java-lib:2.5.2")
     implementation("org.eclipse.keyple:keyple-card-calypso-java-lib:3.1.8")
-    implementation("org.eclipse.keyple:keyple-plugin-android-nfc-java-lib:3.0.0")
+    implementation("org.eclipse.keyple:keyple-plugin-android-nfc-java-lib:3.1.0-SNAPSHOT")
     implementation("org.eclipse.keyple:keyple-plugin-android-omapi-java-lib:2.1.0")
     // End Keyple configuration
 
     // CNA specific components
-    compileOnly(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
+    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 
     // Network
     implementation("org.java-websocket:Java-WebSocket:1.5.5")

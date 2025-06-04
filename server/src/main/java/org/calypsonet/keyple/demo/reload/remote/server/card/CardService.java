@@ -32,6 +32,8 @@ import org.eclipse.keyple.core.util.HexUtil;
 import org.eclipse.keypop.calypso.card.card.CalypsoCard;
 import org.eclipse.keypop.calypso.card.transaction.CardIOException;
 import org.eclipse.keypop.reader.CardReader;
+import org.eclipse.keypop.reader.selection.spi.SmartCard;
+import org.eclipse.keypop.storagecard.card.StorageCard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +43,7 @@ public class CardService {
   private static final Logger logger = LoggerFactory.getLogger(CardService.class);
   private static final String SUCCESS = "SUCCESS";
   private static final String FAIL = "FAIL";
+  private static final String READ = "READ";
   private static final String SECURED_READ = "SECURED READ";
   private static final String RELOAD = "RELOAD";
   private static final String ISSUANCE = "ISSUANCE";
@@ -247,6 +250,15 @@ public class CardService {
   }
 
   AnalyzeContractsOutputDto analyzeContracts(
+      CardReader cardReader, SmartCard smartCard, AnalyzeContractsInputDto inputData) {
+    if (smartCard instanceof CalypsoCard) {
+      return analyzeCalypsoCardContracts(cardReader, (CalypsoCard) smartCard, inputData);
+    } else {
+      return analyzeStorageCardContracts(cardReader, (StorageCard) smartCard, inputData);
+    }
+  }
+
+  private AnalyzeContractsOutputDto analyzeCalypsoCardContracts(
       CardReader cardReader, CalypsoCard calypsoCard, AnalyzeContractsInputDto inputData) {
 
     String pluginType = inputData.getPluginType();
@@ -306,6 +318,67 @@ public class CardService {
               .setStatus(FAIL)
               .setType(SECURED_READ)
               .setCardSerialNumber(appSerialNumber));
+      return new AnalyzeContractsOutputDto(Collections.emptyList(), 2);
+    } finally {
+      CardResourceServiceProvider.getService().releaseCardResource(samResource);
+    }
+  }
+
+  private AnalyzeContractsOutputDto analyzeStorageCardContracts(
+      CardReader cardReader, StorageCard storageCard, AnalyzeContractsInputDto inputData) {
+
+    String pluginType = inputData.getPluginType();
+    String cardUID = HexUtil.toHex(storageCard.getUID());
+
+    CardResource samResource =
+        CardResourceServiceProvider.getService()
+            .getCardResource(CardConfigurator.SAM_RESOURCE_PROFILE_NAME);
+    try {
+      Card card = cardRepository.readCard(cardReader, storageCard, samResource);
+      // logger.info("{}", card); deactivate until LocalDate is properly processed by KeypleUtil
+      List<ContractStructure> validContracts = findValidContracts(card);
+      activityService.push(
+          new Activity()
+              .setPlugin(pluginType)
+              .setStatus(SUCCESS)
+              .setType(READ)
+              .setCardSerialNumber(cardUID));
+      return new AnalyzeContractsOutputDto(validContracts, 0);
+    } catch (CardNotPersonalizedException e) {
+      logger.error(AN_ERROR_OCCURRED_WHILE_ANALYZING_THE_CONTRACTS, e.getMessage());
+      activityService.push(
+          new Activity()
+              .setPlugin(pluginType)
+              .setStatus(FAIL)
+              .setType(READ)
+              .setCardSerialNumber(cardUID));
+      return new AnalyzeContractsOutputDto(Collections.emptyList(), 4);
+    } catch (ExpiredEnvironmentException e) {
+      logger.error(AN_ERROR_OCCURRED_WHILE_ANALYZING_THE_CONTRACTS, e.getMessage());
+      activityService.push(
+          new Activity()
+              .setPlugin(pluginType)
+              .setStatus(FAIL)
+              .setType(READ)
+              .setCardSerialNumber(cardUID));
+      return new AnalyzeContractsOutputDto(Collections.emptyList(), 5);
+    } catch (CardIOException e) {
+      logger.error(AN_ERROR_OCCURRED_WHILE_ANALYZING_THE_CONTRACTS, e.getMessage(), e);
+      activityService.push(
+          new Activity()
+              .setPlugin(pluginType)
+              .setStatus(FAIL)
+              .setType(READ)
+              .setCardSerialNumber(cardUID));
+      return new AnalyzeContractsOutputDto(Collections.emptyList(), 1);
+    } catch (RuntimeException e) {
+      logger.error(AN_ERROR_OCCURRED_WHILE_ANALYZING_THE_CONTRACTS, e.getMessage(), e);
+      activityService.push(
+          new Activity()
+              .setPlugin(pluginType)
+              .setStatus(FAIL)
+              .setType(READ)
+              .setCardSerialNumber(cardUID));
       return new AnalyzeContractsOutputDto(Collections.emptyList(), 2);
     } finally {
       CardResourceServiceProvider.getService().releaseCardResource(samResource);

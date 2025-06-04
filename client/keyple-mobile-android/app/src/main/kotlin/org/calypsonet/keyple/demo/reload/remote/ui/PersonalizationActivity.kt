@@ -118,7 +118,8 @@ class PersonalizationActivity : AbstractCardActivity() {
     if (event?.type == CardReaderEvent.Type.CARD_INSERTED) {
       runOnUiThread { showNowPersonalizingInformation() }
       GlobalScope.launch {
-        remoteServiceExecution(selectedDeviceReaderName, AppSettings.aidEnums, "ISO_14443_4")
+        remoteServiceExecution(
+            selectedDeviceReaderName, AppSettings.aidEnums, "ISO_14443_4_LOGICAL_PROTOCOL")
       }
     }
   }

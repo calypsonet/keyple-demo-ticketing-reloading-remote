@@ -116,7 +116,10 @@ class CardReaderActivity : AbstractCardActivity() {
       runOnUiThread { showNowLoadingInformation() }
       GlobalScope.launch {
         remoteServiceExecution(
-            selectedDeviceReaderName, pluginType, AppSettings.aidEnums, "ISO_14443_4")
+            selectedDeviceReaderName,
+            pluginType,
+            AppSettings.aidEnums,
+            "ISO_14443_4_LOGICAL_PROTOCOL")
       }
     }
   }

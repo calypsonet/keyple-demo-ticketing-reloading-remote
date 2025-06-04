@@ -30,6 +30,7 @@ import org.eclipse.keyple.plugin.pcsc.PcscReader;
 import org.eclipse.keypop.calypso.card.card.CalypsoCard;
 import org.eclipse.keypop.calypso.crypto.legacysam.sam.LegacySam;
 import org.eclipse.keypop.reader.CardReader;
+import org.eclipse.keypop.reader.selection.spi.SmartCard;
 import org.eclipse.keypop.reader.spi.CardReaderObservationExceptionHandlerSpi;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.slf4j.Logger;
@@ -214,7 +215,7 @@ public class CardConfigurator {
         // Execute service
         outputData =
             cardService.analyzeContracts(
-                reader, (CalypsoCard) readerExtension.getInitialCardContent(), inputData);
+                reader, (SmartCard) readerExtension.getInitialCardContent(), inputData);
 
       } else if (RemoteServiceId.READ_CARD_AND_WRITE_CONTRACT.name().equals(serviceId)) {
 

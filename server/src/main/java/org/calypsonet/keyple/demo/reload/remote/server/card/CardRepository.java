@@ -13,8 +13,10 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.enterprise.context.ApplicationScoped;
+import org.calypsonet.keyple.card.storagecard.StorageCardExtensionService;
 import org.calypsonet.keyple.demo.common.constant.CardConstant;
 import org.calypsonet.keyple.demo.common.model.ContractStructure;
 import org.calypsonet.keyple.demo.common.model.EnvironmentHolderStructure;
@@ -41,6 +43,8 @@ import org.eclipse.keypop.reader.CardReader;
 import org.eclipse.keypop.reader.ReaderApiFactory;
 import org.eclipse.keypop.reader.selection.CardSelectionManager;
 import org.eclipse.keypop.reader.selection.CardSelectionResult;
+import org.eclipse.keypop.storagecard.card.StorageCard;
+import org.eclipse.keypop.storagecard.transaction.StorageCardTransactionManager;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -148,6 +152,16 @@ public class CardRepository {
     logger.info(CALYPSO_SESSION_CLOSED);
 
     return parse(calypsoCard);
+  }
+
+  Card readCard(CardReader cardReader, StorageCard storageCard, CardResource samResource) {
+    StorageCardExtensionService storageCardExtension = StorageCardExtensionService.getInstance();
+    StorageCardTransactionManager cardTransactionManager =
+        storageCardExtension.createStorageCardTransactionManager(cardReader, storageCard);
+    cardTransactionManager
+        .prepareReadBlocks(0, storageCard.getProductType().getBlockCount() - 1)
+        .processCommands(org.eclipse.keypop.storagecard.transaction.ChannelControl.KEEP_OPEN);
+    return parse(storageCard);
   }
 
   int writeCard(
@@ -317,5 +331,29 @@ public class CardRepository {
       return 2;
     }
     return 4;
+  }
+
+  private Card parse(StorageCard storageCard) {
+    // Parse environment
+    EnvironmentHolderStructure environment =
+        new EnvironmentHolderStructureParser()
+            .parse(
+                storageCard.getBlocks(
+                    CardConstant.SC_ENVIRONMENT_AND_HOLDER_FIRST_BLOCK,
+                    CardConstant.SC_ENVIRONMENT_AND_HOLDER_LAST_BLOCK));
+    // parse contracts
+    List<ContractStructure> contracts =
+        Collections.singletonList(
+            new ContractStructureParser()
+                .parse(
+                    storageCard.getBlocks(
+                        CardConstant.SC_CONTRACT_FIRST_BLOCK, CardConstant.SC_COUNTER_LAST_BLOCK)));
+    // parse event
+    EventStructure event =
+        new EventStructureParser()
+            .parse(
+                storageCard.getBlocks(
+                    CardConstant.SC_EVENT_FIRST_BLOCK, CardConstant.SC_EVENT_LAST_BLOCK));
+    return new Card(environment, contracts, event);
   }
 }

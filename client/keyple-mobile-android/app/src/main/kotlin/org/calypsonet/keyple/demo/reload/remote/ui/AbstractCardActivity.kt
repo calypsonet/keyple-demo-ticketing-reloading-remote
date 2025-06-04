@@ -15,9 +15,11 @@ import kotlin.jvm.Throws
 import org.calypsonet.keyple.demo.common.constant.CardConstant
 import org.calypsonet.keyple.demo.reload.remote.data.ReaderRepository
 import org.calypsonet.keyple.demo.reload.remote.data.model.AppSettings
+import org.calypsonet.keyple.demo.reload.remote.data.model.CardProtocolEnum
 import org.calypsonet.keyple.demo.reload.remote.data.model.CardReaderResponse
 import org.calypsonet.keyple.demo.reload.remote.data.model.DeviceEnum
 import org.calypsonet.keyple.demo.reload.remote.data.model.Status
+import org.calypsonet.keyple.plugin.storagecard.ApduInterpreterFactoryProvider
 import org.eclipse.keyple.core.service.KeyplePluginException
 import org.eclipse.keyple.core.service.Plugin
 import org.eclipse.keyple.distributed.LocalServiceClient
@@ -90,7 +92,8 @@ abstract class AbstractCardActivity :
     val plugin: Plugin? =
         readerRepository.registerPlugin(
             AndroidNfcPluginFactoryProvider.provideFactory(
-                AndroidNfcConfig(this@AbstractCardActivity)))
+                AndroidNfcConfig(
+                    this@AbstractCardActivity, ApduInterpreterFactoryProvider.provideFactory())))
 
     if (plugin == null) {
       return
@@ -103,7 +106,11 @@ abstract class AbstractCardActivity :
     observableCardReader.setReaderObservationExceptionHandler(this@AbstractCardActivity)
 
     (observableCardReader as ConfigurableCardReader).activateProtocol(
-        AndroidNfcSupportedProtocols.ISO_14443_4.name, "ISO_14443_4")
+        AndroidNfcSupportedProtocols.ISO_14443_4.name,
+        CardProtocolEnum.ISO_14443_4_LOGICAL_PROTOCOL.name)
+    (observableCardReader as ConfigurableCardReader).activateProtocol(
+        AndroidNfcSupportedProtocols.MIFARE_ULTRALIGHT.name,
+        CardProtocolEnum.MIFARE_ULTRALIGHT_LOGICAL_PROTOCOL.name)
 
     observableCardReader.startCardDetection(ObservableCardReader.DetectionMode.REPEATING)
   }
