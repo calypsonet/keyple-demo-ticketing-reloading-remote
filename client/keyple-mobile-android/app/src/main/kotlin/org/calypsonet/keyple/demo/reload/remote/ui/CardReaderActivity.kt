@@ -157,15 +157,17 @@ class CardReaderActivity : AbstractCardActivity() {
               when (smartCard) {
                 is CalypsoCard -> {
                   changeDisplay(
-                      CardReaderResponse(Status.SUCCESS, "", 0, arrayListOf(), arrayListOf(), ""),
-                      uniqueIdentifier = HexUtil.toHex(smartCard!!.applicationSerialNumber),
-                      finishActivity = true)
+                    CardReaderResponse(
+                      status, "", contracts.size, buildCardTitles(contracts), arrayListOf(), ""),
+                    HexUtil.toHex(smartCard!!.applicationSerialNumber),
+                    finishActivity)
                 }
                 is StorageCard -> {
                   changeDisplay(
-                      CardReaderResponse(Status.SUCCESS, "", 0, arrayListOf(), arrayListOf(), ""),
-                      uniqueIdentifier = HexUtil.toHex(smartCard!!.uid),
-                      finishActivity = true)
+                    CardReaderResponse(
+                      status, "", contracts.size, buildCardTitles(contracts), arrayListOf(), ""),
+                    HexUtil.toHex(smartCard!!.uid),
+                    finishActivity)
                 }
               }
             }

@@ -386,6 +386,15 @@ public class CardService {
   }
 
   WriteContractOutputDto writeContract(
+      CardReader cardReader, SmartCard smartCard, WriteContractInputDto inputData) {
+    if (smartCard instanceof CalypsoCard) {
+      return writeCalypsoCardContract(cardReader, (CalypsoCard) smartCard, inputData);
+    } else {
+      return writeStorageCardContract(cardReader, (StorageCard) smartCard, inputData);
+    }
+  }
+
+  private WriteContractOutputDto writeCalypsoCardContract(
       CardReader cardReader, CalypsoCard calypsoCard, WriteContractInputDto inputData) {
 
     String pluginType = inputData.getPluginType();
@@ -447,7 +456,71 @@ public class CardService {
     }
   }
 
+  private WriteContractOutputDto writeStorageCardContract(
+      CardReader cardReader, StorageCard storageCard, WriteContractInputDto inputData) {
+
+    String pluginType = inputData.getPluginType();
+    String cardUID = HexUtil.toHex(storageCard.getUID());
+
+    CardResource samResource =
+        CardResourceServiceProvider.getService()
+            .getCardResource(CardConfigurator.SAM_RESOURCE_PROFILE_NAME);
+    try {
+      Card card = cardRepository.readCard(cardReader, storageCard, samResource);
+      if (card == null) {
+        // If card has not been read previously, throw error
+        return new WriteContractOutputDto(4);
+      }
+      // logger.info("{}", card); deactivate until LocalDate is properly processed by KeypleUtil
+      insertNewContract(inputData.getContractTariff(), inputData.getTicketToLoad(), card);
+      int statusCode = cardRepository.writeCard(cardReader, storageCard, samResource, card);
+      activityService.push(
+          new Activity()
+              .setPlugin(pluginType)
+              .setStatus(SUCCESS)
+              .setType(RELOAD)
+              .setCardSerialNumber(cardUID)
+              .setContractLoaded(
+                  inputData.getContractTariff().toString().replace("_", " ")
+                      + ((inputData.getTicketToLoad() != 0)
+                          ? ": " + inputData.getTicketToLoad()
+                          : "")));
+      return new WriteContractOutputDto(statusCode);
+    } catch (CardIOException e) {
+      logger.error(AN_ERROR_OCCURRED_WHILE_WRITING_THE_CONTRACT, e.getMessage(), e);
+      activityService.push(
+          new Activity()
+              .setPlugin(pluginType)
+              .setStatus(FAIL)
+              .setType(RELOAD)
+              .setCardSerialNumber(cardUID)
+              .setContractLoaded(""));
+      return new WriteContractOutputDto(1);
+    } catch (RuntimeException e) {
+      logger.error(AN_ERROR_OCCURRED_WHILE_WRITING_THE_CONTRACT, e.getMessage(), e);
+      activityService.push(
+          new Activity()
+              .setPlugin(pluginType)
+              .setStatus(FAIL)
+              .setType(RELOAD)
+              .setCardSerialNumber(cardUID)
+              .setContractLoaded(""));
+      return new WriteContractOutputDto(2);
+    } finally {
+      CardResourceServiceProvider.getService().releaseCardResource(samResource);
+    }
+  }
+
   CardIssuanceOutputDto initCard(
+      CardReader cardReader, SmartCard smartCard, CardIssuanceInputDto inputData) {
+    if (smartCard instanceof CalypsoCard) {
+      return initCalypsoCard(cardReader, (CalypsoCard) smartCard, inputData);
+    } else {
+      return initStorageCard(cardReader, (StorageCard) smartCard, inputData);
+    }
+  }
+
+  private CardIssuanceOutputDto initCalypsoCard(
       CardReader cardReader, CalypsoCard calypsoCard, CardIssuanceInputDto inputData) {
 
     String pluginType = inputData.getPluginType();
@@ -487,6 +560,47 @@ public class CardService {
               .setStatus(FAIL)
               .setType(ISSUANCE)
               .setCardSerialNumber(appSerialNumber));
+      return new CardIssuanceOutputDto(2);
+    } finally {
+      CardResourceServiceProvider.getService().releaseCardResource(samResource);
+    }
+  }
+
+  CardIssuanceOutputDto initStorageCard(
+      CardReader cardReader, StorageCard storageCard, CardIssuanceInputDto inputData) {
+
+    String pluginType = inputData.getPluginType();
+    String cardUID = HexUtil.toHex(storageCard.getUID());
+
+    CardResource samResource =
+        CardResourceServiceProvider.getService()
+            .getCardResource(CardConfigurator.SAM_RESOURCE_PROFILE_NAME);
+    try {
+      cardRepository.initCard(cardReader, storageCard, samResource);
+      activityService.push(
+          new Activity()
+              .setPlugin(pluginType)
+              .setStatus(SUCCESS)
+              .setType(ISSUANCE)
+              .setCardSerialNumber(cardUID));
+      return new CardIssuanceOutputDto(0);
+    } catch (CardIOException e) {
+      logger.error(AN_ERROR_OCCURRED_WHILE_INITIALIZING_THE_CARD, e.getMessage(), e);
+      activityService.push(
+          new Activity()
+              .setPlugin(pluginType)
+              .setStatus(FAIL)
+              .setType(ISSUANCE)
+              .setCardSerialNumber(cardUID));
+      return new CardIssuanceOutputDto(1);
+    } catch (RuntimeException e) {
+      logger.error(AN_ERROR_OCCURRED_WHILE_INITIALIZING_THE_CARD, e.getMessage(), e);
+      activityService.push(
+          new Activity()
+              .setPlugin(pluginType)
+              .setStatus(FAIL)
+              .setType(ISSUANCE)
+              .setCardSerialNumber(cardUID));
       return new CardIssuanceOutputDto(2);
     } finally {
       CardResourceServiceProvider.getService().releaseCardResource(samResource);

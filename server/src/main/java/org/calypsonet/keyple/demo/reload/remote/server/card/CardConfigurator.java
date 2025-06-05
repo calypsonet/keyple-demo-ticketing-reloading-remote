@@ -27,7 +27,6 @@ import org.eclipse.keyple.distributed.RemotePluginServerFactoryBuilder;
 import org.eclipse.keyple.distributed.RemoteReaderServer;
 import org.eclipse.keyple.plugin.pcsc.PcscPluginFactoryBuilder;
 import org.eclipse.keyple.plugin.pcsc.PcscReader;
-import org.eclipse.keypop.calypso.card.card.CalypsoCard;
 import org.eclipse.keypop.calypso.crypto.legacysam.sam.LegacySam;
 import org.eclipse.keypop.reader.CardReader;
 import org.eclipse.keypop.reader.selection.spi.SmartCard;
@@ -225,7 +224,7 @@ public class CardConfigurator {
         // Execute service
         outputData =
             cardService.writeContract(
-                reader, (CalypsoCard) readerExtension.getInitialCardContent(), inputData);
+                reader, (SmartCard) readerExtension.getInitialCardContent(), inputData);
 
       } else if (RemoteServiceId.PERSONALIZE_CARD.name().equals(serviceId)) {
 
@@ -235,7 +234,7 @@ public class CardConfigurator {
         // Execute service
         outputData =
             cardService.initCard(
-                reader, (CalypsoCard) readerExtension.getInitialCardContent(), inputData);
+                reader, (SmartCard) readerExtension.getInitialCardContent(), inputData);
 
       } else if (RemoteServiceId.SELECT_APP_AND_ANALYZE_CONTRACTS.name().equals(serviceId)) {
 
