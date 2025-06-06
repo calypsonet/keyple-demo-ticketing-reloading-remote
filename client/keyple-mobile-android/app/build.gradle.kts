@@ -133,7 +133,7 @@ dependencies {
     // End Keyple configuration
 
     // CNA specific components
-    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
+    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
 
     // Network
     implementation("org.java-websocket:Java-WebSocket:1.5.5")
