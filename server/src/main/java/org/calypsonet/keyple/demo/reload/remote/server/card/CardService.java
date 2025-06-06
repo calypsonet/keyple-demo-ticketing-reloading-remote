@@ -926,11 +926,11 @@ public class CardService {
     // Iterate through the contracts in the card session
     List<ContractStructure> contracts = card.getContracts();
     List<ContractStructure> validContracts = new ArrayList<>();
-    int calypsoIndex = 1;
+    int contractIndex = 1;
     for (ContractStructure contract : contracts) {
       logger.info(
           CONTRACT_AT_INDEX,
-          calypsoIndex,
+          contractIndex,
           contract.getContractTariff(),
           contract.getContractSaleDate().getValue());
       if (contract.getContractVersionNumber() == VersionNumber.UNDEFINED) {
@@ -946,11 +946,11 @@ public class CardService {
           // set the change flag to true.
           contract.setContractTariff(PriorityCode.EXPIRED);
           // Update contract
-          card.setContract(calypsoIndex - 1, contract);
+          card.setContract(contractIndex - 1, contract);
         }
         validContracts.add(contract);
       }
-      calypsoIndex++;
+      contractIndex++;
     }
     logger.info(CONTRACTS, Arrays.deepToString(validContracts.toArray()));
     return validContracts;

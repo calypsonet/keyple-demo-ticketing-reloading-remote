@@ -14,7 +14,6 @@ import logo_cna from '../img/logo-cna.png';
           Calypso Network Association
         </Link>{' '}
         {new Date().getFullYear()}
-        {'.'}
       </Typography>
     </div>
   );
