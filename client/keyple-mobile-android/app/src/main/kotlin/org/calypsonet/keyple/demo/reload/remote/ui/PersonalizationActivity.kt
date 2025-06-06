@@ -53,7 +53,7 @@ class PersonalizationActivity : AbstractCardActivity() {
     try {
       if (DeviceEnum.getDeviceEnum(prefData.loadDeviceType()!!) == DeviceEnum.CONTACTLESS_CARD) {
         showPresentNfcCardInstructions()
-        initAndActivateAndroidKeypleNfcReader()
+        initAndActivateCardReader()
       } else {
         showNowPersonalizingInformation()
         initOmapiReader {
@@ -72,7 +72,7 @@ class PersonalizationActivity : AbstractCardActivity() {
     activityPersonalizationBinding.loadingAnimation.cancelAnimation()
     try {
       if (DeviceEnum.getDeviceEnum(prefData.loadDeviceType()!!) == DeviceEnum.CONTACTLESS_CARD) {
-        deactivateAndClearAndroidKeypleNfcReader()
+        deactivateAndClearCardReader()
       } else {
         deactivateAndClearOmapiReader()
       }

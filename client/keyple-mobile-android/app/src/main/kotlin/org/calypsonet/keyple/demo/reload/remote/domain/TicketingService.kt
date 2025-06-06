@@ -21,6 +21,7 @@ import org.eclipse.keyple.card.calypso.CalypsoExtensionService
 import org.eclipse.keyple.core.service.SmartCardServiceProvider
 import org.eclipse.keypop.reader.selection.spi.SmartCard
 import org.eclipse.keypop.storagecard.card.ProductType.MIFARE_ULTRALIGHT
+import org.eclipse.keypop.storagecard.card.ProductType.ST25_SRT512
 
 @AppScoped
 class TicketingService @Inject constructor(private var readerRepository: ReaderRepository) {
@@ -60,11 +61,18 @@ class TicketingService @Inject constructor(private var readerRepository: ReaderR
             calypsoCardSelector,
             calypsoExtension.calypsoCardApiFactory.createCalypsoCardSelectionExtension())
       }
-      cardSelectionManager.prepareSelection(
-          readerApiFactory
-              .createBasicCardSelector()
-              .filterByCardProtocol(CardProtocolEnum.MIFARE_ULTRALIGHT_LOGICAL_PROTOCOL.name),
-          storageCardExtension.createStorageCardSelectionExtension(MIFARE_ULTRALIGHT))
+      if (storageCardExtension != null) {
+        cardSelectionManager.prepareSelection(
+            readerApiFactory
+                .createBasicCardSelector()
+                .filterByCardProtocol(CardProtocolEnum.MIFARE_ULTRALIGHT_LOGICAL_PROTOCOL.name),
+            storageCardExtension.createStorageCardSelectionExtension(MIFARE_ULTRALIGHT))
+        cardSelectionManager.prepareSelection(
+            readerApiFactory
+                .createBasicCardSelector()
+                .filterByCardProtocol(CardProtocolEnum.ST25_SRT512_LOGICAL_PROTOCOL.name),
+            storageCardExtension.createStorageCardSelectionExtension(ST25_SRT512))
+      }
 
       val selectionResult = cardSelectionManager.processCardSelectionScenario(reader)
       val smartCard = selectionResult.activeSmartCard

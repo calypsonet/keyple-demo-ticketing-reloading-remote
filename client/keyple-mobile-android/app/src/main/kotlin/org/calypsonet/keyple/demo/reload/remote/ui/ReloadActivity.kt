@@ -56,7 +56,7 @@ class ReloadActivity : AbstractCardActivity() {
     try {
       if (DeviceEnum.getDeviceEnum(prefData.loadDeviceType()!!) == DeviceEnum.CONTACTLESS_CARD) {
         showPresentNfcCardInstructions()
-        initAndActivateAndroidKeypleNfcReader()
+        initAndActivateCardReader()
       } else {
         showNowLoadingInformation()
         initOmapiReader {
@@ -76,7 +76,7 @@ class ReloadActivity : AbstractCardActivity() {
     activityCardReaderBinding.loadingAnimation.cancelAnimation()
     try {
       if (DeviceEnum.getDeviceEnum(prefData.loadDeviceType()!!) == DeviceEnum.CONTACTLESS_CARD) {
-        deactivateAndClearAndroidKeypleNfcReader()
+        deactivateAndClearCardReader()
       }
     } catch (e: Exception) {
       Timber.e(e)

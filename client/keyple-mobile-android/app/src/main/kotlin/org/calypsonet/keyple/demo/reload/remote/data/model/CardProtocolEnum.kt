@@ -11,5 +11,6 @@ package org.calypsonet.keyple.demo.reload.remote.data.model
 
 enum class CardProtocolEnum {
   ISO_14443_4_LOGICAL_PROTOCOL,
-  MIFARE_ULTRALIGHT_LOGICAL_PROTOCOL
+  MIFARE_ULTRALIGHT_LOGICAL_PROTOCOL,
+  ST25_SRT512_LOGICAL_PROTOCOL
 }

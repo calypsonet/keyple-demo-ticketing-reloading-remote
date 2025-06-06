@@ -61,13 +61,18 @@ class CardReaderActivity : AbstractCardActivity() {
     try {
       when (device) {
         DeviceEnum.CONTACTLESS_CARD -> {
-          val nfcManager = getSystemService(NFC_SERVICE) as NfcManager
-          if (nfcManager.defaultAdapter?.isEnabled == true) {
-            showPresentNfcCardInstructions()
-            initAndActivateAndroidKeypleNfcReader()
+          if (!isBluebirdDevice) {
+            val nfcManager = getSystemService(NFC_SERVICE) as NfcManager
+            if (nfcManager.defaultAdapter?.isEnabled == true) {
+              showPresentNfcCardInstructions()
+              initAndActivateCardReader()
+            } else {
+              launchExceptionResponse(
+                  IllegalStateException("NFC not activated"), finishActivity = true)
+            }
           } else {
-            launchExceptionResponse(
-                IllegalStateException("NFC not activated"), finishActivity = true)
+            showPresentNfcCardInstructions()
+            initAndActivateCardReader()
           }
         }
         DeviceEnum.SIM -> {
@@ -99,7 +104,7 @@ class CardReaderActivity : AbstractCardActivity() {
     activityCardReaderBinding.loadingAnimation.cancelAnimation()
     try {
       if (DeviceEnum.getDeviceEnum(prefData.loadDeviceType()!!) == DeviceEnum.CONTACTLESS_CARD) {
-        deactivateAndClearAndroidKeypleNfcReader()
+        deactivateAndClearCardReader()
       } else {
         deactivateAndClearOmapiReader()
       }
@@ -157,17 +162,27 @@ class CardReaderActivity : AbstractCardActivity() {
               when (smartCard) {
                 is CalypsoCard -> {
                   changeDisplay(
-                    CardReaderResponse(
-                      status, "", contracts.size, buildCardTitles(contracts), arrayListOf(), ""),
-                    HexUtil.toHex(smartCard!!.applicationSerialNumber),
-                    finishActivity)
+                      CardReaderResponse(
+                          status,
+                          "",
+                          contracts.size,
+                          buildCardTitles(contracts),
+                          arrayListOf(),
+                          ""),
+                      HexUtil.toHex(smartCard!!.applicationSerialNumber),
+                      finishActivity)
                 }
                 is StorageCard -> {
                   changeDisplay(
-                    CardReaderResponse(
-                      status, "", contracts.size, buildCardTitles(contracts), arrayListOf(), ""),
-                    HexUtil.toHex(smartCard!!.uid),
-                    finishActivity)
+                      CardReaderResponse(
+                          status,
+                          "",
+                          contracts.size,
+                          buildCardTitles(contracts),
+                          arrayListOf(),
+                          ""),
+                      HexUtil.toHex(smartCard!!.uid),
+                      finishActivity)
                 }
               }
             }
