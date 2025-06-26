@@ -65,6 +65,22 @@ xmlns:app="http://schemas.android.com/apk/res-auto"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <TextView
+        android:id="@+id/cardTypeLabel"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black"
+        android:textSize="10sp"
+        android:fontFamily="@font/worksans_regular"
+        android:gravity="center"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/contentTitle"
+        app:layout_constraintBottom_toTopOf="@id/titlesList"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="16dp"/>
+
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/animation"
         android:layout_width="0dp"

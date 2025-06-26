@@ -92,4 +92,5 @@
     <string name="card_content_description_placeholder">From JJ Month YYYY to JJ Month YYYY</string>
     <string name="card_content_validation_title_placeholder">Multi Trip - Place d\'Italie</string>
     <string name="card_content_validation_date_placeholder">JJ Month YYYY, HH:MM:SS</string>
+    <string name="card_type">%1$s</string>
 </resources>

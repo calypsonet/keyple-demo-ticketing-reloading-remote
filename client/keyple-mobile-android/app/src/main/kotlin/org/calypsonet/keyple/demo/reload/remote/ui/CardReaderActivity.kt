@@ -164,7 +164,7 @@ class CardReaderActivity : AbstractCardActivity() {
                   changeDisplay(
                       CardReaderResponse(
                           status,
-                          "",
+                          "CALYPSO: DF name "+ HexUtil.toHex(smartCard.dfName),
                           contracts.size,
                           buildCardTitles(contracts),
                           arrayListOf(),
@@ -176,7 +176,7 @@ class CardReaderActivity : AbstractCardActivity() {
                   changeDisplay(
                       CardReaderResponse(
                           status,
-                          "",
+                          smartCard.productType.name,
                           contracts.size,
                           buildCardTitles(contracts),
                           arrayListOf(),

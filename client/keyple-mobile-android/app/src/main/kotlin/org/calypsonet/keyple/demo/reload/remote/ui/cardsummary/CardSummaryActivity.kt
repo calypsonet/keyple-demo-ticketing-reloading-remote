@@ -104,6 +104,12 @@ class CardSummaryActivity : AbstractDemoActivity() {
         activityCardSummaryBinding.contentTitle.visibility = View.GONE
       }
     }
+
+    if (!cardContent.cardType.isNullOrBlank()) {
+      activityCardSummaryBinding.cardTypeLabel.visibility = View.VISIBLE
+      activityCardSummaryBinding.cardTypeLabel.text = getString(R.string.card_type, cardContent.cardType)
+    }
+
     activityCardSummaryBinding.animation.playAnimation()
 
     // Play sound
