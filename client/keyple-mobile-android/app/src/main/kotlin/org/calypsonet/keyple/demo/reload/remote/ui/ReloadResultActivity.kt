@@ -17,6 +17,7 @@ import com.airbnb.lottie.LottieDrawable
 import java.util.Timer
 import java.util.TimerTask
 import org.calypsonet.keyple.demo.reload.remote.R
+import org.calypsonet.keyple.demo.reload.remote.data.model.CardReaderResponse
 import org.calypsonet.keyple.demo.reload.remote.data.model.Status
 import org.calypsonet.keyple.demo.reload.remote.databinding.ActivityChargeResultBinding
 
@@ -33,11 +34,21 @@ class ReloadResultActivity : AbstractDemoActivity() {
     toolbarBinding.toolbarLogo.setImageResource(R.drawable.ic_logo_white)
 
     val status = Status.getStatus(intent.getStringExtra(STATUS))
+    val cardContent: CardReaderResponse? =
+        intent.getParcelableExtra(AbstractCardActivity.CARD_CONTENT)
 
     activityChargeResultBinding.tryBtn.setOnClickListener { onBackPressed() }
     activityChargeResultBinding.cancelBtn.setOnClickListener {
       val intent = Intent(this, HomeActivity::class.java)
       startActivity(intent)
+    }
+
+    if (cardContent != null && !cardContent.cardType.isNullOrBlank()) {
+      activityChargeResultBinding.cardTypeLabel.visibility = View.VISIBLE
+      activityChargeResultBinding.cardTypeLabel.text =
+          getString(R.string.card_type, cardContent.cardType)
+    } else {
+      activityChargeResultBinding.cardTypeLabel.visibility = View.GONE
     }
 
     when (status) {

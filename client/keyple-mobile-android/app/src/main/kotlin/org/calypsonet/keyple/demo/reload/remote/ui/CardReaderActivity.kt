@@ -138,6 +138,12 @@ class CardReaderActivity : AbstractCardActivity() {
     withContext(Dispatchers.IO) {
       try {
         val smartCard = ticketingService.getSmartCard(selectedDeviceReaderName, aidEnums)
+        val cardType =
+            when (smartCard) {
+              is CalypsoCard -> "CALYPSO: DF name " + HexUtil.toHex(smartCard.dfName)
+              is StorageCard -> smartCard.productType.name
+              else -> "unexpected card type"
+            }
         val analyseContractsInput = AnalyzeContractsInputDto(pluginType)
         // un-mock for run
         val compatibleContractOutput =
@@ -164,7 +170,7 @@ class CardReaderActivity : AbstractCardActivity() {
                   changeDisplay(
                       CardReaderResponse(
                           status,
-                          "CALYPSO: DF name "+ HexUtil.toHex(smartCard.dfName),
+                          cardType,
                           contracts.size,
                           buildCardTitles(contracts),
                           arrayListOf(),
@@ -176,7 +182,7 @@ class CardReaderActivity : AbstractCardActivity() {
                   changeDisplay(
                       CardReaderResponse(
                           status,
-                          smartCard.productType.name,
+                          cardType,
                           contracts.size,
                           buildCardTitles(contracts),
                           arrayListOf(),
@@ -194,26 +200,27 @@ class CardReaderActivity : AbstractCardActivity() {
             when (smartCard) {
               is CalypsoCard -> {
                 launchInvalidCardResponse(
+                    cardType,
                     String.format(
                         getString(R.string.card_invalid_structure),
                         HexUtil.toHex(smartCard!!.applicationSubtype)))
               }
               is StorageCard -> {
-                launchInvalidCardResponse(getString(R.string.storage_card_invalid))
+                launchInvalidCardResponse(cardType, getString(R.string.storage_card_invalid))
               }
               else -> {}
             } // card rejected
           }
           3 -> {
-            launchInvalidCardResponse(getString(R.string.card_not_personalized))
+            launchInvalidCardResponse(cardType, getString(R.string.card_not_personalized))
           } // card not personalized
           4 -> {
-            launchInvalidCardResponse(getString(R.string.expired_environment))
+            launchInvalidCardResponse(cardType, getString(R.string.expired_environment))
           } // expired environment
         }
       } catch (e: IllegalStateException) {
         Timber.e(e)
-        launchInvalidCardResponse(e.message!!)
+        launchInvalidCardResponse("Undetermined card type", e.message!!)
       } catch (e: Exception) {
         Timber.e(e)
         val finishActivity =

@@ -117,24 +117,28 @@ abstract class AbstractCardActivity :
     observableCardReader.addObserver(this@AbstractCardActivity)
     observableCardReader.setReaderObservationExceptionHandler(this@AbstractCardActivity)
 
-    (observableCardReader as ConfigurableCardReader).activateProtocol(
-        if (isBluebirdDevice) {
-          BluebirdContactlessProtocols.ISO_14443_4_A.name
-        } else {
-          AndroidNfcSupportedProtocols.ISO_14443_4.name
-        },
-        CardProtocolEnum.ISO_14443_4_LOGICAL_PROTOCOL.name)
-    (observableCardReader as ConfigurableCardReader).activateProtocol(
-        if (isBluebirdDevice) {
-          BluebirdContactlessProtocols.MIFARE_ULTRALIGHT.name
-        } else {
-          AndroidNfcSupportedProtocols.MIFARE_ULTRALIGHT.name
-        },
-        CardProtocolEnum.MIFARE_ULTRALIGHT_LOGICAL_PROTOCOL.name)
+    val configurableReader = observableCardReader as ConfigurableCardReader
+
     if (isBluebirdDevice) {
-      (observableCardReader as ConfigurableCardReader).activateProtocol(
+      configurableReader.activateProtocol(
+          BluebirdContactlessProtocols.ISO_14443_4_A.name,
+          CardProtocolEnum.ISO_14443_4_LOGICAL_PROTOCOL.name)
+      configurableReader.activateProtocol(
+          BluebirdContactlessProtocols.ISO_14443_4_B.name,
+          CardProtocolEnum.ISO_14443_4_LOGICAL_PROTOCOL.name)
+      configurableReader.activateProtocol(
+          BluebirdContactlessProtocols.MIFARE_ULTRALIGHT.name,
+          CardProtocolEnum.MIFARE_ULTRALIGHT_LOGICAL_PROTOCOL.name)
+      configurableReader.activateProtocol(
           BluebirdContactlessProtocols.ST25_SRT512.name,
           CardProtocolEnum.ST25_SRT512_LOGICAL_PROTOCOL.name)
+    } else {
+      configurableReader.activateProtocol(
+          AndroidNfcSupportedProtocols.ISO_14443_4.name,
+          CardProtocolEnum.ISO_14443_4_LOGICAL_PROTOCOL.name)
+      configurableReader.activateProtocol(
+          AndroidNfcSupportedProtocols.MIFARE_ULTRALIGHT.name,
+          CardProtocolEnum.MIFARE_ULTRALIGHT_LOGICAL_PROTOCOL.name)
     }
 
     observableCardReader.startCardDetection(ObservableCardReader.DetectionMode.REPEATING)
@@ -156,11 +160,6 @@ abstract class AbstractCardActivity :
   fun initOmapiReader(callback: () -> Unit) {
     AndroidOmapiPluginFactoryProvider(this@AbstractCardActivity) {
       readerRepository.registerPlugin(it)
-      //            (readerRepository.getReader(AndroidOmapiReader.READER_NAME_SIM_1) as
-      // ConfigurableCardReader).activateProtocol(
-      //                ContactCardCommonProtocol.ISO_7816_3.name,
-      //                ContactCardCommonProtocol.ISO_7816_3.name
-      //            )
       callback()
     }
   }
@@ -170,10 +169,11 @@ abstract class AbstractCardActivity :
     readerRepository.unregisterPlugin(AndroidOmapiPlugin.PLUGIN_NAME)
   }
 
-  fun launchInvalidCardResponse(message: String) {
+  fun launchInvalidCardResponse(cardType: String, message: String) {
     runOnUiThread {
       changeDisplay(
-          CardReaderResponse(Status.INVALID_CARD, "", 0, arrayListOf(), arrayListOf(), "", message),
+          CardReaderResponse(
+              Status.INVALID_CARD, cardType, 0, arrayListOf(), arrayListOf(), "", message),
           finishActivity =
               device !=
                   DeviceEnum.CONTACTLESS_CARD // /Only with NFC we can come back to 'wait for device

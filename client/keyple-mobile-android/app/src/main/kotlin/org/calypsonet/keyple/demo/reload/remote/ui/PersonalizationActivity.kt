@@ -108,6 +108,8 @@ class PersonalizationActivity : AbstractCardActivity() {
     intent.putExtra(ReloadResultActivity.IS_PERSONALIZATION_RESULT, true)
     intent.putExtra(ReloadResultActivity.STATUS, cardReaderResponse.status.name)
     intent.putExtra(ReloadResultActivity.MESSAGE, cardReaderResponse.errorMessage)
+    intent.putExtra(CARD_CONTENT, cardReaderResponse)
+    intent.putExtra(CARD_APPLICATION_NUMBER, uniqueIdentifier)
     startActivity(intent)
     if (finishActivity == true) {
       finish()
@@ -132,6 +134,12 @@ class PersonalizationActivity : AbstractCardActivity() {
     withContext(Dispatchers.IO) {
       try {
         val smartCard = ticketingService.getSmartCard(selectedDeviceReaderName, aidEnums)
+        val cardType =
+            when (smartCard) {
+              is CalypsoCard -> "CALYPSO: DF name " + HexUtil.toHex(smartCard.dfName)
+              is StorageCard -> smartCard.productType.name
+              else -> "unexpected card type"
+            }
         val cardIssuanceInput = CardIssuanceInputDto(pluginType)
         val cardIssuanceOutput =
             localServiceClient.executeRemoteService(
@@ -146,13 +154,15 @@ class PersonalizationActivity : AbstractCardActivity() {
               when (smartCard) {
                 is CalypsoCard -> {
                   changeDisplay(
-                      CardReaderResponse(Status.SUCCESS, "", 0, arrayListOf(), arrayListOf(), ""),
+                      CardReaderResponse(
+                          Status.SUCCESS, cardType, 0, arrayListOf(), arrayListOf(), ""),
                       uniqueIdentifier = HexUtil.toHex(smartCard!!.applicationSerialNumber),
                       finishActivity = true)
                 }
                 is StorageCard -> {
                   changeDisplay(
-                      CardReaderResponse(Status.SUCCESS, "", 0, arrayListOf(), arrayListOf(), ""),
+                      CardReaderResponse(
+                          Status.SUCCESS, cardType, 0, arrayListOf(), arrayListOf(), ""),
                       uniqueIdentifier = HexUtil.toHex(smartCard!!.uid),
                       finishActivity = true)
                 }
@@ -166,12 +176,13 @@ class PersonalizationActivity : AbstractCardActivity() {
             when (smartCard) {
               is CalypsoCard -> {
                 launchInvalidCardResponse(
+                    cardType,
                     String.format(
                         getString(R.string.card_invalid_structure),
                         HexUtil.toHex(smartCard!!.applicationSubtype)))
               }
               is StorageCard -> {
-                launchInvalidCardResponse(getString(R.string.storage_card_invalid))
+                launchInvalidCardResponse(cardType, getString(R.string.storage_card_invalid))
               }
               else -> {}
             } // card rejected
@@ -179,7 +190,7 @@ class PersonalizationActivity : AbstractCardActivity() {
         }
       } catch (e: IllegalStateException) {
         Timber.e(e)
-        launchInvalidCardResponse(e.message!!)
+        launchInvalidCardResponse("Undetermined card type", e.message!!)
       } catch (e: Exception) {
         Timber.e(e)
         launchExceptionResponse(e)

@@ -107,6 +107,12 @@ class ReloadActivity : AbstractCardActivity() {
       try {
         val readCardUniqueIdentifier = intent.getStringExtra(CARD_APPLICATION_NUMBER)
         val smartCard = ticketingService.getSmartCard(selectedDeviceReaderName, aidEnums)
+        val cardType =
+            when (smartCard) {
+              is CalypsoCard -> "CALYPSO: DF name " + HexUtil.toHex(smartCard.dfName)
+              is StorageCard -> smartCard.productType.name
+              else -> "unexpected card type"
+            }
         when (smartCard) {
           is CalypsoCard -> {
             if (HexUtil.toHex(smartCard!!.applicationSerialNumber) != readCardUniqueIdentifier) {
@@ -154,7 +160,7 @@ class ReloadActivity : AbstractCardActivity() {
             runOnUiThread {
               changeDisplay(
                   CardReaderResponse(
-                      Status.SUCCESS, "", ticketToBeLoaded, arrayListOf(), arrayListOf(), ""),
+                      Status.SUCCESS, cardType, ticketToBeLoaded, arrayListOf(), arrayListOf(), ""),
                   finishActivity = true)
             }
           }
@@ -165,12 +171,13 @@ class ReloadActivity : AbstractCardActivity() {
             when (smartCard) {
               is CalypsoCard -> {
                 launchInvalidCardResponse(
+                    cardType,
                     String.format(
                         getString(R.string.card_invalid_structure),
                         HexUtil.toHex(smartCard!!.applicationSubtype)))
               }
               is StorageCard -> {
-                launchInvalidCardResponse(getString(R.string.storage_card_invalid))
+                launchInvalidCardResponse(cardType, getString(R.string.storage_card_invalid))
               }
               else -> {}
             } // card rejected
@@ -178,7 +185,7 @@ class ReloadActivity : AbstractCardActivity() {
         }
       } catch (e: IllegalStateException) {
         Timber.e(e)
-        launchInvalidCardResponse(e.message!!)
+        launchInvalidCardResponse("Undetermined card type", e.message!!)
       } catch (e: Exception) {
         Timber.e(e)
         launchExceptionResponse(e)
@@ -188,7 +195,7 @@ class ReloadActivity : AbstractCardActivity() {
 
   override fun changeDisplay(
       cardReaderResponse: CardReaderResponse,
-      applicationSerialNumber: String?,
+      uniqueIdentifier: String?,
       finishActivity: Boolean?
   ) {
     activityCardReaderBinding.loadingAnimation.cancelAnimation()
@@ -197,6 +204,8 @@ class ReloadActivity : AbstractCardActivity() {
     intent.putExtra(ReloadResultActivity.TICKETS_NUMBER, 0)
     intent.putExtra(ReloadResultActivity.STATUS, cardReaderResponse.status.toString())
     intent.putExtra(ReloadResultActivity.MESSAGE, cardReaderResponse.errorMessage)
+    intent.putExtra(CARD_CONTENT, cardReaderResponse)
+    intent.putExtra(CARD_APPLICATION_NUMBER, uniqueIdentifier)
     startActivity(intent)
     if (finishActivity == true) {
       finish()

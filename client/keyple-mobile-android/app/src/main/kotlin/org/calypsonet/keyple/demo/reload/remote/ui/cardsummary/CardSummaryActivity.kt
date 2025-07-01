@@ -107,7 +107,8 @@ class CardSummaryActivity : AbstractDemoActivity() {
 
     if (!cardContent.cardType.isNullOrBlank()) {
       activityCardSummaryBinding.cardTypeLabel.visibility = View.VISIBLE
-      activityCardSummaryBinding.cardTypeLabel.text = getString(R.string.card_type, cardContent.cardType)
+      activityCardSummaryBinding.cardTypeLabel.text =
+          getString(R.string.card_type, cardContent.cardType)
     }
 
     activityCardSummaryBinding.animation.playAnimation()
