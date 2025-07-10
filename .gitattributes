@@ -7,7 +7,7 @@
 # CRLF for Windows files.
 *.{cmd,[cC][mM][dD]} text eol=crlf
 *.{bat,[bB][aA][tT]} text eol=crlf
-*.cs                 text eol=crlf diff=csharp
+*.cs                 text diff=csharp
 
 # LF for Linux files.
 *.sh text eol=lf
