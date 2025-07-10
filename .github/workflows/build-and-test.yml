@@ -7,35 +7,93 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
-  build-and-test:
+  build-and-test-server:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository code from ${{ github.repository }}/${{ github.ref }}
         uses: actions/checkout@v4
-      - name: Set up JDK 17
+
+      - name: Set up JDK
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
+
       - name: Set up Node JS
         uses: actions/setup-node@v4
         with:
           node-version: 16
+
+      - name: Update permissions
+        working-directory: .
+        run: chmod +x ./server/gradlew ./.github/scripts/*.sh
+
+      - name: Check version
+        working-directory: ./server/
+        run: ../.github/scripts/check_version.sh
+
+      - name: Build and Test
+        working-directory: ./server/
+        run: |
+          cd ./dashboard-app
+          npm install
+          cd ..
+          ./gradlew build --info --stacktrace
+
+  build-and-test-client-interop-mobile-multiplatform:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code from ${{ github.repository }}/${{ github.ref }}
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Update permissions
+        working-directory: .
+        run: chmod +x ./client/interop-mobile-multiplatform/gradlew ./.github/scripts/*.sh
+
+  build-and-test-client-keyple-mobile-android:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code from ${{ github.repository }}/${{ github.ref }}
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Update permissions
+        working-directory: .
+        run: chmod +x ./client/keyple-mobile-android/gradlew ./.github/scripts/*.sh
+
+      - name: Check version
+        working-directory: ./client/keyple-mobile-android/
+        run: ../../.github/scripts/check_version.sh
+
+      - name: Build and Test
+        working-directory: ./client/keyple-mobile-android/
+        run: ./gradlew build --info --stacktrace
+
+  build-and-test-client-pc-dotnet:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code from ${{ github.repository }}/${{ github.ref }}
+        uses: actions/checkout@v4
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 7.0.x
-      - name: Update permissions
-        working-directory: .
-        run: chmod +x ./client/keyple-mobile-android/gradlew ./server/gradlew ./.github/scripts/*.sh
-      - name: Check version client Keyple Mobile Android
-        working-directory: ./client/keyple-mobile-android/
-        run: ../../.github/scripts/check_version.sh
-      - name: Check version server
-        working-directory: ./server/
-        run: ../.github/scripts/check_version.sh
+
       - name: Check code format, build and test client .NET
         working-directory: ./client/pc-dotnet
         run: |
@@ -43,13 +101,3 @@ jobs:
           dotnet format --verify-no-changes App.sln
           dotnet build --no-restore
           dotnet test --no-build --verbosity normal
-      - name: Build and Test client Keyple Mobile Android
-        working-directory: ./client/keyple-mobile-android/
-        run: ./gradlew clean build --info --stacktrace
-      - name: Build and Test server
-        working-directory: ./server/
-        run: |
-          cd ./dashboard-app
-          npm install
-          cd ..
-          ./gradlew clean build --info --stacktrace

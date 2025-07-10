@@ -1,4 +1,4 @@
-rootProject.name = "keyple-demo-ticketing-reloading-client-android-app"
+rootProject.name = "keyple-demo-ticketing-reloading-client-keyple-mobile-android-app"
 include (":app")
 
 pluginManagement {
