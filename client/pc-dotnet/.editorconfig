@@ -52,7 +52,7 @@ dotnet_style_qualification_for_event = false:suggestion
 # C# files
 [*.cs]
 # Licence header
-file_header_template = Copyright (c) 2025 Calypso Networks Association https://calypsonet.org/\n\nThis program and the accompanying materials are made available under the\nterms of the BSD 3-Clause License which is available at\nhttps://opensource.org/licenses/BSD-3-Clause.\n\nSPDX-License-Identifier: BSD-3-Clause
+file_header_template = Copyright (c) 2025 Calypso Networks Association https://calypsonet.org/\n\nSee the NOTICE file(s) distributed with this work for additional information\nregarding copyright ownership.\n\nThis program and the accompanying materials are made available under the\nterms of the BSD 3-Clause License which is available at\nhttps://opensource.org/licenses/BSD-3-Clause.\n\nSPDX-License-Identifier: BSD-3-Clause
 dotnet_diagnostic.IDE0073.severity = error
 
 # New line preferences
