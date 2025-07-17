@@ -38,8 +38,8 @@ kotlin {
         val desktopMain by getting
 
         commonMain.dependencies {
-            implementation(libs.keyple.interop.jsonapi.client)
-            implementation(libs.keyple.interop.localreader)
+            implementation(libs.keyple.interop.jsonapi.client.kmp.lib)
+            implementation(libs.keyple.interop.localreader.nfcmobile.kmp.lib)
 
             implementation(libs.kotlinx.serialization)
             implementation(libs.ktor.serialization.kotlinx.json)

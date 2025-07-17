@@ -16,7 +16,8 @@ ktor = "3.0.+"
 napier = "2.7.1"
 compottie= "2.0.0-beta02"
 spotlessPluginGradle = "6.25.0"
-keyple-interop = "0.1.6+"
+keyple-interop-jsonapi-client-kmp-lib = "0.1.6"
+keyple-interop-localreader-nfcmobile-kmp-lib = "0.1.6"
 
 [libraries]
 compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "jetpack-compose-bom" }
@@ -48,8 +49,8 @@ napier = { module = "io.github.aakira:napier", version.ref = "napier" }
 compottie = { module = "io.github.alexzhirkevich:compottie", version.ref = "compottie" }
 spotless-plugin-gradle = { module = "com.diffplug.spotless:spotless-plugin-gradle", version.ref = "spotlessPluginGradle" }
 
-keyple-interop-jsonapi-client = { module = "org.eclipse.keyple:keyple-interop-jsonapi-client-kmp-lib", version.ref = "keyple-interop" }
-keyple-interop-localreader = { module = "org.eclipse.keyple:keyple-interop-localreader-nfcmobile-kmp-lib", version.ref = "keyple-interop" }
+keyple-interop-jsonapi-client-kmp-lib = { module = "org.eclipse.keyple:keyple-interop-jsonapi-client-kmp-lib", version.ref = "keyple-interop-jsonapi-client-kmp-lib" }
+keyple-interop-localreader-nfcmobile-kmp-lib = { module = "org.eclipse.keyple:keyple-interop-localreader-nfcmobile-kmp-lib", version.ref = "keyple-interop-localreader-nfcmobile-kmp-lib" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
