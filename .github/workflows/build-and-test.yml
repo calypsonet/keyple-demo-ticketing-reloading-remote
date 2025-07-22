@@ -44,7 +44,7 @@ jobs:
           ./gradlew build --info --stacktrace
 
   build-and-test-client-interop-mobile-multiplatform:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - name: Check out repository code from ${{ github.repository }}/${{ github.ref }}
         uses: actions/checkout@v4
@@ -58,6 +58,14 @@ jobs:
       - name: Update permissions
         working-directory: .
         run: chmod +x ./client/interop-mobile-multiplatform/gradlew ./.github/scripts/*.sh
+
+      - name: Check version
+        working-directory: ./client/interop-mobile-multiplatform/
+        run: ../../.github/scripts/check_version.sh
+
+      - name: Build and Test
+        working-directory: ./client/interop-mobile-multiplatform/
+        run: ./gradlew build packageDistributionForCurrentOS packageUberJarForCurrentOS --info --stacktrace
 
   build-and-test-client-keyple-mobile-android:
     runs-on: ubuntu-latest

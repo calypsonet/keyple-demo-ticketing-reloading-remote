@@ -28,14 +28,14 @@ kotlin {
   if (System.getProperty("os.name").lowercase().contains("mac")) {
     listOf(iosX64(), iosArm64(), iosSimulatorArm64()).forEach { iosTarget ->
       iosTarget.binaries.framework {
-        baseName = "KeypleDemo"
+        baseName = rootProject.name
         isStatic = true
       }
     }
   }
   androidTarget {
     @OptIn(ExperimentalKotlinGradlePluginApi::class)
-    compilerOptions { jvmTarget.set(JvmTarget.JVM_11) }
+    compilerOptions { jvmTarget.set(JvmTarget.fromTarget(javaTargetLevel)) }
   }
   jvm("desktop") { kotlin { jvmToolchain(jvmToolchainVersion.toInt()) } }
   sourceSets {
@@ -103,9 +103,11 @@ android {
     versionCode = (project.findProperty("androidAppVersionCode") as String).toInt()
     versionName = project.findProperty("androidAppVersionName") as String
   }
-  buildFeatures { viewBinding = true }
+  buildFeatures {
+    viewBinding = true
+    compose = true
+  }
   buildTypes { getByName("release") { isMinifyEnabled = false } }
-  buildFeatures { compose = true }
   dependencies { debugImplementation(compose.uiTooling) }
   compileOptions {
     sourceCompatibility = JavaVersion.toVersion(javaSourceLevel)
@@ -124,11 +126,7 @@ android {
       outputImpl.outputFileName = newName
     }
   }
-  publishing {
-    singleVariant("release") {
-      // No withSourcesJar() and withJavadocJar(), as we'll configure them manually during release
-    }
-  }
+  publishing { singleVariant("release") {} }
   lint { abortOnError = false }
 }
 
@@ -139,11 +137,11 @@ tasks.withType<JavaExec>().configureEach {
 
 compose.desktop {
   application {
-    mainClass = "MainKt"
+    mainClass = "org.calypsonet.keyple.demo.reload.remote.MainKt"
     nativeDistributions {
       targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-      packageName = "KeypleDemo"
-      packageVersion = "1.0.0"
+      packageName = rootProject.name
+      packageVersion = project.findProperty("desktopPackageVersion") as String
     }
   }
 }

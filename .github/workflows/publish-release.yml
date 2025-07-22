@@ -1,0 +1,148 @@
+name: Build and Test
+
+on:
+  release:
+    types:
+      - published
+  workflow_dispatch:
+
+jobs:
+  publish-release-server:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code from ${{ github.repository }}/${{ github.ref }}
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Set up Node JS
+        uses: actions/setup-node@v4
+        with:
+          node-version: 16
+
+      - name: Update permissions
+        working-directory: .
+        run: chmod +x ./server/gradlew ./.github/scripts/*.sh
+
+      - name: Build artifacts
+        working-directory: ./server/
+        run: |
+          cd ./dashboard-app
+          npm install
+          cd ..
+          ./gradlew build
+
+      - name: Collect artifacts
+        working-directory: ./server/
+        run: |
+          mkdir -p release-artifacts
+          cp build/*-full.jar release-artifacts/ || true
+
+      - name: Upload artifacts to GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: server/release-artifacts/*
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  publish-release-client-interop-mobile-multiplatform:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code from ${{ github.repository }}/${{ github.ref }}
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Update permissions
+        working-directory: .
+        run: chmod +x ./client/interop-mobile-multiplatform/gradlew ./.github/scripts/*.sh
+
+      - name: Build artifacts
+        working-directory: ./client/interop-mobile-multiplatform/
+        run: ./gradlew build packageDistributionForCurrentOS packageUberJarForCurrentOS
+
+      - name: Collect artifacts
+        working-directory: ./client/interop-mobile-multiplatform/
+        run: |
+          mkdir -p release-artifacts
+          cp composeApp/build/compose/binaries/main/msi/*.msi release-artifacts/ || true
+          cp composeApp/build/compose/binaries/main/deb/*.deb release-artifacts/ || true
+          cp composeApp/build/compose/binaries/main/dmg/*.dmg release-artifacts/ || true
+          cp composeApp/build/compose/jars/*.jar release-artifacts/ || true
+          cp composeApp/build/outputs/apk/release/*.apk release-artifacts/ || true
+
+      - name: Upload artifacts to GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: client/interop-mobile-multiplatform/release-artifacts/*
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  publish-release-client-keyple-mobile-android:
+    runs-on: macos-latest
+    steps:
+      - name: Check out repository code from ${{ github.repository }}/${{ github.ref }}
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Update permissions
+        working-directory: .
+        run: chmod +x ./client/keyple-mobile-android/gradlew ./.github/scripts/*.sh
+
+      - name: Build artifacts
+        working-directory: ./client/keyple-mobile-android/
+        run: ./gradlew build
+
+      - name: Collect artifacts
+        working-directory: ./client/keyple-mobile-android/
+        run: |
+          mkdir -p release-artifacts
+          cp app/build/outputs/apk/release/*.apk release-artifacts/ || true
+
+      - name: Upload artifacts to GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: client/keyple-mobile-android/release-artifacts/*
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  publish-release-client-pc-dotnet:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code from ${{ github.repository }}/${{ github.ref }}
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 7.0.x
+
+      - name: Check code format, build and test client .NET
+        working-directory: ./client/pc-dotnet/
+        run: |
+          dotnet restore
+          dotnet format --verify-no-changes App.sln
+          dotnet build --no-restore
+          dotnet test --no-build --verbosity normal
+
+      - name: Collect artifacts
+        working-directory: ./client/pc-dotnet/
+        run: |
+          mkdir -p release-artifacts
+          cp ?/*.? release-artifacts/ || true
+
+      - name: Upload artifacts to GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: client/pc-dotnet/release-artifacts/*
+          token: ${{ secrets.GITHUB_TOKEN }}
