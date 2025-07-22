@@ -29,6 +29,8 @@ jobs:
         run: chmod +x ./server/gradlew ./.github/scripts/*.sh
 
       - name: Build artifacts
+        env:
+          ORG_GRADLE_PROJECT_releaseTag: ${{ github.event.release.tag_name }}
         working-directory: ./server/
         run: |
           cd ./dashboard-app
@@ -65,6 +67,8 @@ jobs:
         run: chmod +x ./client/interop-mobile-multiplatform/gradlew ./.github/scripts/*.sh
 
       - name: Build artifacts
+        env:
+          ORG_GRADLE_PROJECT_releaseTag: ${{ github.event.release.tag_name }}
         working-directory: ./client/interop-mobile-multiplatform/
         run: ./gradlew build packageDistributionForCurrentOS packageUberJarForCurrentOS
 
@@ -101,6 +105,8 @@ jobs:
         run: chmod +x ./client/keyple-mobile-android/gradlew ./.github/scripts/*.sh
 
       - name: Build artifacts
+        env:
+          ORG_GRADLE_PROJECT_releaseTag: ${{ github.event.release.tag_name }}
         working-directory: ./client/keyple-mobile-android/
         run: ./gradlew build
 
