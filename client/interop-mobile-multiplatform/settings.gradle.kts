@@ -1,33 +1,21 @@
-rootProject.name = "KeypleInteropRemoteDemo"
-enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+rootProject.name = "keyple-demo-ticketing-reloading-interop-app"
+
+include(":composeApp")
 
 pluginManagement {
-    repositories {
-        mavenLocal()
-        mavenCentral()
-        google {
-            mavenContent {
-                includeGroupAndSubgroups("androidx")
-                includeGroupAndSubgroups("com.android")
-                includeGroupAndSubgroups("com.google")
-            }
-        }
-        gradlePluginPortal()
-    }
+  repositories {
+    gradlePluginPortal()
+    mavenCentral()
+    google()
+  }
 }
 
 dependencyResolutionManagement {
-    repositories {
-        mavenLocal()
-        mavenCentral()
-        google {
-            mavenContent {
-                includeGroupAndSubgroups("androidx")
-                includeGroupAndSubgroups("com.android")
-                includeGroupAndSubgroups("com.google")
-            }
-        }
-    }
+  repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+  repositories {
+    mavenLocal()
+    mavenCentral()
+    google()
+    maven(url = "https://central.sonatype.com/repository/maven-snapshots")
+  }
 }
-
-include(":composeApp")

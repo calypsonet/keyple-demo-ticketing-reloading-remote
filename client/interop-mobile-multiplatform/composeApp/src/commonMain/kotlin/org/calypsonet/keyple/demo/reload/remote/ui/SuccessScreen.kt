@@ -1,6 +1,9 @@
 /* ******************************************************************************
  * Copyright (c) 2024 Calypso Networks Association https://calypsonet.org/
  *
+ * See the NOTICE file(s) distributed with this work for additional information
+ * regarding copyright ownership.
+ *
  * This program and the accompanying materials are made available under the
  * terms of the BSD 3-Clause License which is available at
  * https://opensource.org/licenses/BSD-3-Clause.
@@ -25,8 +28,8 @@ import io.github.alexzhirkevich.compottie.LottieComposition
 import io.github.alexzhirkevich.compottie.LottieCompositionSpec
 import io.github.alexzhirkevich.compottie.animateLottieCompositionAsState
 import io.github.alexzhirkevich.compottie.rememberLottieComposition
-import keypleinteropremotedemo.composeapp.generated.resources.Res
-import keypleinteropremotedemo.composeapp.generated.resources.success_title_loaded
+import org.calypsonet.keyple.composeapp.generated.resources.Res
+import org.calypsonet.keyple.composeapp.generated.resources.success_title_loaded
 import org.calypsonet.keyple.demo.reload.remote.AppState
 import org.calypsonet.keyple.demo.reload.remote.nav.Home
 import org.jetbrains.compose.resources.ExperimentalResourceApi

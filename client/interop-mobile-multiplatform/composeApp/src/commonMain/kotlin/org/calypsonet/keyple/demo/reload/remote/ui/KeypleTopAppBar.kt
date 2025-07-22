@@ -1,6 +1,9 @@
 /* ******************************************************************************
  * Copyright (c) 2024 Calypso Networks Association https://calypsonet.org/
  *
+ * See the NOTICE file(s) distributed with this work for additional information
+ * regarding copyright ownership.
+ *
  * This program and the accompanying materials are made available under the
  * terms of the BSD 3-Clause License which is available at
  * https://opensource.org/licenses/BSD-3-Clause.
@@ -43,10 +46,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import keypleinteropremotedemo.composeapp.generated.resources.Res
-import keypleinteropremotedemo.composeapp.generated.resources.ic_logo_keyple
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
+import org.calypsonet.keyple.composeapp.generated.resources.Res
+import org.calypsonet.keyple.composeapp.generated.resources.ic_logo_keyple
 import org.calypsonet.keyple.demo.reload.remote.AppState
 import org.jetbrains.compose.resources.vectorResource
 

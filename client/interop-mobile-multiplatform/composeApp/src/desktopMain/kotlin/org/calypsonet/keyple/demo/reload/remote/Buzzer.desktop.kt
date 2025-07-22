@@ -1,6 +1,9 @@
 /* ******************************************************************************
  * Copyright (c) 2025 Calypso Networks Association https://calypsonet.org/
  *
+ * See the NOTICE file(s) distributed with this work for additional information
+ * regarding copyright ownership.
+ *
  * This program and the accompanying materials are made available under the
  * terms of the BSD 3-Clause License which is available at
  * https://opensource.org/licenses/BSD-3-Clause.
@@ -43,7 +46,7 @@ actual class PlatformBuzzer {
       val sdl = AudioSystem.getSourceDataLine(af)
       sdl.open(af)
       sdl.start()
-      for (i in 0 ..< msecs * 8) {
+      for (i in 0..<msecs * 8) {
         val angle = i / (SAMPLE_RATE / hz) * 2.0 * Math.PI
         buf[0] = (sin(angle) * 127.0 * vol).toInt().toByte()
         sdl.write(buf, 0, 1)
