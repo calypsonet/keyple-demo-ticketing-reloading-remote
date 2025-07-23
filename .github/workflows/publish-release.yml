@@ -51,7 +51,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
   publish-release-client-interop-mobile-multiplatform:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - name: Check out repository code from ${{ github.repository }}/${{ github.ref }}
         uses: actions/checkout@v4
@@ -89,7 +89,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
   publish-release-client-keyple-mobile-android:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Check out repository code from ${{ github.repository }}/${{ github.ref }}
         uses: actions/checkout@v4
@@ -133,22 +133,21 @@ jobs:
         with:
           dotnet-version: 7.0.x
 
-      - name: Check code format, build and test client .NET
+      - name: Check code format, build, test, and publish client .NET
         working-directory: ./client/pc-dotnet/
         run: |
           dotnet restore
           dotnet format --verify-no-changes App.sln
-          dotnet build --no-restore
           dotnet test --no-build --verbosity normal
+          dotnet publish --no-restore -c Release -o ./publish
 
-      - name: Collect artifacts
+      - name: Archive the published application
         working-directory: ./client/pc-dotnet/
         run: |
-          mkdir -p release-artifacts
-          cp ?/*.? release-artifacts/ || true
+          zip -r "pc-dotnet-app-${{ github.ref_name }}.zip" ./publish/
 
       - name: Upload artifacts to GitHub release
         uses: softprops/action-gh-release@v2
         with:
-          files: client/pc-dotnet/release-artifacts/*
+          files: client/pc-dotnet/pc-dotnet-app-${{ github.ref_name }}.zip
           token: ${{ secrets.GITHUB_TOKEN }}
