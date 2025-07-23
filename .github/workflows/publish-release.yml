@@ -139,15 +139,15 @@ jobs:
           dotnet restore
           dotnet format --verify-no-changes App.sln
           dotnet test --no-build --verbosity normal
-          dotnet publish --no-restore -c Release -o ./publish
+          dotnet publish -c Release -r win-x64 --no-restore -o ./publish
 
       - name: Archive the published application
-        working-directory: ./client/pc-dotnet/
+        working-directory: ./client/pc-dotnet/publish/
         run: |
-          zip -r "pc-dotnet-app-${{ github.ref_name }}.zip" ./publish/
+          zip -j -r "../keyple-demo-ticketing-reloading-pc-dotnet-app-${{ github.ref_name }}.zip" ./*
 
       - name: Upload artifacts to GitHub release
         uses: softprops/action-gh-release@v2
         with:
-          files: client/pc-dotnet/pc-dotnet-app-${{ github.ref_name }}.zip
+          files: client/pc-dotnet/keyple-demo-ticketing-reloading-pc-dotnet-app-${{ github.ref_name }}.zip
           token: ${{ secrets.GITHUB_TOKEN }}
