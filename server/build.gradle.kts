@@ -37,7 +37,7 @@ dependencies {
   implementation("org.eclipse.keyple:keyple-card-calypso-crypto-legacysam-java-lib:0.9.0")
   implementation("org.eclipse.keyple:keyple-plugin-pcsc-java-lib:2.5.2")
   // End Keyple configuration
-  implementation("org.eclipse.keypop:keypop-storagecard-java-api:0.2.0")
+  implementation("org.eclipse.keypop:keypop-storagecard-java-api:0.3.0")
 
   // CNA specific components
   implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
