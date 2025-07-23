@@ -76,7 +76,7 @@ jobs:
         working-directory: ./client/interop-mobile-multiplatform/
         run: |
           mkdir -p release-artifacts
-          cp composeApp/build/outputs/apk/release/*.apk release-artifacts/ || true
+          cp composeApp/build/outputs/apk/debug/*.apk release-artifacts/ || true
 
       - name: Upload artifacts to GitHub release
         uses: softprops/action-gh-release@v2
@@ -215,7 +215,7 @@ jobs:
         working-directory: ./client/keyple-mobile-android/
         run: |
           mkdir -p release-artifacts
-          cp app/build/outputs/apk/release/*.apk release-artifacts/ || true
+          cp app/build/outputs/apk/debug/*.apk release-artifacts/ || true
 
       - name: Upload artifacts to GitHub release
         uses: softprops/action-gh-release@v2

@@ -41,7 +41,7 @@ jobs:
           cd ./dashboard-app
           npm install
           cd ..
-          ./gradlew build --info --stacktrace
+          ./gradlew build
 
   build-and-test-client-interop-mobile-multiplatform:
     runs-on: macos-latest
@@ -65,7 +65,7 @@ jobs:
 
       - name: Build and Test
         working-directory: ./client/interop-mobile-multiplatform/
-        run: ./gradlew build --info --stacktrace
+        run: ./gradlew build
 
   build-and-test-client-keyple-mobile-android:
     runs-on: ubuntu-latest
@@ -89,7 +89,7 @@ jobs:
 
       - name: Build and Test
         working-directory: ./client/keyple-mobile-android/
-        run: ./gradlew build --info --stacktrace
+        run: ./gradlew build
 
   build-and-test-client-pc-dotnet:
     runs-on: ubuntu-latest
