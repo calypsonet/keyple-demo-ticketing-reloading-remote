@@ -141,7 +141,7 @@ compose.desktop {
     nativeDistributions {
       targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
       packageName = rootProject.name
-      packageVersion = project.findProperty("desktopPackageVersion") as String
+      packageVersion = project.version.toString().drop(2)
     }
   }
 }

@@ -50,7 +50,41 @@ jobs:
           files: server/release-artifacts/*
           token: ${{ secrets.GITHUB_TOKEN }}
 
-  publish-release-client-interop-mobile-multiplatform:
+  publish-release-client-interop-mobile-multiplatform-android:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code from ${{ github.repository }}/${{ github.ref }}
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Update permissions
+        working-directory: .
+        run: chmod +x ./client/interop-mobile-multiplatform/gradlew ./.github/scripts/*.sh
+
+      - name: Build artifacts
+        env:
+          ORG_GRADLE_PROJECT_releaseTag: ${{ github.event.release.tag_name }}
+        working-directory: ./client/interop-mobile-multiplatform/
+        run: ./gradlew build
+
+      - name: Collect artifacts
+        working-directory: ./client/interop-mobile-multiplatform/
+        run: |
+          mkdir -p release-artifacts
+          cp composeApp/build/outputs/apk/release/*.apk release-artifacts/ || true
+
+      - name: Upload artifacts to GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: client/interop-mobile-multiplatform/release-artifacts/*
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  publish-release-client-interop-mobile-multiplatform-desktop-macos:
     runs-on: macos-latest
     steps:
       - name: Check out repository code from ${{ github.repository }}/${{ github.ref }}
@@ -70,17 +104,84 @@ jobs:
         env:
           ORG_GRADLE_PROJECT_releaseTag: ${{ github.event.release.tag_name }}
         working-directory: ./client/interop-mobile-multiplatform/
-        run: ./gradlew build packageDistributionForCurrentOS packageUberJarForCurrentOS
+        run: ./gradlew packageDistributionForCurrentOS packageUberJarForCurrentOS
+
+      - name: Collect artifacts
+        working-directory: ./client/interop-mobile-multiplatform/
+        run: |
+          mkdir -p release-artifacts
+          cp composeApp/build/compose/binaries/main/dmg/*.dmg release-artifacts/ || true
+          cp composeApp/build/compose/jars/*.jar release-artifacts/ || true
+
+      - name: Upload artifacts to GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: client/interop-mobile-multiplatform/release-artifacts/*
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  publish-release-client-interop-mobile-multiplatform-desktop-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code from ${{ github.repository }}/${{ github.ref }}
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Update permissions
+        working-directory: .
+        run: chmod +x ./client/interop-mobile-multiplatform/gradlew ./.github/scripts/*.sh
+
+      - name: Build artifacts
+        env:
+          ORG_GRADLE_PROJECT_releaseTag: ${{ github.event.release.tag_name }}
+        working-directory: ./client/interop-mobile-multiplatform/
+        run: ./gradlew packageDistributionForCurrentOS packageUberJarForCurrentOS
+
+      - name: Collect artifacts
+        working-directory: ./client/interop-mobile-multiplatform/
+        run: |
+          mkdir -p release-artifacts
+          cp composeApp/build/compose/binaries/main/deb/*.deb release-artifacts/ || true
+          cp composeApp/build/compose/jars/*.jar release-artifacts/ || true
+
+      - name: Upload artifacts to GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: client/interop-mobile-multiplatform/release-artifacts/*
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  publish-release-client-interop-mobile-multiplatform-desktop-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Check out repository code from ${{ github.repository }}/${{ github.ref }}
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Update permissions
+        working-directory: .
+        run: chmod +x ./client/interop-mobile-multiplatform/gradlew ./.github/scripts/*.sh
+
+      - name: Build artifacts
+        env:
+          ORG_GRADLE_PROJECT_releaseTag: ${{ github.event.release.tag_name }}
+        working-directory: ./client/interop-mobile-multiplatform/
+        run: ./gradlew packageDistributionForCurrentOS packageUberJarForCurrentOS
 
       - name: Collect artifacts
         working-directory: ./client/interop-mobile-multiplatform/
         run: |
           mkdir -p release-artifacts
           cp composeApp/build/compose/binaries/main/msi/*.msi release-artifacts/ || true
-          cp composeApp/build/compose/binaries/main/deb/*.deb release-artifacts/ || true
-          cp composeApp/build/compose/binaries/main/dmg/*.dmg release-artifacts/ || true
           cp composeApp/build/compose/jars/*.jar release-artifacts/ || true
-          cp composeApp/build/outputs/apk/release/*.apk release-artifacts/ || true
 
       - name: Upload artifacts to GitHub release
         uses: softprops/action-gh-release@v2

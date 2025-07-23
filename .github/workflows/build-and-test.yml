@@ -65,7 +65,7 @@ jobs:
 
       - name: Build and Test
         working-directory: ./client/interop-mobile-multiplatform/
-        run: ./gradlew build packageDistributionForCurrentOS packageUberJarForCurrentOS --info --stacktrace
+        run: ./gradlew build --info --stacktrace
 
   build-and-test-client-keyple-mobile-android:
     runs-on: ubuntu-latest
