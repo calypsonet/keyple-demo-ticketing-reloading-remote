@@ -1,6 +1,9 @@
 /* ******************************************************************************
  * Copyright (c) 2021 Calypso Networks Association https://calypsonet.org/
  *
+ * See the NOTICE file(s) distributed with this work for additional information
+ * regarding copyright ownership.
+ *
  * This program and the accompanying materials are made available under the
  * terms of the BSD 3-Clause License which is available at
  * https://opensource.org/licenses/BSD-3-Clause.
@@ -13,72 +16,80 @@ import java.lang.IllegalStateException
 import java.util.*
 import javax.inject.Inject
 import kotlin.jvm.Throws
-import org.calypsonet.keyple.demo.common.constant.CardConstant
+import org.calypsonet.keyple.card.storagecard.StorageCardExtensionService
 import org.calypsonet.keyple.demo.reload.remote.data.ReaderRepository
+import org.calypsonet.keyple.demo.reload.remote.data.model.CardProtocolEnum
 import org.calypsonet.keyple.demo.reload.remote.di.scopes.AppScoped
 import org.eclipse.keyple.card.calypso.CalypsoExtensionService
 import org.eclipse.keyple.core.service.SmartCardServiceProvider
-import org.eclipse.keypop.calypso.card.card.CalypsoCard
+import org.eclipse.keypop.reader.selection.spi.SmartCard
+import org.eclipse.keypop.storagecard.card.ProductType.MIFARE_ULTRALIGHT
+import org.eclipse.keypop.storagecard.card.ProductType.ST25_SRT512
 
 @AppScoped
 class TicketingService @Inject constructor(private var readerRepository: ReaderRepository) {
 
-  /** Select card and retrieve CalypsoPO */
+  /** Select card and retrieve the active card */
   @Throws(IllegalStateException::class, Exception::class)
-  fun getCalypsoCard(
-      readerName: String,
-      aidEnums: ArrayList<ByteArray>,
-      protocol: String?
-  ): CalypsoCard {
+  fun getSmartCard(readerName: String, aidEnums: ArrayList<ByteArray>): SmartCard {
     with(ReaderRepository.getReader(readerName)) {
-      if (isCardPresent) {
-        val smartCardService = SmartCardServiceProvider.getService()
+      val smartCardService = SmartCardServiceProvider.getService()
 
-        val readerApiFactory = smartCardService.readerApiFactory
+      val readerApiFactory = smartCardService.readerApiFactory
 
-        val reader = ReaderRepository.getReader(readerName)
+      val reader = ReaderRepository.getReader(readerName)
 
-        /** Get the generic card extension service */
-        val calypsoExtension = CalypsoExtensionService.getInstance()
+      /** Get the Calypso card extension service */
+      val calypsoExtension = CalypsoExtensionService.getInstance()
 
-        /** Verify that the extension's API level is consistent with the current service. */
-        smartCardService.checkCardExtension(calypsoExtension)
+      /** Get the Storage card extension service */
+      val storageCardExtension = StorageCardExtensionService.getInstance()
 
-        val cardSelectionManager = readerApiFactory.createCardSelectionManager()
+      /** Verify that the extension's API level is consistent with the current service. */
+      smartCardService.checkCardExtension(calypsoExtension)
 
-        aidEnums.forEach {
-          /**
-           * Generic selection: configures a CardSelector with all the desired attributes to make
-           * the selection and read additional information afterwards
-           */
-          val cardSelector =
-              if (protocol != null) {
-                readerApiFactory
-                    .createIsoCardSelector()
-                    .filterByDfName(it)
-                    .filterByCardProtocol(protocol)
-              } else {
-                readerApiFactory.createIsoCardSelector().filterByDfName(it)
-              }
-          cardSelectionManager.prepareSelection(
-              cardSelector,
-              calypsoExtension.calypsoCardApiFactory.createCalypsoCardSelectionExtension())
-        }
+      val cardSelectionManager = readerApiFactory.createCardSelectionManager()
 
-        val selectionResult = cardSelectionManager.processCardSelectionScenario(reader)
-        if (selectionResult.activeSmartCard != null) {
-          val calypsoCard = selectionResult.activeSmartCard as CalypsoCard
-          // check is the DF name is the expected one (Req. TL-SEL-AIDMATCH.1)
-          if (!CardConstant.aidMatch(
-              aidEnums[selectionResult.activeSelectionIndex], calypsoCard.dfName)) {
-            throw IllegalStateException("Unexpected DF name")
-          }
-          return calypsoCard
-        } else {
-          throw IllegalStateException("Selection error: AID not found")
-        }
+      aidEnums.forEach {
+        /**
+         * Generic selection: configures a CardSelector with all the desired attributes to make the
+         * selection and read additional information afterwards
+         */
+        val calypsoCardSelector =
+            readerApiFactory
+                .createIsoCardSelector()
+                .filterByCardProtocol(CardProtocolEnum.ISO_14443_4_LOGICAL_PROTOCOL.name)
+                .filterByDfName(it)
+        cardSelectionManager.prepareSelection(
+            calypsoCardSelector,
+            calypsoExtension.calypsoCardApiFactory.createCalypsoCardSelectionExtension())
+      }
+      if (storageCardExtension != null) {
+        cardSelectionManager.prepareSelection(
+            readerApiFactory
+                .createBasicCardSelector()
+                .filterByCardProtocol(CardProtocolEnum.MIFARE_ULTRALIGHT_LOGICAL_PROTOCOL.name),
+            storageCardExtension.createStorageCardSelectionExtension(MIFARE_ULTRALIGHT))
+        cardSelectionManager.prepareSelection(
+            readerApiFactory
+                .createBasicCardSelector()
+                .filterByCardProtocol(CardProtocolEnum.ST25_SRT512_LOGICAL_PROTOCOL.name),
+            storageCardExtension.createStorageCardSelectionExtension(ST25_SRT512))
+      }
+
+      val selectionResult = cardSelectionManager.processCardSelectionScenario(reader)
+      val smartCard = selectionResult.activeSmartCard
+      if (smartCard != null) {
+        // TODO move this code to the calling method
+        //          val calypsoCard = selectionResult.activeSmartCard as CalypsoCard
+        //          // check is the DF name is the expected one (Req. TL-SEL-AIDMATCH.1)
+        //          if (!CardConstant.aidMatch(
+        //              aidEnums[selectionResult.activeSelectionIndex], calypsoCard.dfName)) {
+        //            throw IllegalStateException("Unexpected DF name")
+        //          }
+        return smartCard
       } else {
-        throw Exception("Card is not present")
+        throw IllegalStateException("Matching smartcard not found")
       }
     }
   }

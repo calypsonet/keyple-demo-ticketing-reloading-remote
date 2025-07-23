@@ -1,6 +1,9 @@
 /* ******************************************************************************
  * Copyright (c) 2021 Calypso Networks Association https://calypsonet.org/
  *
+ * See the NOTICE file(s) distributed with this work for additional information
+ * regarding copyright ownership.
+ *
  * This program and the accompanying materials are made available under the
  * terms of the BSD 3-Clause License which is available at
  * https://opensource.org/licenses/BSD-3-Clause.
@@ -17,6 +20,7 @@ import com.airbnb.lottie.LottieDrawable
 import java.util.Timer
 import java.util.TimerTask
 import org.calypsonet.keyple.demo.reload.remote.R
+import org.calypsonet.keyple.demo.reload.remote.data.model.CardReaderResponse
 import org.calypsonet.keyple.demo.reload.remote.data.model.Status
 import org.calypsonet.keyple.demo.reload.remote.databinding.ActivityChargeResultBinding
 
@@ -33,11 +37,21 @@ class ReloadResultActivity : AbstractDemoActivity() {
     toolbarBinding.toolbarLogo.setImageResource(R.drawable.ic_logo_white)
 
     val status = Status.getStatus(intent.getStringExtra(STATUS))
+    val cardContent: CardReaderResponse? =
+        intent.getParcelableExtra(AbstractCardActivity.CARD_CONTENT)
 
     activityChargeResultBinding.tryBtn.setOnClickListener { onBackPressed() }
     activityChargeResultBinding.cancelBtn.setOnClickListener {
       val intent = Intent(this, HomeActivity::class.java)
       startActivity(intent)
+    }
+
+    if (cardContent != null && !cardContent.cardType.isNullOrBlank()) {
+      activityChargeResultBinding.cardTypeLabel.visibility = View.VISIBLE
+      activityChargeResultBinding.cardTypeLabel.text =
+          getString(R.string.card_type, cardContent.cardType)
+    } else {
+      activityChargeResultBinding.cardTypeLabel.visibility = View.GONE
     }
 
     when (status) {

@@ -8,6 +8,7 @@
     <string name="loading_in_progress">Loading in progress</string>
     <string name="card_invalid_label">Not valid on this network</string>
     <string name="card_invalid_structure">Invalid card\nFile structure %sh not supported</string>
+    <string name="storage_card_invalid">Invalid stoge card</string>
     <string name="card_not_personalized">Environment error: wrong version number</string>
     <string name="expired_environment">Environment error: end date expired</string>
     <string name="transaction_cancelled_label">Title not loaded</string>
@@ -91,4 +92,5 @@
     <string name="card_content_description_placeholder">From JJ Month YYYY to JJ Month YYYY</string>
     <string name="card_content_validation_title_placeholder">Multi Trip - Place d\'Italie</string>
     <string name="card_content_validation_date_placeholder">JJ Month YYYY, HH:MM:SS</string>
+    <string name="card_type">%1$s</string>
 </resources>

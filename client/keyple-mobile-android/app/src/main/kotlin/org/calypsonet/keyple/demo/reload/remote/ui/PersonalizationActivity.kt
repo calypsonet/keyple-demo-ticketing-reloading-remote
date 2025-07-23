@@ -1,6 +1,9 @@
 /* ******************************************************************************
  * Copyright (c) 2021 Calypso Networks Association https://calypsonet.org/
  *
+ * See the NOTICE file(s) distributed with this work for additional information
+ * regarding copyright ownership.
+ *
  * This program and the accompanying materials are made available under the
  * terms of the BSD 3-Clause License which is available at
  * https://opensource.org/licenses/BSD-3-Clause.
@@ -31,7 +34,9 @@ import org.calypsonet.keyple.demo.reload.remote.databinding.ActivityPersonalizat
 import org.calypsonet.keyple.demo.reload.remote.di.scopes.ActivityScoped
 import org.calypsonet.keyple.demo.reload.remote.domain.TicketingService
 import org.eclipse.keyple.core.util.HexUtil
+import org.eclipse.keypop.calypso.card.card.CalypsoCard
 import org.eclipse.keypop.reader.CardReaderEvent
+import org.eclipse.keypop.storagecard.card.StorageCard
 import timber.log.Timber
 
 @ActivityScoped
@@ -51,7 +56,7 @@ class PersonalizationActivity : AbstractCardActivity() {
     try {
       if (DeviceEnum.getDeviceEnum(prefData.loadDeviceType()!!) == DeviceEnum.CONTACTLESS_CARD) {
         showPresentNfcCardInstructions()
-        initAndActivateAndroidKeypleNfcReader()
+        initAndActivateCardReader()
       } else {
         showNowPersonalizingInformation()
         initOmapiReader {
@@ -70,7 +75,7 @@ class PersonalizationActivity : AbstractCardActivity() {
     activityPersonalizationBinding.loadingAnimation.cancelAnimation()
     try {
       if (DeviceEnum.getDeviceEnum(prefData.loadDeviceType()!!) == DeviceEnum.CONTACTLESS_CARD) {
-        deactivateAndClearAndroidKeypleNfcReader()
+        deactivateAndClearCardReader()
       } else {
         deactivateAndClearOmapiReader()
       }
@@ -99,13 +104,15 @@ class PersonalizationActivity : AbstractCardActivity() {
 
   override fun changeDisplay(
       cardReaderResponse: CardReaderResponse,
-      applicationSerialNumber: String?,
+      uniqueIdentifier: String?,
       finishActivity: Boolean?
   ) {
     val intent = Intent(this, ReloadResultActivity::class.java)
     intent.putExtra(ReloadResultActivity.IS_PERSONALIZATION_RESULT, true)
     intent.putExtra(ReloadResultActivity.STATUS, cardReaderResponse.status.name)
     intent.putExtra(ReloadResultActivity.MESSAGE, cardReaderResponse.errorMessage)
+    intent.putExtra(CARD_CONTENT, cardReaderResponse)
+    intent.putExtra(CARD_APPLICATION_NUMBER, uniqueIdentifier)
     startActivity(intent)
     if (finishActivity == true) {
       finish()
@@ -116,7 +123,8 @@ class PersonalizationActivity : AbstractCardActivity() {
     if (event?.type == CardReaderEvent.Type.CARD_INSERTED) {
       runOnUiThread { showNowPersonalizingInformation() }
       GlobalScope.launch {
-        remoteServiceExecution(selectedDeviceReaderName, AppSettings.aidEnums, "ISO_14443_4")
+        remoteServiceExecution(
+            selectedDeviceReaderName, AppSettings.aidEnums, "ISO_14443_4_LOGICAL_PROTOCOL")
       }
     }
   }
@@ -128,38 +136,64 @@ class PersonalizationActivity : AbstractCardActivity() {
   ) {
     withContext(Dispatchers.IO) {
       try {
-        val calypsoCard =
-            ticketingService.getCalypsoCard(selectedDeviceReaderName, aidEnums, protocol)
+        val smartCard = ticketingService.getSmartCard(selectedDeviceReaderName, aidEnums)
+        val cardType =
+            when (smartCard) {
+              is CalypsoCard -> "CALYPSO: DF name " + HexUtil.toHex(smartCard.dfName)
+              is StorageCard -> smartCard.productType.name
+              else -> "unexpected card type"
+            }
         val cardIssuanceInput = CardIssuanceInputDto(pluginType)
         val cardIssuanceOutput =
             localServiceClient.executeRemoteService(
                 RemoteServiceId.PERSONALIZE_CARD.name,
                 selectedDeviceReaderName,
-                calypsoCard,
+                smartCard,
                 cardIssuanceInput,
                 CardIssuanceOutputDto::class.java)
         when (cardIssuanceOutput.statusCode) {
           0 -> {
             runOnUiThread {
-              changeDisplay(
-                  CardReaderResponse(Status.SUCCESS, "", 0, arrayListOf(), arrayListOf(), ""),
-                  applicationSerialNumber = HexUtil.toHex(calypsoCard!!.applicationSerialNumber),
-                  finishActivity = true)
+              when (smartCard) {
+                is CalypsoCard -> {
+                  changeDisplay(
+                      CardReaderResponse(
+                          Status.SUCCESS, cardType, 0, arrayListOf(), arrayListOf(), ""),
+                      uniqueIdentifier = HexUtil.toHex(smartCard!!.applicationSerialNumber),
+                      finishActivity = true)
+                }
+                is StorageCard -> {
+                  changeDisplay(
+                      CardReaderResponse(
+                          Status.SUCCESS, cardType, 0, arrayListOf(), arrayListOf(), ""),
+                      uniqueIdentifier = HexUtil.toHex(smartCard!!.uid),
+                      finishActivity = true)
+                }
+              }
             }
           } // success,
           1 -> {
             launchServerErrorResponse()
           } // server not ready,
           2 -> {
-            launchInvalidCardResponse(
-                String.format(
-                    getString(R.string.card_invalid_structure),
-                    HexUtil.toHex(calypsoCard!!.applicationSubtype)))
-          } // card rejected
+            when (smartCard) {
+              is CalypsoCard -> {
+                launchInvalidCardResponse(
+                    cardType,
+                    String.format(
+                        getString(R.string.card_invalid_structure),
+                        HexUtil.toHex(smartCard!!.applicationSubtype)))
+              }
+              is StorageCard -> {
+                launchInvalidCardResponse(cardType, getString(R.string.storage_card_invalid))
+              }
+              else -> {}
+            } // card rejected
+          }
         }
       } catch (e: IllegalStateException) {
         Timber.e(e)
-        launchInvalidCardResponse(e.message!!)
+        launchInvalidCardResponse("Undetermined card type", e.message!!)
       } catch (e: Exception) {
         Timber.e(e)
         launchExceptionResponse(e)

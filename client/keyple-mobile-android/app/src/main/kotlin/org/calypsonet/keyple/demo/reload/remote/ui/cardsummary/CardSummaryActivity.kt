@@ -1,6 +1,9 @@
 /* ******************************************************************************
  * Copyright (c) 2021 Calypso Networks Association https://calypsonet.org/
  *
+ * See the NOTICE file(s) distributed with this work for additional information
+ * regarding copyright ownership.
+ *
  * This program and the accompanying materials are made available under the
  * terms of the BSD 3-Clause License which is available at
  * https://opensource.org/licenses/BSD-3-Clause.
@@ -104,6 +107,13 @@ class CardSummaryActivity : AbstractDemoActivity() {
         activityCardSummaryBinding.contentTitle.visibility = View.GONE
       }
     }
+
+    if (!cardContent.cardType.isNullOrBlank()) {
+      activityCardSummaryBinding.cardTypeLabel.visibility = View.VISIBLE
+      activityCardSummaryBinding.cardTypeLabel.text =
+          getString(R.string.card_type, cardContent.cardType)
+    }
+
     activityCardSummaryBinding.animation.playAnimation()
 
     // Play sound

@@ -2,10 +2,10 @@
  * Copyright (c) 2021 Calypso Networks Association https://calypsonet.org/
  *
  * This program and the accompanying materials are made available under the
- * terms of the BSD 3-Clause License which is available at
- * https://opensource.org/licenses/BSD-3-Clause.
+ * terms of the MIT License which is available at
+ * https://opensource.org/licenses/MIT.
  *
- * SPDX-License-Identifier: BSD-3-Clause
+ * SPDX-License-Identifier: MIT
  ****************************************************************************** */
 package org.calypsonet.keyple.demo.reload.remote.server.card;
 
@@ -15,6 +15,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import javax.enterprise.context.ApplicationScoped;
+import org.calypsonet.keyple.card.storagecard.StorageCardExtensionService;
 import org.calypsonet.keyple.demo.common.constant.CardConstant;
 import org.calypsonet.keyple.demo.common.model.ContractStructure;
 import org.calypsonet.keyple.demo.common.model.EnvironmentHolderStructure;
@@ -22,9 +23,7 @@ import org.calypsonet.keyple.demo.common.model.EventStructure;
 import org.calypsonet.keyple.demo.common.model.type.DateCompact;
 import org.calypsonet.keyple.demo.common.model.type.PriorityCode;
 import org.calypsonet.keyple.demo.common.model.type.VersionNumber;
-import org.calypsonet.keyple.demo.common.parser.ContractStructureParser;
-import org.calypsonet.keyple.demo.common.parser.EnvironmentHolderStructureParser;
-import org.calypsonet.keyple.demo.common.parser.EventStructureParser;
+import org.calypsonet.keyple.demo.common.parser.*;
 import org.eclipse.keyple.card.calypso.CalypsoExtensionService;
 import org.eclipse.keyple.card.calypso.crypto.legacysam.LegacySamExtensionService;
 import org.eclipse.keyple.core.service.SmartCardServiceProvider;
@@ -41,6 +40,8 @@ import org.eclipse.keypop.reader.CardReader;
 import org.eclipse.keypop.reader.ReaderApiFactory;
 import org.eclipse.keypop.reader.selection.CardSelectionManager;
 import org.eclipse.keypop.reader.selection.CardSelectionResult;
+import org.eclipse.keypop.storagecard.card.StorageCard;
+import org.eclipse.keypop.storagecard.transaction.StorageCardTransactionManager;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -150,6 +151,16 @@ public class CardRepository {
     return parse(calypsoCard);
   }
 
+  Card readCard(CardReader cardReader, StorageCard storageCard, CardResource samResource) {
+    StorageCardExtensionService storageCardExtension = StorageCardExtensionService.getInstance();
+    StorageCardTransactionManager cardTransactionManager =
+        storageCardExtension.createStorageCardTransactionManager(cardReader, storageCard);
+    cardTransactionManager
+        .prepareReadBlocks(0, storageCard.getProductType().getBlockCount() - 1)
+        .processCommands(org.eclipse.keypop.storagecard.transaction.ChannelControl.KEEP_OPEN);
+    return parse(storageCard);
+  }
+
   int writeCard(
       CardReader cardReader, CalypsoCard calypsoCard, CardResource samResource, Card card) {
 
@@ -193,6 +204,37 @@ public class CardRepository {
     return 0;
   }
 
+  int writeCard(
+      CardReader cardReader, StorageCard storageCard, CardResource samResource, Card card) {
+    StorageCardExtensionService storageCardExtension = StorageCardExtensionService.getInstance();
+    StorageCardTransactionManager cardTransactionManager =
+        storageCardExtension.createStorageCardTransactionManager(cardReader, storageCard);
+    /* Update contract records */
+    // TODO simplify
+    if (!card.getUpdatedContracts().isEmpty()) {
+      int contractCount = card.getContracts().size();
+      for (int i = 0; i < contractCount; i++) {
+        ContractStructure contract = card.getContracts().get(i);
+        if (card.getUpdatedContracts().contains(contract)) {
+          // update contract
+          cardTransactionManager.prepareWriteBlocks(
+              CardConstant.SC_CONTRACT_FIRST_BLOCK,
+              new SCContractStructureParser().generate(contract));
+        }
+      }
+    }
+    /* Update event */
+    if (Boolean.TRUE.equals(card.isEventUpdated())) {
+      cardTransactionManager.prepareWriteBlocks(
+          CardConstant.SC_EVENT_FIRST_BLOCK,
+          new SCEventStructureParser().generate(buildEvent(card.getEvent(), card.getContracts())));
+    }
+
+    cardTransactionManager.processCommands(
+        org.eclipse.keypop.storagecard.transaction.ChannelControl.KEEP_OPEN);
+    return 0;
+  }
+
   void initCard(CardReader cardReader, CalypsoCard calypsoCard, CardResource samResource) {
 
     SecureRegularModeTransactionManager cardTransactionManager =
@@ -224,6 +266,29 @@ public class CardRepository {
 
     cardTransactionManager.prepareCloseSecureSession().processCommands(ChannelControl.KEEP_OPEN);
     logger.info(CALYPSO_SESSION_CLOSED);
+  }
+
+  void initCard(CardReader cardReader, StorageCard storageCard, CardResource samResource) {
+
+    StorageCardExtensionService storageCardExtension = StorageCardExtensionService.getInstance();
+    StorageCardTransactionManager cardTransactionManager =
+        storageCardExtension.createStorageCardTransactionManager(cardReader, storageCard);
+
+    // Fill the environment structure with predefined values
+    cardTransactionManager.prepareWriteBlocks(
+        CardConstant.SC_ENVIRONMENT_AND_HOLDER_FIRST_BLOCK,
+        new SCEnvironmentHolderStructureParser().generate(buildEnvironmentHolderStructure()));
+
+    // Clear the first event (update with a byte array filled with 0s).
+    cardTransactionManager.prepareWriteBlocks(
+        CardConstant.SC_EVENT_FIRST_BLOCK, new byte[CardConstant.SC_EVENT_RECORD_SIZE_BYTES]);
+
+    // Clear all contracts (update with a byte array filled with 0s).
+    cardTransactionManager.prepareWriteBlocks(
+        CardConstant.SC_CONTRACT_FIRST_BLOCK, new byte[CardConstant.SC_CONTRACT_RECORD_SIZE_BYTES]);
+
+    cardTransactionManager.processCommands(
+        org.eclipse.keypop.storagecard.transaction.ChannelControl.KEEP_OPEN);
   }
 
   @NotNull
@@ -317,5 +382,29 @@ public class CardRepository {
       return 2;
     }
     return 4;
+  }
+
+  private Card parse(StorageCard storageCard) {
+    // Parse environment
+    EnvironmentHolderStructure environment =
+        new SCEnvironmentHolderStructureParser()
+            .parse(
+                storageCard.getBlocks(
+                    CardConstant.SC_ENVIRONMENT_AND_HOLDER_FIRST_BLOCK,
+                    CardConstant.SC_ENVIRONMENT_AND_HOLDER_LAST_BLOCK));
+    // parse contracts
+    List<ContractStructure> contracts = new ArrayList<>();
+    contracts.add(
+        new SCContractStructureParser()
+            .parse(
+                storageCard.getBlocks(
+                    CardConstant.SC_CONTRACT_FIRST_BLOCK, CardConstant.SC_COUNTER_LAST_BLOCK)));
+    // parse event
+    EventStructure event =
+        new SCEventStructureParser()
+            .parse(
+                storageCard.getBlocks(
+                    CardConstant.SC_EVENT_FIRST_BLOCK, CardConstant.SC_EVENT_LAST_BLOCK));
+    return new Card(environment, contracts, event);
   }
 }

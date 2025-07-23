@@ -1,6 +1,9 @@
 /* ******************************************************************************
  * Copyright (c) 2024 Calypso Networks Association https://calypsonet.org/
  *
+ * See the NOTICE file(s) distributed with this work for additional information
+ * regarding copyright ownership.
+ *
  * This program and the accompanying materials are made available under the
  * terms of the BSD 3-Clause License which is available at
  * https://opensource.org/licenses/BSD-3-Clause.
@@ -41,11 +44,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import keypleinteropremotedemo.composeapp.generated.resources.Res
-import keypleinteropremotedemo.composeapp.generated.resources.basket_title_multi_title
-import keypleinteropremotedemo.composeapp.generated.resources.basket_title_season_title
-import keypleinteropremotedemo.composeapp.generated.resources.card_empty
 import kotlinx.serialization.Serializable
+import org.calypsonet.keyple.composeapp.generated.resources.Res
+import org.calypsonet.keyple.composeapp.generated.resources.basket_title_multi_title
+import org.calypsonet.keyple.composeapp.generated.resources.basket_title_season_title
+import org.calypsonet.keyple.composeapp.generated.resources.card_empty
 import org.calypsonet.keyple.demo.reload.remote.AppState
 import org.calypsonet.keyple.demo.reload.remote.ContractInfo
 import org.calypsonet.keyple.demo.reload.remote.nav.Home

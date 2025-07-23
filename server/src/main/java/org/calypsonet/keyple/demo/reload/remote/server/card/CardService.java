@@ -2,10 +2,10 @@
  * Copyright (c) 2022 Calypso Networks Association https://calypsonet.org/
  *
  * This program and the accompanying materials are made available under the
- * terms of the BSD 3-Clause License which is available at
- * https://opensource.org/licenses/BSD-3-Clause.
+ * terms of the MIT License which is available at
+ * https://opensource.org/licenses/MIT.
  *
- * SPDX-License-Identifier: BSD-3-Clause
+ * SPDX-License-Identifier: MIT
  ****************************************************************************** */
 package org.calypsonet.keyple.demo.reload.remote.server.card;
 
@@ -32,6 +32,8 @@ import org.eclipse.keyple.core.util.HexUtil;
 import org.eclipse.keypop.calypso.card.card.CalypsoCard;
 import org.eclipse.keypop.calypso.card.transaction.CardIOException;
 import org.eclipse.keypop.reader.CardReader;
+import org.eclipse.keypop.reader.selection.spi.SmartCard;
+import org.eclipse.keypop.storagecard.card.StorageCard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +43,7 @@ public class CardService {
   private static final Logger logger = LoggerFactory.getLogger(CardService.class);
   private static final String SUCCESS = "SUCCESS";
   private static final String FAIL = "FAIL";
+  private static final String READ = "READ";
   private static final String SECURED_READ = "SECURED READ";
   private static final String RELOAD = "RELOAD";
   private static final String ISSUANCE = "ISSUANCE";
@@ -247,6 +250,15 @@ public class CardService {
   }
 
   AnalyzeContractsOutputDto analyzeContracts(
+      CardReader cardReader, SmartCard smartCard, AnalyzeContractsInputDto inputData) {
+    if (smartCard instanceof CalypsoCard) {
+      return analyzeCalypsoCardContracts(cardReader, (CalypsoCard) smartCard, inputData);
+    } else {
+      return analyzeStorageCardContracts(cardReader, (StorageCard) smartCard, inputData);
+    }
+  }
+
+  private AnalyzeContractsOutputDto analyzeCalypsoCardContracts(
       CardReader cardReader, CalypsoCard calypsoCard, AnalyzeContractsInputDto inputData) {
 
     String pluginType = inputData.getPluginType();
@@ -312,7 +324,77 @@ public class CardService {
     }
   }
 
+  private AnalyzeContractsOutputDto analyzeStorageCardContracts(
+      CardReader cardReader, StorageCard storageCard, AnalyzeContractsInputDto inputData) {
+
+    String pluginType = inputData.getPluginType();
+    String cardUID = HexUtil.toHex(storageCard.getUID());
+
+    CardResource samResource =
+        CardResourceServiceProvider.getService()
+            .getCardResource(CardConfigurator.SAM_RESOURCE_PROFILE_NAME);
+    try {
+      Card card = cardRepository.readCard(cardReader, storageCard, samResource);
+      // logger.info("{}", card); deactivate until LocalDate is properly processed by KeypleUtil
+      List<ContractStructure> validContracts = findValidContracts(card);
+      activityService.push(
+          new Activity()
+              .setPlugin(pluginType)
+              .setStatus(SUCCESS)
+              .setType(READ)
+              .setCardSerialNumber(cardUID));
+      return new AnalyzeContractsOutputDto(validContracts, 0);
+    } catch (CardNotPersonalizedException e) {
+      logger.error(AN_ERROR_OCCURRED_WHILE_ANALYZING_THE_CONTRACTS, e.getMessage());
+      activityService.push(
+          new Activity()
+              .setPlugin(pluginType)
+              .setStatus(FAIL)
+              .setType(READ)
+              .setCardSerialNumber(cardUID));
+      return new AnalyzeContractsOutputDto(Collections.emptyList(), 4);
+    } catch (ExpiredEnvironmentException e) {
+      logger.error(AN_ERROR_OCCURRED_WHILE_ANALYZING_THE_CONTRACTS, e.getMessage());
+      activityService.push(
+          new Activity()
+              .setPlugin(pluginType)
+              .setStatus(FAIL)
+              .setType(READ)
+              .setCardSerialNumber(cardUID));
+      return new AnalyzeContractsOutputDto(Collections.emptyList(), 5);
+    } catch (CardIOException e) {
+      logger.error(AN_ERROR_OCCURRED_WHILE_ANALYZING_THE_CONTRACTS, e.getMessage(), e);
+      activityService.push(
+          new Activity()
+              .setPlugin(pluginType)
+              .setStatus(FAIL)
+              .setType(READ)
+              .setCardSerialNumber(cardUID));
+      return new AnalyzeContractsOutputDto(Collections.emptyList(), 1);
+    } catch (RuntimeException e) {
+      logger.error(AN_ERROR_OCCURRED_WHILE_ANALYZING_THE_CONTRACTS, e.getMessage(), e);
+      activityService.push(
+          new Activity()
+              .setPlugin(pluginType)
+              .setStatus(FAIL)
+              .setType(READ)
+              .setCardSerialNumber(cardUID));
+      return new AnalyzeContractsOutputDto(Collections.emptyList(), 2);
+    } finally {
+      CardResourceServiceProvider.getService().releaseCardResource(samResource);
+    }
+  }
+
   WriteContractOutputDto writeContract(
+      CardReader cardReader, SmartCard smartCard, WriteContractInputDto inputData) {
+    if (smartCard instanceof CalypsoCard) {
+      return writeCalypsoCardContract(cardReader, (CalypsoCard) smartCard, inputData);
+    } else {
+      return writeStorageCardContract(cardReader, (StorageCard) smartCard, inputData);
+    }
+  }
+
+  private WriteContractOutputDto writeCalypsoCardContract(
       CardReader cardReader, CalypsoCard calypsoCard, WriteContractInputDto inputData) {
 
     String pluginType = inputData.getPluginType();
@@ -374,7 +456,71 @@ public class CardService {
     }
   }
 
+  private WriteContractOutputDto writeStorageCardContract(
+      CardReader cardReader, StorageCard storageCard, WriteContractInputDto inputData) {
+
+    String pluginType = inputData.getPluginType();
+    String cardUID = HexUtil.toHex(storageCard.getUID());
+
+    CardResource samResource =
+        CardResourceServiceProvider.getService()
+            .getCardResource(CardConfigurator.SAM_RESOURCE_PROFILE_NAME);
+    try {
+      Card card = cardRepository.readCard(cardReader, storageCard, samResource);
+      if (card == null) {
+        // If card has not been read previously, throw error
+        return new WriteContractOutputDto(4);
+      }
+      // logger.info("{}", card); deactivate until LocalDate is properly processed by KeypleUtil
+      insertNewContract(inputData.getContractTariff(), inputData.getTicketToLoad(), card);
+      int statusCode = cardRepository.writeCard(cardReader, storageCard, samResource, card);
+      activityService.push(
+          new Activity()
+              .setPlugin(pluginType)
+              .setStatus(SUCCESS)
+              .setType(RELOAD)
+              .setCardSerialNumber(cardUID)
+              .setContractLoaded(
+                  inputData.getContractTariff().toString().replace("_", " ")
+                      + ((inputData.getTicketToLoad() != 0)
+                          ? ": " + inputData.getTicketToLoad()
+                          : "")));
+      return new WriteContractOutputDto(statusCode);
+    } catch (CardIOException e) {
+      logger.error(AN_ERROR_OCCURRED_WHILE_WRITING_THE_CONTRACT, e.getMessage(), e);
+      activityService.push(
+          new Activity()
+              .setPlugin(pluginType)
+              .setStatus(FAIL)
+              .setType(RELOAD)
+              .setCardSerialNumber(cardUID)
+              .setContractLoaded(""));
+      return new WriteContractOutputDto(1);
+    } catch (RuntimeException e) {
+      logger.error(AN_ERROR_OCCURRED_WHILE_WRITING_THE_CONTRACT, e.getMessage(), e);
+      activityService.push(
+          new Activity()
+              .setPlugin(pluginType)
+              .setStatus(FAIL)
+              .setType(RELOAD)
+              .setCardSerialNumber(cardUID)
+              .setContractLoaded(""));
+      return new WriteContractOutputDto(2);
+    } finally {
+      CardResourceServiceProvider.getService().releaseCardResource(samResource);
+    }
+  }
+
   CardIssuanceOutputDto initCard(
+      CardReader cardReader, SmartCard smartCard, CardIssuanceInputDto inputData) {
+    if (smartCard instanceof CalypsoCard) {
+      return initCalypsoCard(cardReader, (CalypsoCard) smartCard, inputData);
+    } else {
+      return initStorageCard(cardReader, (StorageCard) smartCard, inputData);
+    }
+  }
+
+  private CardIssuanceOutputDto initCalypsoCard(
       CardReader cardReader, CalypsoCard calypsoCard, CardIssuanceInputDto inputData) {
 
     String pluginType = inputData.getPluginType();
@@ -414,6 +560,47 @@ public class CardService {
               .setStatus(FAIL)
               .setType(ISSUANCE)
               .setCardSerialNumber(appSerialNumber));
+      return new CardIssuanceOutputDto(2);
+    } finally {
+      CardResourceServiceProvider.getService().releaseCardResource(samResource);
+    }
+  }
+
+  CardIssuanceOutputDto initStorageCard(
+      CardReader cardReader, StorageCard storageCard, CardIssuanceInputDto inputData) {
+
+    String pluginType = inputData.getPluginType();
+    String cardUID = HexUtil.toHex(storageCard.getUID());
+
+    CardResource samResource =
+        CardResourceServiceProvider.getService()
+            .getCardResource(CardConfigurator.SAM_RESOURCE_PROFILE_NAME);
+    try {
+      cardRepository.initCard(cardReader, storageCard, samResource);
+      activityService.push(
+          new Activity()
+              .setPlugin(pluginType)
+              .setStatus(SUCCESS)
+              .setType(ISSUANCE)
+              .setCardSerialNumber(cardUID));
+      return new CardIssuanceOutputDto(0);
+    } catch (CardIOException e) {
+      logger.error(AN_ERROR_OCCURRED_WHILE_INITIALIZING_THE_CARD, e.getMessage(), e);
+      activityService.push(
+          new Activity()
+              .setPlugin(pluginType)
+              .setStatus(FAIL)
+              .setType(ISSUANCE)
+              .setCardSerialNumber(cardUID));
+      return new CardIssuanceOutputDto(1);
+    } catch (RuntimeException e) {
+      logger.error(AN_ERROR_OCCURRED_WHILE_INITIALIZING_THE_CARD, e.getMessage(), e);
+      activityService.push(
+          new Activity()
+              .setPlugin(pluginType)
+              .setStatus(FAIL)
+              .setType(ISSUANCE)
+              .setCardSerialNumber(cardUID));
       return new CardIssuanceOutputDto(2);
     } finally {
       CardResourceServiceProvider.getService().releaseCardResource(samResource);
@@ -739,11 +926,11 @@ public class CardService {
     // Iterate through the contracts in the card session
     List<ContractStructure> contracts = card.getContracts();
     List<ContractStructure> validContracts = new ArrayList<>();
-    int calypsoIndex = 1;
+    int contractIndex = 1;
     for (ContractStructure contract : contracts) {
       logger.info(
           CONTRACT_AT_INDEX,
-          calypsoIndex,
+          contractIndex,
           contract.getContractTariff(),
           contract.getContractSaleDate().getValue());
       if (contract.getContractVersionNumber() == VersionNumber.UNDEFINED) {
@@ -759,11 +946,11 @@ public class CardService {
           // set the change flag to true.
           contract.setContractTariff(PriorityCode.EXPIRED);
           // Update contract
-          card.setContract(calypsoIndex - 1, contract);
+          card.setContract(contractIndex - 1, contract);
         }
         validContracts.add(contract);
       }
-      calypsoIndex++;
+      contractIndex++;
     }
     logger.info(CONTRACTS, Arrays.deepToString(validContracts.toArray()));
     return validContracts;

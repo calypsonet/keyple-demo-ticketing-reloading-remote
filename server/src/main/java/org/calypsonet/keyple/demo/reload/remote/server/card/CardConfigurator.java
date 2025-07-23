@@ -2,10 +2,10 @@
  * Copyright (c) 2020 Calypso Networks Association https://calypsonet.org/
  *
  * This program and the accompanying materials are made available under the
- * terms of the BSD 3-Clause License which is available at
- * https://opensource.org/licenses/BSD-3-Clause.
+ * terms of the MIT License which is available at
+ * https://opensource.org/licenses/MIT.
  *
- * SPDX-License-Identifier: BSD-3-Clause
+ * SPDX-License-Identifier: MIT
  ****************************************************************************** */
 package org.calypsonet.keyple.demo.reload.remote.server.card;
 
@@ -27,9 +27,9 @@ import org.eclipse.keyple.distributed.RemotePluginServerFactoryBuilder;
 import org.eclipse.keyple.distributed.RemoteReaderServer;
 import org.eclipse.keyple.plugin.pcsc.PcscPluginFactoryBuilder;
 import org.eclipse.keyple.plugin.pcsc.PcscReader;
-import org.eclipse.keypop.calypso.card.card.CalypsoCard;
 import org.eclipse.keypop.calypso.crypto.legacysam.sam.LegacySam;
 import org.eclipse.keypop.reader.CardReader;
+import org.eclipse.keypop.reader.selection.spi.SmartCard;
 import org.eclipse.keypop.reader.spi.CardReaderObservationExceptionHandlerSpi;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.slf4j.Logger;
@@ -214,7 +214,7 @@ public class CardConfigurator {
         // Execute service
         outputData =
             cardService.analyzeContracts(
-                reader, (CalypsoCard) readerExtension.getInitialCardContent(), inputData);
+                reader, (SmartCard) readerExtension.getInitialCardContent(), inputData);
 
       } else if (RemoteServiceId.READ_CARD_AND_WRITE_CONTRACT.name().equals(serviceId)) {
 
@@ -224,7 +224,7 @@ public class CardConfigurator {
         // Execute service
         outputData =
             cardService.writeContract(
-                reader, (CalypsoCard) readerExtension.getInitialCardContent(), inputData);
+                reader, (SmartCard) readerExtension.getInitialCardContent(), inputData);
 
       } else if (RemoteServiceId.PERSONALIZE_CARD.name().equals(serviceId)) {
 
@@ -234,7 +234,7 @@ public class CardConfigurator {
         // Execute service
         outputData =
             cardService.initCard(
-                reader, (CalypsoCard) readerExtension.getInitialCardContent(), inputData);
+                reader, (SmartCard) readerExtension.getInitialCardContent(), inputData);
 
       } else if (RemoteServiceId.SELECT_APP_AND_ANALYZE_CONTRACTS.name().equals(serviceId)) {
 
