@@ -12,6 +12,7 @@
     <AssemblyVersion>2025.07.23</AssemblyVersion>
     <FileVersion>2025.07.23</FileVersion>
     <Version>2025.07.23</Version>
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
